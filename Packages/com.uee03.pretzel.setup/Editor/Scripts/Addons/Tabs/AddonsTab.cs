@@ -18,6 +18,29 @@ namespace Pretzel.Setup.Addons.Tabs
 
         public override int Order => 10;
 
+        protected override void BuildToolbar(VisualElement toolbar)
+        {
+            Button updateAll = new(UpdateAll) { text = "Update all", tooltip = "Pull the latest version of every installed Pretzel module that came from git." };
+            toolbar.Add(updateAll);
+        }
+
+        private void UpdateAll()
+        {
+            PretzelProjectSettings settings = Context.Project;
+            List<string> identifiers = new();
+            foreach (ModuleInfo module in ModuleCatalog.All)
+            {
+                PackageInfo info = PackageService.Get(module.Name);
+                string identifier = module.GetIdentifier(settings);
+                if (info != null && info.source == UpmSource.Git && identifier != null)
+                {
+                    identifiers.Add(identifier);
+                }
+            }
+
+            PackageService.InstallIdentifiers(identifiers, "Updating Pretzel modules");
+        }
+
         protected override void BuildCards(VisualElement list)
         {
             PretzelProjectSettings settings = Context.Project;
@@ -83,10 +106,17 @@ namespace Pretzel.Setup.Addons.Tabs
                 return model;
             }
 
-            if (!local && IsOutdated(info, settings))
+            if (!local && info.source == UpmSource.Git && identifier != null)
             {
-                model.Chips.Add(new CardChip("Update to " + ModuleCatalog.ResolveSource(settings).Version, ChipKind.Warn));
-                model.Actions.Add(new CardAction("Update", () => PackageService.InstallIdentifiers(new[] { identifier }, "Updating " + module.DisplayName), !busy, primary: true));
+                bool outdated = IsOutdated(info, settings);
+                if (outdated)
+                {
+                    model.Chips.Add(new CardChip("Update to " + ModuleCatalog.ResolveSource(settings).Version, ChipKind.Warn));
+                }
+
+                // Re-adding the git identifier makes Package Manager fetch the newest commit of the branch or tag.
+                model.Actions.Add(new CardAction("Update", () => PackageService.InstallIdentifiers(new[] { identifier }, "Updating " + module.DisplayName), !busy, primary: outdated,
+                    tooltip: "Pull the latest version from the repository."));
             }
 
             if (info.source == UpmSource.Embedded)
