@@ -42,6 +42,22 @@
             </engine:VisualElement>
         </engine:VisualElement>
 
+        <engine:VisualElement class="pretzel-section">
+            <engine:Label text="Game-specific keys (included in builds)" class="pretzel-section__title" />
+            <engine:Label name="keys-panel__game-hint" class="pretzel-section__hint" />
+            <engine:HelpBox message-type="Warning"
+                            text="A shipped AES key can be extracted from JSON or compiled code. IL2CPP and the generated script's XOR masking only raise the effort; they do not keep it secret. Keep generated AES files out of version control. RSA private keys are never exported." />
+            <engine:Label class="pretzel-section__hint"
+                          text="JSON is loaded automatically by DataIO through Resources, including in player builds. Providers, environment variables and the Editor-only project key file take precedence. Embedded C# uses the existing Shipping generator and registers a provider before the first scene. Choose one delivery method to avoid stale keys." />
+            <engine:VisualElement class="pretzel-button-row">
+                <engine:Button name="keys-panel__game-json" text="Save game key config (JSON)"
+                               class="pretzel-section__action pretzel-section__action--primary" />
+                <engine:Button name="keys-panel__game-embedded" text="Generate embedded C# setup" class="pretzel-section__action" />
+                <engine:Button name="keys-panel__game-select" text="Select game key config" class="pretzel-section__action" />
+            </engine:VisualElement>
+            <engine:Label name="keys-panel__game-result" class="pretzel-section__hint" />
+        </engine:VisualElement>
+
         <engine:VisualElement name="keys-panel__public-section" class="pretzel-section">
             <engine:Label text="About the public key" class="pretzel-section__title" />
             <engine:Label class="pretzel-section__hint"

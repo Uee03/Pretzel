@@ -20,23 +20,32 @@ The IV is not a key. Pretzel creates a random IV for every file and writes it in
 
 - **Environment variables.** Names are `<PREFIX>_AES_KEY`, `<PREFIX>_RSA_PUBLIC` and `<PREFIX>_RSA_PRIVATE`. The values are Base64. The prefix is set per project in the Data Format window (default `PRETZEL_<PRODUCT>`). Variables belong to your user account on that machine, not to the project, so the prefix keeps projects apart. Good for development, build servers and dedicated servers.
 - **Project key file.** `UserSettings/Pretzel/pretzel-keys.json` inside the project. It is per project and per user, and it is plain text. Keep `UserSettings` in `.gitignore`. Only the Editor reads it. Builds never do.
-- **Public key only.** Because it is public, the RSA public key can also be put in the project key file, an environment variable, or compiled into the game.
+- **Game key config.** The Keys tab's **Game-specific keys** section writes `Assets/Resources/Pretzel/GameEncryptionKeys.json`. Unity includes it as a TextAsset in builds. `DataIO` reads it automatically, after the provider, environment variables and (in the Editor) the local project key file. It contains only the selected mode's AES key or RSA public key, never the private key. Missing configs are optional; malformed configs throw.
+- **Public key only.** Because it is public, the RSA public key can also be put in the project key file, an environment variable, the game key config, or compiled into the game.
 
-## Three ways to get a key into a build
+## Four ways to get a key into a build
 
 ### 1. Environment variables on the machine running the game
 
 Best for servers, tools and tests. Not practical for players. `DataIO` finds the variables by itself.
 
-### 2. Embedded in the game (obfuscated)
+### 2. Bundled JSON config (simple offline setup)
 
-The Shipping tab writes `PretzelDataSetup.cs`. It stores the AES key as two XOR-masked arrays and registers `EncryptionKeys.Provider` before the first scene loads.
+Generate a key on the Encryption tab, then choose **Keys > Game-specific keys > Save game key config (JSON)**. No startup code is required. AES allows both reading and writing offline; RSA exports only the public key, so the game can write but your server must decrypt.
 
-This only defeats a string search of the build. A determined player can still recover the key. Use it when the aim is to stop casual save editing.
+The config is plain text, not a secret store. Exclude `Assets/Resources/Pretzel/GameEncryptionKeys.json` and its `.meta` from version control when it contains an AES key. Keep backups separately. Restart Play mode after exporting; existing stores retain their keys. Re-exporting replaces the config, but does not migrate saves encrypted with an older key. RSA exports do not back up the private key; store it separately using the Editor-only options.
+
+### 3. Embedded in the game (obfuscated)
+
+The Shipping tab, or **Keys > Game-specific keys > Generate embedded C# setup**, writes `PretzelDataSetup.cs`. It stores the AES key as two XOR-masked arrays and registers `EncryptionKeys.Provider` before the first scene loads.
+
+This only defeats a string search of the build. IL2CPP compiles this to native code and can increase reverse-engineering effort, but is not a guarantee of secrecy. A determined player can still recover the key. Use it when the aim is to stop casual save editing. Keep the generated AES script out of version control.
+
+Choose JSON or embedded C#, not both: the generated provider takes precedence over the JSON config. Remove stale exports when switching methods.
 
 With RSA, embed the public key. That is safe by design, because the public key cannot decrypt anything.
 
-### 3. Fetch the key with a token (recommended for secret keys)
+### 4. Fetch the key with a token (recommended for secret keys)
 
 The game does not contain the key. It asks a server for it after the player proves who they are.
 
@@ -117,7 +126,7 @@ The file encryption itself is always AES-256, whatever the RSA size.
 
 ## Checklist before you ship
 
-- [ ] The AES key and RSA private key are not in the repository, the build or the logs.
+- [ ] The RSA private key is not in the repository, the build or the logs. The AES key is not in the repository or logs; if bundled for offline saves, its extractability is an accepted trade-off.
 - [ ] `UserSettings` is in `.gitignore`.
 - [ ] You chose a delivery option above, and tested a fresh install.
 - [ ] A save written by the previous build still opens (keep old keys until saves are re-saved).

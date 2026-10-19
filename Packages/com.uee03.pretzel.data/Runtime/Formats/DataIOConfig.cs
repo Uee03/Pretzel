@@ -44,7 +44,8 @@ namespace Pretzel.Data
                     throw new InvalidOperationException(
                         $"DataIO is set to Encrypted, but no keys were found. Set the environment variables {EncryptionKeys.AesVariable(environmentPrefix)} " +
                         $"(or {EncryptionKeys.PublicVariable(environmentPrefix)} / {EncryptionKeys.PrivateVariable(environmentPrefix)}), " +
-                        "assign EncryptionKeys.Provider before the first save, or create the store yourself with DataStoreFactory.");
+                        "export a game key config on the Keys tab, assign EncryptionKeys.Provider before the first save, " +
+                        "or create the store yourself with DataStoreFactory.");
                 }
             }
 

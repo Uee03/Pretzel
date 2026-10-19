@@ -125,7 +125,8 @@ namespace Pretzel.Data
 
         /// <summary>
         /// Finds keys in this order, taking each key from the first source that has it:
-        /// <see cref="Provider"/>, environment variables, and in the Editor the per-project key file.
+        /// <see cref="Provider"/>, environment variables, in the Editor the per-project key file,
+        /// then the optional bundled <see cref="GameEncryptionKeyConfig"/>.
         /// </summary>
         public static EncryptionKeys Resolve(string environmentPrefix)
         {
@@ -137,6 +138,7 @@ namespace Pretzel.Data
                 result.FillMissing(EncryptionKeyFile.Load());
             }
 
+            result.FillMissing(GameEncryptionKeyConfig.Load());
             return result.IsEmpty ? null : result;
         }
 

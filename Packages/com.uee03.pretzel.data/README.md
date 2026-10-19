@@ -41,7 +41,7 @@ Any format except plain text can also be written as Base64 text (`Base64Transfor
 
 - **Format**: Plain text, Compressed, Binary or Encrypted, each with pros, cons and when to use it. Serializer, save folder, extension, pretty print, backup and Base64 text.
 - **Encryption**: AES-256 or RSA public key + AES-256, RSA key size (2048, 3072 or 4096, with 4096 recommended), key generation, and a checklist for what to do with an encrypted JSON.
-- **Keys**: store keys as user environment variables, or in the per-project key file `UserSettings/Pretzel/pretzel-keys.json`, which is plain text and must stay out of version control. Environment variables are per user, not per project, so each project gets its own variable prefix.
+- **Keys**: store keys as user environment variables, or in the per-project key file `UserSettings/Pretzel/pretzel-keys.json`, which is plain text and must stay out of version control. Environment variables are per user, not per project, so each project gets its own variable prefix. The **Game-specific keys** section exports a game-readable JSON config or generates the existing embedded C# setup. Both export only the current mode's AES key or RSA public key, never the RSA private key.
 - **Shipping**: writes `PretzelDataSetup.cs` (environment check, embedded key, or token fetch) and a copy of the key delivery guide into your Assets.
 - **Decrypt**: paste plain JSON, or the Base64 text of a Compressed, Binary or Encrypted file, to decode it. It can also encode JSON with the current format, and take other keys without saving them.
 
@@ -52,7 +52,11 @@ EncryptionKeys keys = EncryptionKeys.Resolve("PRETZEL_MYGAME");
 DataStore store = DataStoreFactory.Create(DataRoots.PersistentData("SaveData"), DataFormat.Encrypted, keys);
 ```
 
-`EncryptionKeys.Resolve` takes each key from the first source that has it: `EncryptionKeys.Provider` (your code, for example keys fetched with a token), the environment variables `<PREFIX>_AES_KEY`, `<PREFIX>_RSA_PUBLIC` and `<PREFIX>_RSA_PRIVATE` (Base64), and in the Editor `UserSettings/Pretzel/pretzel-keys.json`. A wrong key, or an edited file, loads as `Corrupt`.
+`EncryptionKeys.Resolve` takes each key from the first source that has it: `EncryptionKeys.Provider` (your code, for example keys fetched with a token), the environment variables `<PREFIX>_AES_KEY`, `<PREFIX>_RSA_PUBLIC` and `<PREFIX>_RSA_PRIVATE` (Base64), in the Editor `UserSettings/Pretzel/pretzel-keys.json`, then the optional bundled `Assets/Resources/Pretzel/GameEncryptionKeys.json`. The JSON is loaded automatically in both the Editor and player builds; no startup script is needed. A missing config is optional; a malformed config throws rather than silently ignoring it. A wrong key, or an edited file, loads as `Corrupt`.
+
+For offline encrypted saves, generate an AES key, then choose **Keys > Game-specific keys > Save game key config (JSON)**. Alternatively, **Generate embedded C# setup** writes `Assets/Pretzel/Generated/PretzelDataSetup.cs`, using the same generator as Shipping. Choose one method and remove stale generated files when switching. Restart Play mode after exporting; an already-created store keeps its keys. Keep a separate backup of every key needed by existing saves: exporting a new key does not migrate old saves. RSA exports leave the private key unstored, so save that separately through the Editor-only storage options.
+
+Bundling an AES key is a convenience for discouraging casual save editing, not secure secret storage. JSON is plain text; the generated C# uses XOR-masked arrays. IL2CPP compiles the code to native code but does not make embedded keys secret. Exclude generated AES files (including their `.meta` files) from version control; unlike `DataIOConfig.asset`, these exports contain key material.
 
 Two encryption modes:
 

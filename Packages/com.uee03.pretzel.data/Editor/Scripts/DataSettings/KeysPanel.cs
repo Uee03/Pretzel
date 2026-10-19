@@ -1,4 +1,7 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
+using System.Security.Cryptography;
+using System.Text;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -7,6 +10,8 @@ namespace Pretzel.Data.Editor
 {
     internal sealed class KeysPanel : IDataFormatPanel
     {
+        private const string GameConfigPath = "Assets/Resources/" + GameEncryptionKeyConfig.ResourcePath + ".json";
+
         private DataFormatState _state;
         private TextField _prefix;
         private Label _prefixHint;
@@ -22,6 +27,11 @@ namespace Pretzel.Data.Editor
         private Button _envCopy;
         private Button _fileDelete;
         private Button _fileReveal;
+        private Button _gameJson;
+        private Button _gameEmbedded;
+        private Button _gameSelect;
+        private Label _gameHint;
+        private Label _gameResult;
 
         private KeyRow _aesRow;
         private KeyRow _publicRow;
@@ -57,6 +67,11 @@ namespace Pretzel.Data.Editor
             _fileStorePublic = view.Q<Button>("keys-panel__file-store-public");
             _fileReveal = view.Q<Button>("keys-panel__file-reveal");
             _fileDelete = view.Q<Button>("keys-panel__file-delete");
+            _gameJson = view.Q<Button>("keys-panel__game-json");
+            _gameEmbedded = view.Q<Button>("keys-panel__game-embedded");
+            _gameSelect = view.Q<Button>("keys-panel__game-select");
+            _gameHint = view.Q<Label>("keys-panel__game-hint");
+            _gameResult = view.Q<Label>("keys-panel__game-result");
 
             VisualElement rows = view.Q("keys-panel__rows");
             _aesRow = AddRow(rows, "AES key");
@@ -78,6 +93,9 @@ namespace Pretzel.Data.Editor
             _fileStorePublic.clicked += () => StoreFile(KeyScope.PublicOnly);
             _fileReveal.clicked += () => EditorUtility.RevealInFinder(File.Exists(EncryptionKeyFile.Path) ? EncryptionKeyFile.Path : Path.GetDirectoryName(EncryptionKeyFile.Path));
             _fileDelete.clicked += OnDeleteFile;
+            _gameJson.clicked += () => ExportGameKeys(false);
+            _gameEmbedded.clicked += () => ExportGameKeys(true);
+            _gameSelect.clicked += () => SelectAsset(GameConfigPath);
 
             _state.Changed += Refresh;
             Refresh();
@@ -130,6 +148,13 @@ namespace Pretzel.Data.Editor
             _envStore.SetEnabled(hasKeys);
             _fileStore.SetEnabled(hasKeys);
             _envCopy.SetEnabled(hasKeys);
+            _gameJson.SetEnabled(hasKeys);
+            _gameEmbedded.SetEnabled(hasKeys);
+            _gameSelect.SetEnabled(File.Exists(GameConfigPath));
+            _gameHint.text = $"JSON: {GameConfigPath}\nC#: {ShippingGenerator.DefaultFolder}/{ShippingGenerator.ScriptName}\n"
+                             + (rsa
+                                 ? "Exports only the RSA public key. The game can write encrypted files, but reading them requires the private key on your server."
+                                 : "Exports the current AES key so the game can both save and load encrypted files offline.");
 
             // The public key section only matters when there is a public key.
             bool showPublic = keys.HasPublicKey;
@@ -252,6 +277,63 @@ namespace Pretzel.Data.Editor
             EncryptionKeyFile.Delete();
             _state.ReloadKeys();
             PanelUi.SetText(_result, "Key file deleted.");
+        }
+
+        private void ExportGameKeys(bool embedded)
+        {
+            string path = embedded ? ShippingGenerator.DefaultFolder + "/" + ShippingGenerator.ScriptName : GameConfigPath;
+            bool aes = _state.Config.encryptionMode == EncryptionMode.Aes;
+            if ((aes || File.Exists(path)) && !EditorUtility.DisplayDialog("Export game key?",
+                    $"This writes {(aes ? "the AES key" : "only the RSA public key")} to {path} and includes it in builds. "
+                    + "Any existing file at this path will be replaced. Changing a key does not migrate existing saves."
+                    + (aes ? " Anyone with the game can recover this key. Keep a separate backup and do not commit the generated file." : ""),
+                    "Export", "Cancel"))
+            {
+                return;
+            }
+
+            try
+            {
+                if (embedded)
+                {
+                    string error = ShippingGenerator.Generate(ShippingGenerator.DefaultFolder, KeyDelivery.Embedded,
+                        _state.Config, _state.Keys, out path);
+                    if (error != null)
+                    {
+                        PanelUi.SetText(_gameResult, error, "error");
+                        return;
+                    }
+                }
+                else
+                {
+                    string json = GameEncryptionKeyConfig.ToJson(_state.Keys, _state.Config.encryptionMode);
+                    Directory.CreateDirectory(Path.GetDirectoryName(GameConfigPath));
+                    File.WriteAllText(GameConfigPath, json, new UTF8Encoding(false));
+                    AssetDatabase.ImportAsset(GameConfigPath);
+                }
+
+                // RSA export deliberately leaves the private key unstored.
+                if (aes)
+                {
+                    _state.MarkKeysStored();
+                }
+
+                Refresh();
+                PanelUi.SetText(_gameResult, $"Created {path}. Restart Play mode to use the exported key. Keep older keys for existing saves.");
+                SelectAsset(path);
+            }
+            catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or ArgumentException
+                                       or InvalidOperationException or CryptographicException or System.Xml.XmlException)
+            {
+                PanelUi.SetText(_gameResult, $"Could not export game keys: {PanelUi.ErrorText(ex)}", "error");
+            }
+        }
+
+        private static void SelectAsset(string path)
+        {
+            UnityEngine.Object asset = AssetDatabase.LoadAssetAtPath<UnityEngine.Object>(path);
+            Selection.activeObject = asset;
+            EditorGUIUtility.PingObject(asset);
         }
     }
 }
