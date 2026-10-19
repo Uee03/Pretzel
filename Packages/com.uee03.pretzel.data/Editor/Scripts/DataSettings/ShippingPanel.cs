@@ -99,14 +99,26 @@ namespace Pretzel.Data.Editor
         private void OnCreate()
         {
             string folder = _folder.value.Trim().Replace('\\', '/').TrimEnd('/');
-            string error = ShippingGenerator.Generate(folder, Selected, _state.Config, _state.Keys, out string path);
+            string error;
+            string path;
+            try
+            {
+                error = ShippingGenerator.Generate(folder, Selected, _state.Config, _state.Keys, out path);
+            }
+            catch (System.Exception ex) when (ex is IOException or System.UnauthorizedAccessException)
+            {
+                PanelUi.SetText(_result, $"Could not generate shipping files: {PanelUi.ErrorText(ex)}", "error");
+                return;
+            }
+
             if (error != null)
             {
                 PanelUi.SetText(_result, error, "error");
                 return;
             }
 
-            PanelUi.SetText(_result, $"Created {path} and {ShippingGenerator.GuideName}. Call it from your startup code as the guide describes.");
+            PanelUi.SetText(_result, $"Created {path}, {ShippingGenerator.GuideName}, and {ShippingGenerator.ExampleName} "
+                + "(existing example edits preserved). Add the example to a GameObject and use its context menu in Play mode.");
             Object script = AssetDatabase.LoadAssetAtPath<Object>(path);
             if (script)
             {

@@ -23,7 +23,7 @@
         "com.uee03.pretzel.extensions": "0.1.0",
         "com.unity.nuget.newtonsoft-json": "3.2.2"
       },
-      "hash": "871ffa4dec9678780077297e9c57a63e66e54b4e"
+      "hash": "32fc9dcaf80353faf11a14aa9e3e4b253a6faba3"
     },
     "com.uee03.pretzel.extensions": {
       "version": "https://github.com/Uee03/Pretzel.git?path=Packages/com.uee03.pretzel.extensions",
@@ -174,13 +174,6 @@
       "depth": 1,
       "source": "builtin",
       "dependencies": {}
-    },
-    "com.unity.collab-proxy": {
-      "version": "2.13.6",
-      "depth": 0,
-      "source": "registry",
-      "dependencies": {},
-      "url": "https://packages.unity.com"
     },
     "com.unity.collections": {
       "version": "6.6.0",
@@ -372,16 +365,6 @@
         "com.unity.modules.physics2d": "1.0.0",
         "com.unity.modules.physics": "1.0.0"
       }
-    },
-    "com.unity.visualscripting": {
-      "version": "1.9.12",
-      "depth": 0,
-      "source": "registry",
-      "dependencies": {
-        "com.unity.ugui": "2.0.0",
-        "com.unity.modules.jsonserialize": "1.0.0"
-      },
-      "url": "https://packages.unity.com"
     },
     "com.unity.modules.accessibility": {
       "version": "1.0.0",

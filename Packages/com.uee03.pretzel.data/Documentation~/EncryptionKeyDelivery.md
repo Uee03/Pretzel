@@ -103,6 +103,42 @@ Open `PretzelDataSetup.cs` and fill in `RequestKeyAsync` with your own request (
 
 ## Runnable usage examples
 
+### Explicit JSON or embedded-script keys
+
+The generated companion has **Encryption/JSON** and **Encryption/Embedded script** context-menu actions for AES save/load and RSA writing. JSON actions read only the bundled config; embedded actions read only the currently registered provider, without falling back to Editor keys or environment variables.
+
+```csharp
+// JSON: export on Keys > Save game key config (JSON).
+EncryptionKeys jsonKeys = GameEncryptionKeyConfig.Load();
+
+// Embedded C#: export the setup, enter Play mode, then call from Start or later.
+// PretzelDataSetup has already registered its provider; no direct setup-class reference is needed.
+if (EncryptionKeys.Provider == null)
+    throw new InvalidOperationException("Export embedded C# and restart Play mode first.");
+EncryptionKeys embeddedKeys = EncryptionKeys.Provider.Invoke();
+
+// Choose the source matching your export. The export must contain an AES key.
+DataStore saves = DataStoreFactory.Create(DataRoots.PersistentData("MySaves"),
+    DataFormat.Encrypted, jsonKeys, EncryptionMode.Aes);
+saves.Save("profile", new PretzelEncryptionExample.Profile { level = 7 });
+LoadResult<PretzelEncryptionExample.Profile> loaded =
+    saves.Load<PretzelEncryptionExample.Profile>("profile");
+if (!loaded.Ok)
+    Debug.LogWarning($"Load failed ({loaded.Status}): {loaded.Error}");
+
+// For an RSA export, use jsonKeys OR embeddedKeys containing its public key.
+// The client writes; a trusted server with the private key reads.
+DataStore outbox = DataStoreFactory.Create(DataRoots.PersistentData("Reports"),
+    DataFormat.Encrypted, embeddedKeys, EncryptionMode.Rsa);
+outbox.Save("report", new PretzelEncryptionExample.Profile { level = 12 });
+```
+
+The JSON and embedded snippets show alternative sources, not a requirement to export both. Run the AES or RSA portion matching your key. In a game using the global configuration, `DataIO.Save` / `DataIO.Load` already resolve the exported keys automatically; the explicit stores above demonstrate the source directly. Handle `NotFound` and `Corrupt` rather than automatically overwriting existing data. A token/custom provider replaces the embedded provider, so these embedded actions then use that provider instead.
+
+Existing companion files are preserved. To obtain updated examples, rename or back up your old companion, then re-export. Do not leave two scripts defining `PretzelEncryptionExample` in the project.
+
+Both **Keys > Game-specific keys** exports automatically create `Assets/Pretzel/Generated/PretzelEncryptionExample.cs`. No sample import is needed. Add it to a GameObject, enter Play mode, and use the separate AES save/load or RSA write context-menu actions. Nothing runs automatically, and it uses a dedicated example save folder. The script contains no keys; it includes async/token call-site examples, explicit key-source options, and a trusted-server RSA reader. Re-exporting preserves any existing example script and your edits. JSON remains under Resources; scripts remain under the generated scripts folder. Shipping creates the same companion alongside its setup.
+
 Import **Data Usage** in Package Manager and add `EncryptionUsageExample` to a GameObject. Use its component context menu in Play mode for configured AES save/load or RSA report writing. Its source also shows explicit JSON/environment/provider stores, a trusted-server RSA reader, and async token-based AES setup with a supplied HTTPS request function.
 
 In the repository test project, add `DataEncryptionExample` from `Assets/Pretzel/Examples` to a GameObject. Its component context menu includes a no-configuration AES round trip, configured AES save/load, RSA writing, and an Editor-only server simulation. Choose **Encrypted + AES** or **Encrypted + RSA** in Data Format before running the configured examples. Back up the RSA private key through the Editor-only Keys storage options before exporting the public key.

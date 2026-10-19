@@ -152,6 +152,7 @@ namespace Pretzel.Data.Editor
             _gameEmbedded.SetEnabled(hasKeys);
             _gameSelect.SetEnabled(File.Exists(GameConfigPath));
             _gameHint.text = $"JSON: {GameConfigPath}\nC#: {ShippingGenerator.DefaultFolder}/{ShippingGenerator.ScriptName}\n"
+                             + $"Both exports include {ShippingGenerator.DefaultFolder}/{ShippingGenerator.ExampleName} (existing edits preserved).\n"
                              + (rsa
                                  ? "Exports only the RSA public key. The game can write encrypted files, but reading them requires the private key on your server."
                                  : "Exports the current AES key so the game can both save and load encrypted files offline.");
@@ -310,6 +311,7 @@ namespace Pretzel.Data.Editor
                     Directory.CreateDirectory(Path.GetDirectoryName(GameConfigPath));
                     File.WriteAllText(GameConfigPath, json, new UTF8Encoding(false));
                     AssetDatabase.ImportAsset(GameConfigPath);
+                    ShippingGenerator.GenerateUsageExample(ShippingGenerator.DefaultFolder);
                 }
 
                 // RSA export deliberately leaves the private key unstored.
@@ -319,7 +321,9 @@ namespace Pretzel.Data.Editor
                 }
 
                 Refresh();
-                PanelUi.SetText(_gameResult, $"Created {path}. Restart Play mode to use the exported key. Keep older keys for existing saves.");
+                PanelUi.SetText(_gameResult, $"Created {path}. Usage script: {ShippingGenerator.DefaultFolder}/{ShippingGenerator.ExampleName} "
+                    + "(existing edits preserved). Add it to a GameObject and use its context menu in Play mode. "
+                    + "Restart Play mode to use the exported key. Keep older keys for existing saves.");
                 SelectAsset(path);
             }
             catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or ArgumentException

@@ -37,6 +37,21 @@ namespace Pretzel.Data.Tests
                 Assert.That(source, Does.Contain("Never ship that key"));
                 Assert.That(source, Does.Contain("DataStoreFactory.Create"));
                 Assert.That(source, Does.Contain("EncryptionUsageExample"));
+                string example = File.ReadAllText(folder + "/PretzelEncryptionExample.cs");
+                Assert.That(source, Does.Contain("PretzelEncryptionExample.cs"));
+                Assert.That(example, Does.Contain("class PretzelEncryptionExample : MonoBehaviour"));
+                Assert.That(example, Does.Contain("SaveAesProfile"));
+                Assert.That(example, Does.Contain("LoadAesProfile"));
+                Assert.That(example, Does.Contain("ReadRsaReportOnServer"));
+                Assert.That(example, Does.Contain("SaveAndLoadAfterSignInAsync"));
+                Assert.That(example, Does.Contain("SaveAesWithJsonKeys"));
+                Assert.That(example, Does.Contain("LoadAesWithJsonKeys"));
+                Assert.That(example, Does.Contain("WriteRsaWithJsonKeys"));
+                Assert.That(example, Does.Contain("SaveAesWithEmbeddedKeys"));
+                Assert.That(example, Does.Contain("LoadAesWithEmbeddedKeys"));
+                Assert.That(example, Does.Contain("WriteRsaWithEmbeddedKeys"));
+                Assert.That(example, Does.Contain("EncryptionKeys keys = GameEncryptionKeyConfig.Load();"));
+                Assert.That(example, Does.Contain("EncryptionKeys keys = EncryptionKeys.Provider.Invoke();"));
                 if (deliveryName == "Token")
                 {
                     Assert.That(source, Does.Contain("await PretzelDataSetup.LoadKeysAsync"));
@@ -52,6 +67,28 @@ namespace Pretzel.Data.Tests
             {
                 AssetDatabase.DeleteAsset(folder);
                 UnityEngine.Object.DestroyImmediate(config);
+            }
+        }
+
+        [Test]
+        public void StandaloneCompanionGenerationPreservesUserEdits()
+        {
+            Type generator = typeof(Pretzel.Data.Editor.DataFormatWindow).Assembly
+                .GetType("Pretzel.Data.Editor.ShippingGenerator", true);
+            MethodInfo generate = generator.GetMethod("GenerateUsageExample", BindingFlags.Public | BindingFlags.Static);
+            string folder = "Assets/PretzelExampleTest_" + Guid.NewGuid().ToString("N");
+            try
+            {
+                string path = (string)generate.Invoke(null, new object[] { folder });
+                string edited = File.ReadAllText(path) + "\n// User customization\n";
+                File.WriteAllText(path, edited);
+                Assert.That(generate.Invoke(null, new object[] { folder }), Is.EqualTo(path));
+                Assert.That(File.ReadAllText(path), Is.EqualTo(edited));
+                Assert.That(File.Exists(folder + "/PretzelDataSetup.cs"), Is.False);
+            }
+            finally
+            {
+                AssetDatabase.DeleteAsset(folder);
             }
         }
     }
