@@ -101,6 +101,16 @@ if (!ok)
 
 Open `PretzelDataSetup.cs` and fill in `RequestKeyAsync` with your own request (for example with `Pretzel.Api.ApiClient`).
 
+## Runnable usage examples
+
+Import **Data Usage** in Package Manager and add `EncryptionUsageExample` to a GameObject. Use its component context menu in Play mode for configured AES save/load or RSA report writing. Its source also shows explicit JSON/environment/provider stores, a trusted-server RSA reader, and async token-based AES setup with a supplied HTTPS request function.
+
+In the repository test project, add `DataEncryptionExample` from `Assets/Pretzel/Examples` to a GameObject. Its component context menu includes a no-configuration AES round trip, configured AES save/load, RSA writing, and an Editor-only server simulation. Choose **Encrypted + AES** or **Encrypted + RSA** in Data Format before running the configured examples. Back up the RSA private key through the Editor-only Keys storage options before exporting the public key.
+
+JSON and environment delivery need no startup call. Embedded setup registers before the first scene; call save/load from `Start` or later. Token delivery must finish after sign-in and before any save/load. The generated setup includes commented call-site examples for these flows.
+
+**AES reads and writes on the client. RSA writes on the client and reads on a trusted server.** If a load returns `Corrupt`, report a wrong key or damaged file rather than silently replacing the player's data. Do not generate new keys on each launch or overwrite existing saves just to test loading.
+
 ## Protecting the private key
 
 If you use RSA mode, the private key is the one that matters.

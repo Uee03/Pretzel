@@ -90,3 +90,13 @@ Slot methods are gone. A slot is part of the key. `PathType` is replaced by `IDa
 ## Sample
 
 `Samples~/DataUsage`: keys, slots, a ScriptableObject, a migration and an async save.
+
+Import **Data Usage** from Package Manager, add `EncryptionUsageExample` to a GameObject, and use its component context menu in Play mode:
+
+1. For offline saves, select **Encrypted + AES** in **Pretzel > Data Format**, generate a key, then export JSON or embedded C# on **Keys** (or supply environment variables). **Save and load configured AES profile** demonstrates `DataIO.Save` / `DataIO.Load` with slots and explicit load-error handling.
+2. For client-to-server data, select **Encrypted + RSA**, generate a pair, store the private key in Editor-only storage, and export only the public key. **Write RSA report for server** creates `report.pretzel` in `persistentDataPath/EncryptionExamples/RsaOutbox`. Send that file over HTTPS; `ReadRsaReportOnServer` shows how a trusted server/tool decrypts it using its private key. RSA is not a client-side save/load replacement.
+3. Read `CreateAesStore` for explicit stores and JSON/environment/provider sources. `LoadAesKeyAfterSignInAsync` accepts your own authenticated key-service request, installs the returned AES key, and demonstrates async saving/loading with cancellation. Do not call `DataIO` before the key arrives. The generated token setup has a similar flow, but its request stub must be implemented first.
+
+The repository test project includes `TestPretzel/Assets/Pretzel/Examples/DataEncryptionExample.cs`. Add it to a GameObject and enter Play mode. Its context menu includes an AES demo that needs no configuration, configured AES save/load, RSA report writing, and an **Editor-only** trusted-server read. The no-configuration AES demo uses a disposable random key and temporary folder; real saves must reuse the same backed-up key across launches.
+
+Newly generated `PretzelDataSetup.cs` files include commented save/load, explicit-store and RSA-server examples; token setups also include the sign-in call sequence. These comments do not save automatically. Exporting another key does not migrate existing files.

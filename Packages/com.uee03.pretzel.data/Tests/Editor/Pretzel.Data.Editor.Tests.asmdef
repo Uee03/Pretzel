@@ -1,7 +1,7 @@
 {
   "name": "Pretzel.Data.Editor.Tests",
   "rootNamespace": "Pretzel.Data.Tests",
-  "references": ["Pretzel.Data", "UnityEngine.TestRunner", "UnityEditor.TestRunner"],
+  "references": ["Pretzel.Data", "Pretzel.Data.Editor", "UnityEngine.TestRunner", "UnityEditor.TestRunner"],
   "includePlatforms": ["Editor"],
   "overrideReferences": true,
   "precompiledReferences": ["nunit.framework.dll", "Newtonsoft.Json.dll"],
