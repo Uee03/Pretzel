@@ -1,0 +1,26 @@
+{
+  "name": "Pretzel.Integrations.UniTask",
+  "rootNamespace": "Pretzel.Integrations.UniTask",
+  "references": [
+    "Pretzel.Core",
+    "Pretzel.Api",
+    "UniTask"
+  ],
+  "includePlatforms": [],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": false,
+  "defineConstraints": [
+    "PRETZEL_UNITASK"
+  ],
+  "versionDefines": [
+    {
+      "name": "com.cysharp.unitask",
+      "expression": "",
+      "define": "PRETZEL_UNITASK"
+    }
+  ],
+  "noEngineReferences": false
+}

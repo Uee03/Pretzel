@@ -1,0 +1,25 @@
+<engine:UXML xmlns:engine="UnityEngine.UIElements" xmlns:editor="UnityEditor.UIElements">
+    <engine:ScrollView class="pretzel-tab">
+        <engine:VisualElement class="pretzel-section">
+            <engine:Label text="Shipping the keys with the game" class="pretzel-section__title" />
+            <engine:Label class="pretzel-section__hint"
+                          text="Anything inside a game can be extracted by a determined player. The RSA public key is the exception: it can only encrypt, so it is safe to ship. Secret keys need one of the options below." />
+            <engine:HelpBox name="shipping-panel__format-warning" message-type="Info" />
+            <engine:DropdownField name="shipping-panel__delivery" label="How the game gets its key" />
+            <engine:Label name="shipping-panel__delivery-hint" class="pretzel-section__hint" />
+            <engine:TextField name="shipping-panel__folder" label="Output folder" />
+            <engine:HelpBox name="shipping-panel__embed-warning" message-type="Warning" />
+            <engine:VisualElement class="pretzel-button-row">
+                <engine:Button name="shipping-panel__create" text="Create setup script and guide"
+                               class="pretzel-section__action pretzel-section__action--primary" />
+                <engine:Button name="shipping-panel__guide" text="Open key delivery guide" class="pretzel-section__action" />
+            </engine:VisualElement>
+            <engine:Label name="shipping-panel__result" class="pretzel-section__hint" />
+        </engine:VisualElement>
+
+        <engine:VisualElement class="pretzel-section">
+            <engine:Label text="Using a token to get the key" class="pretzel-section__title" />
+            <engine:VisualElement name="shipping-panel__token-steps" class="pretzel-bullets" />
+        </engine:VisualElement>
+    </engine:ScrollView>
+</engine:UXML>

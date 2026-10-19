@@ -1,0 +1,22 @@
+{
+  "name": "com.uee03.pretzel.ui.ugui",
+  "displayName": "Pretzel UI (UGUI)",
+  "version": "0.1.0",
+  "unity": "6000.0",
+  "description": "UGUI components: UIFader, hover fade and Button and Graphic extensions.",
+  "author": { "name": "Ubaidullah Effendi" },
+  "license": "MIT",
+  "dependencies": {
+    "com.uee03.pretzel.core": "0.1.0",
+    "com.uee03.pretzel.ui": "0.1.0",
+    "com.uee03.pretzel.tween": "0.1.0",
+    "com.unity.ugui": "2.0.0"
+  },
+  "samples": [
+    {
+      "displayName": "UGUI Usage",
+      "description": "UIFader on a CanvasGroup with a hover fade and Button extensions.",
+      "path": "Samples~/UGUIUsage"
+    }
+  ]
+}

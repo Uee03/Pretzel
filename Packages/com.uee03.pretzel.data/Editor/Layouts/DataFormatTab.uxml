@@ -1,0 +1,44 @@
+<engine:UXML xmlns:engine="UnityEngine.UIElements" xmlns:editor="UnityEditor.UIElements">
+    <engine:ScrollView class="pretzel-tab">
+        <engine:VisualElement class="pretzel-section">
+            <engine:Label text="Format" class="pretzel-section__title" />
+            <engine:Label class="pretzel-section__hint"
+                          text="How DataIO writes files. Plain text JSON is the default and the other formats are optional providers on top of it." />
+            <engine:VisualElement name="format-panel__picker" class="pretzel-format-picker" />
+        </engine:VisualElement>
+
+        <engine:VisualElement class="pretzel-section">
+            <engine:Label name="format-panel__title" class="pretzel-section__title" />
+            <engine:Label name="format-panel__summary" class="pretzel-section__hint" />
+            <engine:Label text="Pros" class="pretzel-subtitle pretzel-subtitle--pro" />
+            <engine:VisualElement name="format-panel__pros" class="pretzel-bullets" />
+            <engine:Label text="Cons" class="pretzel-subtitle pretzel-subtitle--con" />
+            <engine:VisualElement name="format-panel__cons" class="pretzel-bullets" />
+            <engine:Label text="Best for" class="pretzel-subtitle" />
+            <engine:Label name="format-panel__best" class="pretzel-section__hint" />
+        </engine:VisualElement>
+
+        <engine:VisualElement class="pretzel-section">
+            <engine:Label text="Options" class="pretzel-section__title" />
+            <engine:DropdownField name="format-panel__extension" label="File extension" />
+            <engine:EnumField name="format-panel__serializer" label="Serializer" />
+            <engine:TextField name="format-panel__folder" label="Save folder" />
+            <engine:Toggle name="format-panel__pretty" label="Pretty print JSON" />
+            <engine:Toggle name="format-panel__backup" label="Keep .bak backup" />
+            <engine:Toggle name="format-panel__base64" label="Store as Base64 text" />
+            <engine:Label name="format-panel__hint" class="pretzel-section__hint" />
+            <engine:HelpBox name="format-panel__warning" message-type="Warning" />
+        </engine:VisualElement>
+
+        <engine:Foldout text="Base64 strings as binary data" value="false" class="pretzel-section">
+            <engine:Label class="pretzel-section__hint"
+                          text="Base64 writes binary bytes as text, using 64 safe characters. It makes the data bigger, not smaller, but it fits anywhere text does." />
+            <engine:Label text="Pros" class="pretzel-subtitle pretzel-subtitle--pro" />
+            <engine:VisualElement name="format-panel__base64-pros" class="pretzel-bullets" />
+            <engine:Label text="Cons" class="pretzel-subtitle pretzel-subtitle--con" />
+            <engine:VisualElement name="format-panel__base64-cons" class="pretzel-bullets" />
+            <engine:Label class="pretzel-section__hint"
+                          text="Rule of thumb: keep files as raw bytes. Use Base64 only when the data has to travel as text, and compress first if size matters." />
+        </engine:Foldout>
+    </engine:ScrollView>
+</engine:UXML>

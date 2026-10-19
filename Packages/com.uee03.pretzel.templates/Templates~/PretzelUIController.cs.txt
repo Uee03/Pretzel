@@ -1,0 +1,17 @@
+using Pretzel.UI;
+using UnityEngine.UIElements;
+
+#ROOTNAMESPACEBEGIN#
+public class #SCRIPTNAME# : UIControllerBase
+{
+    protected override void OnBind(VisualElement root)
+    {
+        // Query elements and register callbacks here.
+    }
+
+    protected override void OnUnbind(VisualElement root)
+    {
+        // Unregister what OnBind registered.
+    }
+}
+#ROOTNAMESPACEEND#

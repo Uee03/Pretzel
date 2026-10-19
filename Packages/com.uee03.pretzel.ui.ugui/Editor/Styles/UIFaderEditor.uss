@@ -1,0 +1,12 @@
+.pretzel-ui-fader__group {
+    margin-top: 6px;
+}
+
+.pretzel-ui-fader__title {
+    -unity-font-style: bold;
+    margin-bottom: 2px;
+}
+
+.pretzel-ui-fader__field--hidden {
+    display: none;
+}

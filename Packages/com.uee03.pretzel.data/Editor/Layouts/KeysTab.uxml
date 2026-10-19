@@ -1,0 +1,57 @@
+<engine:UXML xmlns:engine="UnityEngine.UIElements" xmlns:editor="UnityEditor.UIElements">
+    <engine:ScrollView class="pretzel-tab">
+        <engine:VisualElement class="pretzel-section">
+            <engine:Label text="Where the keys are stored" class="pretzel-section__title" />
+            <engine:Label class="pretzel-section__hint"
+                          text="The key file belongs to this project only: it lives in this project's UserSettings folder. Environment variables belong to your user account on this computer and are shared by every project, so their names start with a prefix. Give each project its own prefix." />
+            <engine:TextField name="keys-panel__prefix" label="Variable prefix" />
+            <engine:Label name="keys-panel__prefix-hint" class="pretzel-section__hint" />
+            <engine:VisualElement name="keys-panel__rows" />
+            <engine:Label name="keys-panel__result" class="pretzel-section__hint" />
+            <engine:VisualElement class="pretzel-button-row">
+                <engine:Button name="keys-panel__reload" text="Reload from storage" class="pretzel-section__action" />
+            </engine:VisualElement>
+        </engine:VisualElement>
+
+        <engine:VisualElement class="pretzel-section">
+            <engine:Label text="Environment variables" class="pretzel-section__title" />
+            <engine:Label name="keys-panel__env-hint" class="pretzel-section__hint" />
+            <engine:VisualElement class="pretzel-button-row">
+                <engine:Button name="keys-panel__env-store" text="Store keys as environment variables"
+                               class="pretzel-section__action pretzel-section__action--primary" />
+                <engine:Button name="keys-panel__env-store-public" text="Store public key only" class="pretzel-section__action" />
+                <engine:Button name="keys-panel__env-copy" text="Copy commands" class="pretzel-section__action" />
+                <engine:Button name="keys-panel__env-remove" text="Remove variables"
+                               class="pretzel-section__action pretzel-section__action--danger" />
+            </engine:VisualElement>
+        </engine:VisualElement>
+
+        <engine:VisualElement class="pretzel-section">
+            <engine:Label text="Project key file (JSON, per project)" class="pretzel-section__title" />
+            <engine:Label name="keys-panel__file-path" class="pretzel-section__hint" />
+            <engine:Label class="pretzel-section__hint"
+                          text="Plain text. Only the Editor reads it, builds never do. Keep UserSettings out of version control." />
+            <engine:Label name="keys-panel__git" class="pretzel-chip" />
+            <engine:VisualElement class="pretzel-button-row">
+                <engine:Button name="keys-panel__file-store" text="Save keys to project key file"
+                               class="pretzel-section__action pretzel-section__action--primary" />
+                <engine:Button name="keys-panel__file-store-public" text="Save public key only" class="pretzel-section__action" />
+                <engine:Button name="keys-panel__file-reveal" text="Show in folder" class="pretzel-section__action" />
+                <engine:Button name="keys-panel__file-delete" text="Delete key file"
+                               class="pretzel-section__action pretzel-section__action--danger" />
+            </engine:VisualElement>
+        </engine:VisualElement>
+
+        <engine:VisualElement name="keys-panel__public-section" class="pretzel-section">
+            <engine:Label text="About the public key" class="pretzel-section__title" />
+            <engine:Label class="pretzel-section__hint"
+                          text="The RSA public key may be public. It can be stored in the project key file or an environment variable, or shipped inside the game, because it can only encrypt. Only the private key has to stay secret." />
+        </engine:VisualElement>
+
+        <engine:VisualElement class="pretzel-section">
+            <engine:Label text="About the IV" class="pretzel-section__title" />
+            <engine:Label class="pretzel-section__hint"
+                          text="The IV is generated randomly for every file and written at the start of the file. It is not secret and there is nothing to store. A fixed IV would make encryption weaker, so Pretzel does not offer one." />
+        </engine:VisualElement>
+    </engine:ScrollView>
+</engine:UXML>

@@ -1,0 +1,119 @@
+.pretzel-packages {
+    flex-grow: 1;
+}
+
+.pretzel-packages__toolbar {
+    flex-direction: row;
+    align-items: center;
+    padding: 4px var(--pretzel-gap);
+}
+
+.pretzel-packages__search {
+    flex-grow: 1;
+    margin-right: 6px;
+}
+
+/* Cards */
+.pretzel-card {
+    margin-bottom: var(--pretzel-gap);
+    padding: var(--pretzel-gap);
+    background-color: var(--pretzel-surface-raised);
+    border-width: 1px;
+    border-color: var(--pretzel-border);
+    border-radius: var(--pretzel-radius);
+    transition-property: border-color;
+    transition-duration: 0.12s;
+}
+
+.pretzel-card:hover {
+    border-color: var(--pretzel-honey-deep);
+}
+
+.pretzel-card__header {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.pretzel-card__titles {
+    flex-shrink: 1;
+}
+
+.pretzel-card__title {
+    font-size: var(--unity-metrics-default-font_big_size);
+    -unity-font-style: bold;
+}
+
+.pretzel-card__subtitle {
+    opacity: 0.6;
+    font-size: var(--unity-metrics-default-font_small_size);
+}
+
+.pretzel-card__chips {
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    flex-shrink: 0;
+    max-width: 55%;
+}
+
+.pretzel-card__chips > .pretzel-chip {
+    margin-left: 4px;
+    margin-bottom: 2px;
+}
+
+.pretzel-card__description {
+    margin-top: 4px;
+    white-space: normal;
+}
+
+.pretzel-card__detail {
+    margin-top: 2px;
+    opacity: 0.7;
+    white-space: normal;
+}
+
+.pretzel-card__note {
+    margin-top: 6px;
+}
+
+.pretzel-card__actions {
+    flex-direction: row;
+    flex-wrap: wrap;
+    margin-top: 6px;
+}
+
+.pretzel-card__action {
+    margin-left: 0;
+    margin-right: 6px;
+}
+
+.pretzel-card__action--primary {
+    background-color: var(--pretzel-honey);
+    color: var(--pretzel-outline);
+    border-color: var(--pretzel-outline);
+    -unity-font-style: bold;
+}
+
+.pretzel-card__action--primary:hover {
+    background-color: var(--pretzel-honey-deep);
+}
+
+.pretzel-card__action--primary:disabled {
+    opacity: 0.5;
+}
+
+.pretzel-card__action--danger {
+    border-color: var(--pretzel-missing);
+}
+
+.pretzel-chip--neutral {
+    color: var(--pretzel-text);
+    border-color: var(--pretzel-border);
+    opacity: 0.8;
+}
+
+.pretzel-starter {
+    border-color: var(--pretzel-honey-deep);
+    border-width: 2px;
+}

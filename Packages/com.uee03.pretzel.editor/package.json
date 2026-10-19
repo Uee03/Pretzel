@@ -1,0 +1,9 @@
+{
+  "name": "com.uee03.pretzel.editor",
+  "displayName": "Pretzel Editor",
+  "version": "0.1.0",
+  "unity": "6000.0",
+  "description": "Standalone editor utilities that work in any project and need no other Pretzel module.",
+  "author": { "name": "Ubaidullah Effendi" },
+  "license": "MIT"
+}

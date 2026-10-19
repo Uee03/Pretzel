@@ -1,0 +1,31 @@
+<engine:UXML xmlns:engine="UnityEngine.UIElements" xmlns:editor="UnityEditor.UIElements">
+    <engine:ScrollView class="pretzel-tab">
+        <engine:VisualElement class="pretzel-section">
+            <engine:Label text="Project" class="pretzel-section__title" />
+            <engine:TextField name="main-tab__company" label="Company" />
+            <engine:TextField name="main-tab__product" label="Product" />
+            <engine:TextField name="main-tab__version" label="Version" />
+            <editor:ObjectField name="main-tab__icon" label="Icon" />
+            <editor:ObjectField name="main-tab__cursor" label="Cursor" />
+        </engine:VisualElement>
+
+        <engine:VisualElement class="pretzel-section">
+            <engine:Label text="Folder structure" class="pretzel-section__title" />
+            <engine:DropdownField name="main-tab__preset" label="Preset" />
+            <engine:ListView name="main-tab__folders" class="pretzel-folder-list" />
+            <engine:Label name="main-tab__folder-status" class="pretzel-section__hint" />
+            <engine:Button name="main-tab__create-folders" text="Create Folders"
+                           class="pretzel-section__action pretzel-section__action--primary" />
+        </engine:VisualElement>
+
+        <engine:VisualElement class="pretzel-section">
+            <engine:Label text="Scenes" class="pretzel-section__title" />
+            <engine:VisualElement name="main-tab__scene-templates" class="pretzel-scene-templates" />
+        </engine:VisualElement>
+
+        <engine:VisualElement class="pretzel-section">
+            <engine:Label text="Setup checklist" class="pretzel-section__title" />
+            <engine:VisualElement name="main-tab__checklist" />
+        </engine:VisualElement>
+    </engine:ScrollView>
+</engine:UXML>

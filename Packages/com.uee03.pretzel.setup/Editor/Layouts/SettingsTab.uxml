@@ -1,0 +1,61 @@
+<engine:UXML xmlns:engine="UnityEngine.UIElements" xmlns:editor="UnityEditor.UIElements">
+    <engine:ScrollView class="pretzel-tab">
+        <engine:VisualElement class="pretzel-section">
+            <engine:Label text="Folder presets" class="pretzel-section__title" />
+            <engine:DropdownField name="settings-tab__default-preset" label="Default preset" />
+            <engine:Button name="settings-tab__reset-presets" text="Reset presets"
+                           class="pretzel-section__action pretzel-section__action--danger" />
+        </engine:VisualElement>
+
+        <engine:VisualElement class="pretzel-section">
+            <engine:Label text="Data" class="pretzel-section__title" />
+            <engine:Label class="pretzel-section__hint"
+                          text="The format DataIO saves in (plain text, compressed, binary or encrypted), its serializer, save folder, file extension and keys are set in the Data Format window." />
+            <engine:Button name="settings-tab__open-data-format" text="Open Data Format window"
+                           class="pretzel-section__action pretzel-section__action--primary" />
+            <engine:TextField name="settings-tab__settings-folder" label="Settings folder" />
+            <engine:Button name="settings-tab__open-persistent" text="Open persistent data folder"
+                           class="pretzel-section__action" />
+        </engine:VisualElement>
+
+        <engine:VisualElement class="pretzel-section">
+            <engine:Label text="Pretzel modules" class="pretzel-section__title" />
+            <engine:TextField name="settings-tab__module-url" label="Repository URL" />
+            <engine:TextField name="settings-tab__module-version" label="Tag or branch" />
+            <engine:Label class="pretzel-section__hint"
+                          text="The Addons tab installs Pretzel modules from this git repository, with ?path=Packages/&lt;module&gt; added for you." />
+        </engine:VisualElement>
+
+        <engine:VisualElement class="pretzel-section">
+            <engine:Label text="Catalog sources" class="pretzel-section__title" />
+            <engine:ListView name="settings-tab__sources" class="pretzel-folder-list" />
+            <engine:Label class="pretzel-section__hint"
+                          text="Extra package catalogs for the Addons Extra tab, one URL or file path per line." />
+        </engine:VisualElement>
+
+        <engine:VisualElement class="pretzel-section">
+            <engine:Label text="Paths (this user)" class="pretzel-section__title" />
+            <engine:VisualElement class="pretzel-section__row">
+                <engine:TextField name="settings-tab__resources" label="Resources folder" />
+                <engine:Button name="settings-tab__resources-browse" text="Browse" />
+            </engine:VisualElement>
+            <engine:Toggle name="settings-tab__custom-temp" label="Custom temp folder" />
+            <engine:VisualElement class="pretzel-section__row">
+                <engine:TextField name="settings-tab__temp" label="Temp folder" />
+                <engine:Button name="settings-tab__temp-browse" text="Browse" />
+            </engine:VisualElement>
+            <engine:Button name="settings-tab__reset-user" text="Reset user paths"
+                           class="pretzel-section__action pretzel-section__action--danger" />
+        </engine:VisualElement>
+
+        <engine:VisualElement class="pretzel-section">
+            <engine:Foldout name="settings-tab__about" text="About" value="false">
+                <engine:Label name="settings-tab__about-text" class="pretzel-section__hint" />
+                <engine:VisualElement name="settings-tab__about-links" class="pretzel-about__links" />
+            </engine:Foldout>
+        </engine:VisualElement>
+
+        <engine:Button name="settings-tab__reset-project" text="Reset all project settings"
+                       class="pretzel-section__action pretzel-section__action--danger" />
+    </engine:ScrollView>
+</engine:UXML>

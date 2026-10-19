@@ -1,0 +1,20 @@
+/* Pretzel tokens. Surfaces and text follow the editor skin, so the window works in the Light and Dark themes. */
+.pretzel-setup {
+    --pretzel-honey: #FFE100;
+    --pretzel-honey-deep: #FF9B00;
+    --pretzel-outline: #855000;
+    --pretzel-cream: #F3EDA6;
+    --pretzel-cream-deep: #EBE389;
+
+    --pretzel-surface: var(--unity-colors-window-background);
+    --pretzel-surface-raised: var(--unity-colors-box-background);
+    --pretzel-border: var(--unity-colors-default-border);
+    --pretzel-text: var(--unity-colors-default-text);
+
+    --pretzel-ok: #4FA64F;
+    --pretzel-warn: var(--unity-colors-warning-text);
+    --pretzel-missing: var(--unity-colors-error-text);
+
+    --pretzel-radius: var(--unity-metrics-default-border_radius);
+    --pretzel-gap: 8px;
+}

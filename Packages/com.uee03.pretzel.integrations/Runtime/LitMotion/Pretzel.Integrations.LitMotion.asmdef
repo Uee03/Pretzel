@@ -1,0 +1,26 @@
+{
+  "name": "Pretzel.Integrations.LitMotion",
+  "rootNamespace": "Pretzel.Integrations.LitMotion",
+  "references": [
+    "Pretzel.Core",
+    "Pretzel.Tween",
+    "LitMotion"
+  ],
+  "includePlatforms": [],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": false,
+  "defineConstraints": [
+    "PRETZEL_LITMOTION"
+  ],
+  "versionDefines": [
+    {
+      "name": "com.annulusgames.lit-motion",
+      "expression": "",
+      "define": "PRETZEL_LITMOTION"
+    }
+  ],
+  "noEngineReferences": false
+}

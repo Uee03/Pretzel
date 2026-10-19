@@ -1,0 +1,12 @@
+<engine:UXML xmlns:engine="UnityEngine.UIElements" xmlns:editor="UnityEditor.UIElements">
+    <engine:VisualElement name="data-window" class="data-window">
+        <engine:VisualElement class="data-window__header">
+            <engine:Image name="data-window__logo" class="data-window__logo" />
+            <engine:VisualElement>
+                <engine:Label text="Data Format" class="data-window__title" />
+                <engine:Label text="How DataIO saves your data" class="data-window__subtitle" />
+            </engine:VisualElement>
+        </engine:VisualElement>
+        <engine:TabView name="data-window__tabs" class="data-window__tabs" />
+    </engine:VisualElement>
+</engine:UXML>

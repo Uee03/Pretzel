@@ -1,0 +1,20 @@
+using UnityEngine;
+
+#ROOTNAMESPACEBEGIN#
+public class #SCRIPTNAME# : MonoBehaviour
+{
+    #region FIELDS
+    #endregion
+
+    #region UNITY METHODS
+
+    private void Awake()
+    {
+    }
+
+    #endregion
+
+    #region METHODS
+    #endregion
+}
+#ROOTNAMESPACEEND#

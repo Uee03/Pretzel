@@ -1,0 +1,30 @@
+{
+  "name": "Pretzel.Integrations.Samples.R3",
+  "rootNamespace": "Pretzel.Samples.Integrations",
+  "references": [
+    "Pretzel.Api",
+    "Pretzel.Data",
+    "Pretzel.UI",
+    "Pretzel.Integrations.R3",
+    "R3.Unity"
+  ],
+  "includePlatforms": [],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": true,
+  "precompiledReferences": [
+    "R3.dll"
+  ],
+  "autoReferenced": true,
+  "defineConstraints": [
+    "PRETZEL_R3"
+  ],
+  "versionDefines": [
+    {
+      "name": "com.cysharp.r3",
+      "expression": "",
+      "define": "PRETZEL_R3"
+    }
+  ],
+  "noEngineReferences": false
+}

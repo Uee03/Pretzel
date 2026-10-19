@@ -1,0 +1,23 @@
+{
+  "name": "com.uee03.pretzel.api",
+  "displayName": "Pretzel API",
+  "version": "0.1.0",
+  "unity": "6000.0",
+  "description": "HTTP client built on UnityWebRequest and Awaitable.",
+  "author": { "name": "Ubaidullah Effendi" },
+  "license": "MIT",
+  "dependencies": {
+    "com.uee03.pretzel.core": "0.1.0",
+    "com.uee03.pretzel.data": "0.1.0",
+    "com.unity.modules.unitywebrequest": "1.0.0",
+    "com.unity.modules.unitywebrequesttexture": "1.0.0",
+    "com.unity.modules.unitywebrequestaudio": "1.0.0"
+  },
+  "samples": [
+    {
+      "displayName": "API Usage",
+      "description": "GET, JSON POST, downloads, retries and cancellation.",
+      "path": "Samples~/ApiUsage"
+    }
+  ]
+}

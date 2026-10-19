@@ -1,0 +1,11 @@
+using Pretzel.Core.Singletons;
+
+#ROOTNAMESPACEBEGIN#
+public class #SCRIPTNAME# : Singleton<#SCRIPTNAME#>
+{
+    protected override void Awake()
+    {
+        base.Awake();
+    }
+}
+#ROOTNAMESPACEEND#

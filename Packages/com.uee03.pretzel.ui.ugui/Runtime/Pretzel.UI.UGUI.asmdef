@@ -1,0 +1,20 @@
+{
+  "name": "Pretzel.UI.UGUI",
+  "rootNamespace": "Pretzel.UI.UGUI",
+  "references": [
+    "Pretzel.Core",
+    "Pretzel.UI",
+    "Pretzel.Tween",
+    "Unity.TextMeshPro",
+    "UnityEngine.UI"
+  ],
+  "includePlatforms": [],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": true,
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": false
+}

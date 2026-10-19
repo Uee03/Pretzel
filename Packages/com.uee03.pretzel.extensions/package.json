@@ -1,0 +1,21 @@
+{
+  "name": "com.uee03.pretzel.extensions",
+  "displayName": "Pretzel Extensions",
+  "version": "0.1.0",
+  "unity": "6000.0",
+  "description": "Extension methods for .NET and Unity types (string, IO, GameObject, Transform, collections and more).",
+  "author": { "name": "Ubaidullah Effendi" },
+  "license": "MIT",
+  "dependencies": {
+    "com.uee03.pretzel.core": "0.1.0",
+    "com.unity.modules.imageconversion": "1.0.0",
+    "com.unity.modules.physics": "1.0.0"
+  },
+  "samples": [
+    {
+      "displayName": "Extensions Usage",
+      "description": "Examples for the string, collection, float, Transform, GameObject and file extensions.",
+      "path": "Samples~/ExtensionsUsage"
+    }
+  ]
+}

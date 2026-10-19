@@ -1,0 +1,12 @@
+{
+  "name": "com.uee03.pretzel.setup",
+  "displayName": "Pretzel Setup",
+  "version": "0.1.0",
+  "unity": "6000.0",
+  "description": "The Project Setup window: project info, folder presets, scene templates, and install of Pretzel modules and curated third-party packages. Needs no other Pretzel module.",
+  "author": { "name": "Ubaidullah Effendi" },
+  "license": "MIT",
+  "dependencies": {
+    "com.unity.nuget.newtonsoft-json": "3.2.2"
+  }
+}

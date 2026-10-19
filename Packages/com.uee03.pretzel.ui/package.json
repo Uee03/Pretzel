@@ -1,0 +1,21 @@
+{
+  "name": "com.uee03.pretzel.ui",
+  "displayName": "Pretzel UI",
+  "version": "0.1.0",
+  "unity": "6000.0",
+  "description": "Runtime UI Toolkit helpers, element factories and transitions.",
+  "author": { "name": "Ubaidullah Effendi" },
+  "license": "MIT",
+  "dependencies": {
+    "com.uee03.pretzel.core": "0.1.0",
+    "com.uee03.pretzel.tween": "0.1.0",
+    "com.unity.modules.uielements": "1.0.0"
+  },
+  "samples": [
+    {
+      "displayName": "UI Toolkit Usage",
+      "description": "Element factories, fades, a hover fade and a controller.",
+      "path": "Samples~/UIUsage"
+    }
+  ]
+}

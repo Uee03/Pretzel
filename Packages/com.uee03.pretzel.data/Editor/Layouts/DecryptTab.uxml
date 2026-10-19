@@ -1,0 +1,32 @@
+<engine:UXML xmlns:engine="UnityEngine.UIElements" xmlns:editor="UnityEditor.UIElements">
+    <engine:ScrollView class="pretzel-tab">
+        <engine:VisualElement class="pretzel-section">
+            <engine:Label text="Decrypt and decode" class="pretzel-section__title" />
+            <engine:Label class="pretzel-section__hint"
+                          text="Paste plain JSON, or the Base64 text of a Compressed, Binary or Encrypted file. Binary files can be loaded with Load file. The format is detected unless you choose one." />
+            <engine:DropdownField name="decrypt-panel__format" label="Input format" />
+            <engine:TextField name="decrypt-panel__input" label="Input" multiline="true" class="pretzel-code-field" />
+            <engine:VisualElement class="pretzel-button-row">
+                <engine:Button name="decrypt-panel__decode" text="Decrypt / decode"
+                               class="pretzel-section__action pretzel-section__action--primary" />
+                <engine:Button name="decrypt-panel__encode" text="Encrypt / encode with current format" class="pretzel-section__action" />
+                <engine:Button name="decrypt-panel__load" text="Load file" class="pretzel-section__action" />
+                <engine:Button name="decrypt-panel__clear" text="Clear" class="pretzel-section__action" />
+            </engine:VisualElement>
+            <engine:Label name="decrypt-panel__status" class="pretzel-section__hint" />
+            <engine:TextField name="decrypt-panel__output" label="Output" multiline="true" readonly="true" class="pretzel-code-field" />
+            <engine:VisualElement class="pretzel-button-row">
+                <engine:Button name="decrypt-panel__copy" text="Copy output" class="pretzel-section__action" />
+                <engine:Button name="decrypt-panel__use-output" text="Move output to input" class="pretzel-section__action" />
+            </engine:VisualElement>
+        </engine:VisualElement>
+
+        <engine:Foldout name="decrypt-panel__keys-foldout" text="Use other keys" value="false" class="pretzel-section">
+            <engine:Label class="pretzel-section__hint"
+                          text="By default the keys from the Encryption and Keys tabs are used. Paste keys here to override them, for example a private key that is not stored on this machine. Nothing pasted here is saved." />
+            <engine:TextField name="decrypt-panel__aes" label="AES key (Base64)" />
+            <engine:TextField name="decrypt-panel__private" label="RSA private key" multiline="true" class="pretzel-code-field pretzel-code-field--short" />
+            <engine:TextField name="decrypt-panel__public" label="RSA public key" multiline="true" class="pretzel-code-field pretzel-code-field--short" />
+        </engine:Foldout>
+    </engine:ScrollView>
+</engine:UXML>

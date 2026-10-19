@@ -1,0 +1,21 @@
+{
+  "name": "com.uee03.pretzel.data",
+  "displayName": "Pretzel Data",
+  "version": "0.1.0",
+  "unity": "6000.0",
+  "description": "Save and load with a pluggable serializer, plus SerializableGuid.",
+  "author": { "name": "Ubaidullah Effendi" },
+  "license": "MIT",
+  "dependencies": {
+    "com.uee03.pretzel.core": "0.1.0",
+    "com.uee03.pretzel.extensions": "0.1.0",
+    "com.unity.nuget.newtonsoft-json": "3.2.2"
+  },
+  "samples": [
+    {
+      "displayName": "Data Usage",
+      "description": "Keys, slots, a ScriptableObject, a migration and an async save.",
+      "path": "Samples~/DataUsage"
+    }
+  ]
+}

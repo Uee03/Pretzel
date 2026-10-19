@@ -1,0 +1,16 @@
+{
+  "name": "com.uee03.pretzel.core",
+  "displayName": "Pretzel Core",
+  "version": "0.1.0",
+  "unity": "6000.0",
+  "description": "Foundational guards and singletons shared by all Pretzel modules.",
+  "author": { "name": "Ubaidullah Effendi" },
+  "license": "MIT",
+  "samples": [
+    {
+      "displayName": "Core Usage",
+      "description": "Singletons and argument guards.",
+      "path": "Samples~/CoreUsage"
+    }
+  ]
+}

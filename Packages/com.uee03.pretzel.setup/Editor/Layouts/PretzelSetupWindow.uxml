@@ -1,0 +1,12 @@
+<engine:UXML xmlns:engine="UnityEngine.UIElements" xmlns:editor="UnityEditor.UIElements">
+    <engine:VisualElement name="setup-window" class="pretzel-setup">
+        <engine:VisualElement class="pretzel-setup__header">
+            <engine:Image name="setup-window__logo" class="pretzel-setup__logo" />
+            <engine:VisualElement>
+                <engine:Label text="Pretzel" class="pretzel-setup__title" />
+                <engine:Label name="setup-window__version" class="pretzel-setup__version" />
+            </engine:VisualElement>
+        </engine:VisualElement>
+        <engine:TabView name="setup-window__tabs" class="pretzel-setup__tabs" />
+    </engine:VisualElement>
+</engine:UXML>

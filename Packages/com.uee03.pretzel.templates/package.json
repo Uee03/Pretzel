@@ -1,0 +1,13 @@
+{
+  "name": "com.uee03.pretzel.templates",
+  "displayName": "Pretzel Templates",
+  "version": "0.1.0",
+  "unity": "6000.0",
+  "description": "Script templates for Pretzel types.",
+  "author": { "name": "Ubaidullah Effendi" },
+  "license": "MIT",
+  "dependencies": {
+    "com.uee03.pretzel.core": "0.1.0",
+    "com.uee03.pretzel.ui": "0.1.0"
+  }
+}
