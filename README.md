@@ -62,6 +62,34 @@ Each integration assembly compiles only when its third-party package is installe
 
 The packages live in `Packages/`. `TestPretzel/` is a Unity project for trying them out. To use Pretzel in a project, add `com.uee03.pretzel.setup` to its `manifest.json` as a git dependency (`https://github.com/Uee03/Pretzel.git?path=Packages/com.uee03.pretzel.setup#<tag>`), then install the other modules from the Addons tab. The tab installs them from the same repository and tag that Setup came from, unless the Settings tab overrides it.
 
+### Git URLs
+
+In Unity, open `Window > Package Manager`, choose `+ > Install package from git URL...` and paste the URL of the package. Append `#<tag>` (or `#main`) to pin a version.
+
+| Package | Git URL |
+|---|---|
+| setup | `https://github.com/Uee03/Pretzel.git?path=Packages/com.uee03.pretzel.setup` |
+| core | `https://github.com/Uee03/Pretzel.git?path=Packages/com.uee03.pretzel.core` |
+| extensions | `https://github.com/Uee03/Pretzel.git?path=Packages/com.uee03.pretzel.extensions` |
+| data | `https://github.com/Uee03/Pretzel.git?path=Packages/com.uee03.pretzel.data` |
+| tween | `https://github.com/Uee03/Pretzel.git?path=Packages/com.uee03.pretzel.tween` |
+| ui | `https://github.com/Uee03/Pretzel.git?path=Packages/com.uee03.pretzel.ui` |
+| ui.ugui | `https://github.com/Uee03/Pretzel.git?path=Packages/com.uee03.pretzel.ui.ugui` |
+| api | `https://github.com/Uee03/Pretzel.git?path=Packages/com.uee03.pretzel.api` |
+| templates | `https://github.com/Uee03/Pretzel.git?path=Packages/com.uee03.pretzel.templates` |
+| integrations | `https://github.com/Uee03/Pretzel.git?path=Packages/com.uee03.pretzel.integrations` |
+| editor | `https://github.com/Uee03/Pretzel.git?path=Packages/com.uee03.pretzel.editor` |
+
+Or add them to `manifest.json`:
+
+```json
+{
+  "dependencies": {
+    "com.uee03.pretzel.setup": "https://github.com/Uee03/Pretzel.git?path=Packages/com.uee03.pretzel.setup"
+  }
+}
+```
+
 Open `Pretzel > Project Setup` to create the folder structure, start a 2D or 3D scene, and install the recommended addons.
 
 ## Moving from LazyJedi
