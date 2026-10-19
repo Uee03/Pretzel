@@ -4,7 +4,7 @@
   "version": "0.1.0",
   "unity": "6000.0",
   "description": "Easing functions for float, Vector2, Vector3 and Color.",
-  "author": { "name": "Ubaidullah Effendi" },
+  "author": { "name": "Uee03" },
   "license": "MIT",
   "dependencies": {
     "com.uee03.pretzel.core": "0.1.0"

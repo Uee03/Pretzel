@@ -16,9 +16,7 @@ namespace Pretzel.Setup.Tabs
     {
         private static readonly (string Label, string Url)[] Credits =
         {
-            ("Lazy-Jedi (the original toolkit)", "https://github.com/Lazy-Jedi/Lazy-Jedi"),
-            ("BluMalice", "https://github.com/BLUDRAG"),
-            ("Kenney Assets", "https://www.kenney.nl/assets")
+            ("Lazy-Jedi (the original toolkit)", "https://github.com/Lazy-Jedi/Lazy-Jedi")
         };
 
         private PretzelTabContext _context;
@@ -289,7 +287,7 @@ namespace Pretzel.Setup.Tabs
         private void SetUpAbout()
         {
             _view.Q<Label>("settings-tab__about-text").text =
-                $"Pretzel {SetupAssets.PackageVersion()}, a modular toolkit by Ubaidullah Effendi. It grew out of Lazy-Jedi.";
+                $"Pretzel {SetupAssets.PackageVersion()}, a modular toolkit by Uee03. It grew out of Lazy-Jedi.";
 
             VisualElement links = _view.Q<VisualElement>("settings-tab__about-links");
             foreach ((string label, string url) in Credits)

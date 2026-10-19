@@ -1,5 +1,50 @@
 {
   "dependencies": {
+    "com.github-glitchenzo.nugetforunity": {
+      "version": "https://github.com/GlitchEnzo/NuGetForUnity.git?path=/src/NuGetForUnity#v4.5.0",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {},
+      "hash": "a7c6b49a0141a5bff9b1983e38137522ef61977d"
+    },
+    "com.uee03.pretzel.core": {
+      "version": "https://github.com/Uee03/Pretzel.git?path=Packages/com.uee03.pretzel.core",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {},
+      "hash": "affb0587c024bb1e9849592f9f57739534a44cdc"
+    },
+    "com.uee03.pretzel.data": {
+      "version": "https://github.com/Uee03/Pretzel.git?path=Packages/com.uee03.pretzel.data",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {
+        "com.uee03.pretzel.core": "0.1.0",
+        "com.uee03.pretzel.extensions": "0.1.0",
+        "com.unity.nuget.newtonsoft-json": "3.2.2"
+      },
+      "hash": "affb0587c024bb1e9849592f9f57739534a44cdc"
+    },
+    "com.uee03.pretzel.extensions": {
+      "version": "https://github.com/Uee03/Pretzel.git?path=Packages/com.uee03.pretzel.extensions",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {
+        "com.uee03.pretzel.core": "0.1.0",
+        "com.unity.modules.imageconversion": "1.0.0",
+        "com.unity.modules.physics": "1.0.0"
+      },
+      "hash": "affb0587c024bb1e9849592f9f57739534a44cdc"
+    },
+    "com.uee03.pretzel.setup": {
+      "version": "https://github.com/Uee03/Pretzel.git?path=Packages/com.uee03.pretzel.setup",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {
+        "com.unity.nuget.newtonsoft-json": "3.2.2"
+      },
+      "hash": "affb0587c024bb1e9849592f9f57739534a44cdc"
+    },
     "com.unity.2d.animation": {
       "version": "16.0.1",
       "depth": 0,
