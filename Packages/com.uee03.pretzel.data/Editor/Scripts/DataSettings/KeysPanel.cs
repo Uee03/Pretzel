@@ -1,7 +1,6 @@
 ﻿using System;
 using System.IO;
 using System.Security.Cryptography;
-using System.Text;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -10,10 +9,12 @@ namespace Pretzel.Data.Editor
 {
     internal sealed class KeysPanel : IDataFormatPanel
     {
-        private const string GameConfigPath = "Assets/Resources/" + GameEncryptionKeyConfig.ResourcePath + ".json";
-
         private DataFormatState _state;
         private TextField _prefix;
+        private EnumField _source;
+        private Label _active;
+        private Label _activeDetail;
+        private Button _previousClear;
         private Label _prefixHint;
         private Label _result;
         private Label _envHint;
@@ -54,6 +55,10 @@ namespace Pretzel.Data.Editor
             view.style.flexGrow = 1f;
 
             _prefix = view.Q<TextField>("keys-panel__prefix");
+            _source = view.Q<EnumField>("keys-panel__source");
+            _active = view.Q<Label>("keys-panel__active");
+            _activeDetail = view.Q<Label>("keys-panel__active-detail");
+            _previousClear = view.Q<Button>("keys-panel__previous-clear");
             _prefixHint = view.Q<Label>("keys-panel__prefix-hint");
             _result = view.Q<Label>("keys-panel__result");
             _envHint = view.Q<Label>("keys-panel__env-hint");
@@ -84,6 +89,9 @@ namespace Pretzel.Data.Editor
             _filePath.text = EncryptionKeyFile.Path;
 
             _prefix.RegisterValueChangedCallback(evt => OnPrefixChanged(evt.newValue.Trim()));
+            _source.Init(KeySource.Automatic);
+            _source.RegisterValueChangedCallback(evt => _state.Edit("Change key source", c => c.keySource = (KeySource)evt.newValue));
+            _previousClear.clicked += OnClearPrevious;
             view.Q<Button>("keys-panel__reload").clicked += OnReload;
             _envStore.clicked += () => StoreEnvironment(KeyScope.All);
             _envStorePublic.clicked += () => StoreEnvironment(KeyScope.PublicOnly);
@@ -95,7 +103,7 @@ namespace Pretzel.Data.Editor
             _fileDelete.clicked += OnDeleteFile;
             _gameJson.clicked += () => ExportGameKeys(false);
             _gameEmbedded.clicked += () => ExportGameKeys(true);
-            _gameSelect.clicked += () => SelectAsset(GameConfigPath);
+            _gameSelect.clicked += () => SelectAsset(GameKeyExport.JsonPath);
 
             _state.Changed += Refresh;
             Refresh();
@@ -150,12 +158,17 @@ namespace Pretzel.Data.Editor
             _envCopy.SetEnabled(hasKeys);
             _gameJson.SetEnabled(hasKeys);
             _gameEmbedded.SetEnabled(hasKeys);
-            _gameSelect.SetEnabled(File.Exists(GameConfigPath));
-            _gameHint.text = $"JSON: {GameConfigPath}\nC#: {ShippingGenerator.DefaultFolder}/{ShippingGenerator.ScriptName}\n"
-                             + $"Both exports include {ShippingGenerator.DefaultFolder}/{ShippingGenerator.ExampleName} (existing edits preserved).\n"
+            _gameSelect.SetEnabled(GameKeyExport.JsonExists);
+            _gameHint.text = $"JSON: {GameKeyExport.JsonPath}\nC#: {ShippingGenerator.DefaultFolder}/{ShippingGenerator.ScriptName}\n"
                              + (rsa
                                  ? "Exports only the RSA public key. The game can write encrypted files, but reading them requires the private key on your server."
                                  : "Exports the current AES key so the game can both save and load encrypted files offline.");
+
+            _source.SetValueWithoutNotify(config.keySource);
+            RefreshActiveKey(config);
+            int previous = keys.PreviousAesKeys.Count;
+            PanelUi.SetVisible(_previousClear, previous > 0);
+            _previousClear.text = $"Clear {previous} previous AES key(s)";
 
             // The public key section only matters when there is a public key.
             bool showPublic = keys.HasPublicKey;
@@ -191,13 +204,59 @@ namespace Pretzel.Data.Editor
             PanelUi.SetChip(row.Environment, text, status == EnvironmentStatus.NotSet ? PanelUi.Warn : PanelUi.Ok);
         }
 
-        private EncryptionKeys KeysForMode()
+        private void RefreshActiveKey(DataIOConfig config)
         {
-            EncryptionKeys keys = _state.Keys;
-            return _state.Config.encryptionMode == EncryptionMode.Aes
-                ? new EncryptionKeys { AesKey = keys.AesKey }
-                : new EncryptionKeys { RsaPublicKey = keys.RsaPublicKey, RsaPrivateKey = keys.RsaPrivateKey };
+            if (config.format != DataFormat.Encrypted)
+            {
+                PanelUi.SetChip(_active, "Not encrypted", PanelUi.Warn);
+                _activeDetail.text = "The format is not Encrypted, so DataIO does not read keys. Choose Encrypted on the Format tab.";
+                return;
+            }
+
+            if (config.keySource == KeySource.Provider && !Application.isPlaying)
+            {
+                PanelUi.SetChip(_active, "Registers at runtime", PanelUi.Warn);
+                _activeDetail.text = "A provider (the embedded setup, a token flow or your code) supplies its keys when Play mode or a build starts, so they cannot be checked here.";
+                return;
+            }
+
+            try
+            {
+                EncryptionKeys active = EncryptionKeys.Resolve(config.environmentPrefix, config.keySource, out string origin);
+                bool ready = active != null && active.CanWrite(config.encryptionMode);
+                PanelUi.SetChip(_active, ready ? "Keys found" : "No usable key", ready ? PanelUi.Ok : PanelUi.Missing);
+                _activeDetail.text = (active ?? new EncryptionKeys()).Describe(config.encryptionMode, origin);
+            }
+            catch (Exception ex)
+            {
+                // A malformed bundled config or a throwing provider must not break the window.
+                PanelUi.SetChip(_active, "Key source failed", PanelUi.Missing);
+                _activeDetail.text = PanelUi.ErrorText(ex);
+            }
         }
+
+        private void OnClearPrevious()
+        {
+            if (!PanelUi.Confirm("Clear previous AES keys?",
+                    "Saves written with an older key can no longer be opened once the keys are gone. Clear them only after every old save was loaded and saved again. "
+                    + "Export the game key again afterwards so builds stop carrying the old keys.",
+                    "Clear", "Cancel"))
+            {
+                return;
+            }
+
+            EncryptionKeys keys = _state.Keys.Clone();
+            keys.PreviousAesKeys.Clear();
+            _state.SetKeys(keys, _state.KeysUnstored);
+            if (EncryptionKeyFile.Exists && keys.HasAesKey)
+            {
+                KeyStorage.SaveFile(KeyStorage.ForMode(keys, EncryptionMode.Aes), KeyScope.All);
+            }
+
+            PanelUi.SetText(_result, "Previous AES keys cleared. Export the game key again so builds stop carrying them.");
+        }
+
+        private EncryptionKeys KeysForMode() => KeyStorage.ForMode(_state.Keys, _state.Config.encryptionMode);
 
         private void OnPrefixChanged(string value)
         {
@@ -282,11 +341,11 @@ namespace Pretzel.Data.Editor
 
         private void ExportGameKeys(bool embedded)
         {
-            string path = embedded ? ShippingGenerator.DefaultFolder + "/" + ShippingGenerator.ScriptName : GameConfigPath;
+            string path = embedded ? ShippingGenerator.DefaultFolder + "/" + ShippingGenerator.ScriptName : GameKeyExport.JsonPath;
             bool aes = _state.Config.encryptionMode == EncryptionMode.Aes;
-            if ((aes || File.Exists(path)) && !EditorUtility.DisplayDialog("Export game key?",
+            if ((aes || File.Exists(path)) && !PanelUi.Confirm("Export game key?",
                     $"This writes {(aes ? "the AES key" : "only the RSA public key")} to {path} and includes it in builds. "
-                    + "Any existing file at this path will be replaced. Changing a key does not migrate existing saves."
+                    + "Any existing file at this path will be replaced. Older AES keys are kept so existing saves still open."
                     + (aes ? " Anyone with the game can recover this key. Keep a separate backup and do not commit the generated file." : ""),
                     "Export", "Cancel"))
             {
@@ -295,35 +354,16 @@ namespace Pretzel.Data.Editor
 
             try
             {
-                if (embedded)
+                string error = GameKeyExport.Export(_state, embedded, ShippingGenerator.DefaultFolder, out path);
+                if (error != null)
                 {
-                    string error = ShippingGenerator.Generate(ShippingGenerator.DefaultFolder, KeyDelivery.Embedded,
-                        _state.Config, _state.Keys, out path);
-                    if (error != null)
-                    {
-                        PanelUi.SetText(_gameResult, error, "error");
-                        return;
-                    }
-                }
-                else
-                {
-                    string json = GameEncryptionKeyConfig.ToJson(_state.Keys, _state.Config.encryptionMode);
-                    Directory.CreateDirectory(Path.GetDirectoryName(GameConfigPath));
-                    File.WriteAllText(GameConfigPath, json, new UTF8Encoding(false));
-                    AssetDatabase.ImportAsset(GameConfigPath);
-                    ShippingGenerator.GenerateUsageExample(ShippingGenerator.DefaultFolder);
-                }
-
-                // RSA export deliberately leaves the private key unstored.
-                if (aes)
-                {
-                    _state.MarkKeysStored();
+                    PanelUi.SetText(_gameResult, error, "error");
+                    return;
                 }
 
                 Refresh();
-                PanelUi.SetText(_gameResult, $"Created {path}. Usage script: {ShippingGenerator.DefaultFolder}/{ShippingGenerator.ExampleName} "
-                    + "(existing edits preserved). Add it to a GameObject and use its context menu in Play mode. "
-                    + "Restart Play mode to use the exported key. Keep older keys for existing saves.");
+                PanelUi.SetText(_gameResult, $"Created {path}. Key source set to {_state.Config.keySource}. Restart Play mode to use it. "
+                    + $"Use the Setup tab to generate the code that creates the store.");
                 SelectAsset(path);
             }
             catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or ArgumentException

@@ -185,9 +185,12 @@ namespace Pretzel.Data.Editor
             EncryptionKeys current = _state.Keys;
             bool rsa = _state.Config.encryptionMode == EncryptionMode.Rsa;
             bool replacing = rsa ? current.HasPublicKey || current.HasPrivateKey : current.HasAesKey;
-            if (replacing && !EditorUtility.DisplayDialog(
-                    "Replace the key?",
-                    "Files encrypted with the current key cannot be opened with a new one. Back up the current key first if you still need those files.",
+            if (replacing && !PanelUi.Confirm(
+                    rsa ? "Replace the key pair?" : "Replace the AES key?",
+                    rsa
+                        ? "Files encrypted with the current key pair cannot be opened with a new one. Back up the current private key first if you still need those files."
+                        : "The current key is kept as a previous key, so saves written with it still open and move to the new key when they are saved again. "
+                          + "Clear the previous keys on the Keys tab once no old saves remain.",
                     "Replace", "Cancel"))
             {
                 return;
@@ -195,8 +198,11 @@ namespace Pretzel.Data.Editor
 
             if (!rsa)
             {
-                EncryptionKeys next = Copy(current);
+                EncryptionKeys next = current.Clone();
+                byte[] replaced = current.AesKey;
                 next.AesKey = EncryptionKeys.GenerateAesKey();
+                // Only after the swap: a key equal to the current one is ignored as a previous key.
+                next.AddPreviousAesKey(replaced);
                 _status.text = string.Empty;
                 _state.SetKeys(next, true);
                 return;
@@ -229,7 +235,7 @@ namespace Pretzel.Data.Editor
                     return;
                 }
 
-                EncryptionKeys next = Copy(_state.Keys);
+                EncryptionKeys next = _state.Keys.Clone();
                 next.RsaPublicKey = task.Result.RsaPublicKey;
                 next.RsaPrivateKey = task.Result.RsaPrivateKey;
                 _status.text = string.Empty;
@@ -267,11 +273,6 @@ namespace Pretzel.Data.Editor
 
             PanelUi.Copy(text);
             _status.text = what + " copied (Base64).";
-        }
-
-        private static EncryptionKeys Copy(EncryptionKeys source)
-        {
-            return new EncryptionKeys { AesKey = source.AesKey, RsaPublicKey = source.RsaPublicKey, RsaPrivateKey = source.RsaPrivateKey };
         }
     }
 }

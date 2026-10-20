@@ -32,7 +32,7 @@ Encryption raises the effort. It does not make client-side data trustworthy. Dec
 | Constant-time comparison of tags (Safeguard) | `CryptographicOperations.FixedTimeEquals` | Do the same in any code that reads these files |
 | Never hardcode keys. Use environment variables or a vault (Frontegg, C# Corner, dev.to, Jovanovic, Osama Haider) | Keys come from `EncryptionKeys.Resolve`: your code, environment variables, the Editor-only key file, or an optional bundled game JSON config | Pick a delivery option in [EncryptionKeyDelivery.md](EncryptionKeyDelivery.md). Bundled JSON is plain text; embedded C# is obfuscation, not protection, even with IL2CPP |
 | Keep keys apart from the data (Jovanovic, Kiteworks) | Editor key file is in `UserSettings`, never next to saves; game JSON is explicitly opt-in | Never put secret keys in the repository or save folder. Only bundle AES for offline saves if you accept that players can extract it; never bundle an RSA private key |
-| Rotate keys, and after any suspected leak (Kiteworks, Frontegg, SCDS, C# Corner, Jovanovic, Osama Haider) | Not automatic. See section 6 | Plan rotation before you ship |
+| Rotate keys, and after any suspected leak (Kiteworks, Frontegg, SCDS, C# Corner, Jovanovic, Osama Haider) | A new AES key keeps the old one as a previous key, so old saves still open and move to the new key when saved again. See section 6 | Plan rotation before you ship, and clear previous keys when no old save remains |
 | Back up keys. A lost key is lost data (SCDS) | Not automatic | Keep every key in a password manager or secret manager, and a copy offline |
 | Use PBKDF2 or similar with a salt when the secret is a password (Safeguard) | `EncryptionKeys.DeriveAesKey` (PBKDF2-HMAC-SHA256, 600,000 iterations. Safeguard's example uses 210,000, and 600,000 is the figure OWASP gives for this function, which was not among the reviewed sources) | See section 5 |
 | Hash passwords, do not encrypt them (C# Corner, Hardik Ojha) | Not for passwords | Hash on a server with bcrypt, Argon2 or PBKDF2 |
@@ -79,7 +79,17 @@ DataStore store = DataStoreFactory.Create(DataRoots.PersistentData("Export"), Da
 
 ## 6. Rotating a key
 
-Pretzel reads with one key per store, so rotate by reading with the old store and writing with a new one.
+For AES, generate a new key on the Encryption tab. The old key is kept as a previous key (`EncryptionKeys.PreviousAesKeys`), and the key file, the bundled JSON and the embedded setup all carry it. A store writes with the current key and reads with the current key first, then each previous key. The HMAC is checked before anything is decrypted, so only the key that wrote a file can open it. Old files therefore keep opening, and move to the new key as they are saved again. Clear the previous keys on the Keys tab once every old save was loaded and saved again.
+
+```csharp
+EncryptionKeys keys = new() { AesKey = newKey };
+keys.AddPreviousAesKey(oldKey);   // add it after setting the new key: a key equal to the current one is ignored
+DataStore store = DataStoreFactory.Create(root, DataFormat.Encrypted, keys);
+```
+
+Environment variables and a token flow carry the current key only, so supply the history yourself when players may hold older saves. RSA has no history: a new key pair cannot open files wrapped for the old public key, so keep the old private key on your server until those files are processed.
+
+To change a key without keeping the old one in the game, or to change formats, copy by reading with one store and writing with another:
 
 ```csharp
 DataStore oldStore = DataStoreFactory.Create(root, DataFormat.Encrypted, oldKeys);
@@ -99,7 +109,7 @@ foreach (int slot in oldStore.ListSlots("Profiles"))
 // Delete the old files and retire the old key only after every file was copied and a copy opens.
 ```
 
-Rotate when someone who knew the key leaves, when a key may have leaked, and on a schedule that fits your risk. For a shipped game, keep the previous key in the build for one release so saves can be upgraded on first launch.
+Rotate when someone who knew the key leaves, when a key may have leaked, and on a schedule that fits your risk. After a leak, a previous key in a build is also extractable, so re-encrypt old saves, then clear it.
 
 ## 7. Reading Pretzel files outside Unity
 
@@ -204,19 +214,19 @@ Load the private key on the server with `rsa.FromXmlString(xml)`, taking the XML
    }
    ```
 5. Test the round trip on the Decrypt tab, and try an edited file to see it rejected.
-6. Pick the delivery option for release on the Shipping tab, and read the delivery guide.
-7. Before release, go through the checklist below.
+6. Pick the delivery option for release on the Shipping tab (or the Setup tab), set the key source to match, and read the delivery guide.
+7. Run **Check build setup**, then go through the checklist below.
 
 Without the window, in code only:
 
 ```csharp
-EncryptionKeys keys = EncryptionKeys.Resolve("PRETZEL_MYGAME");
+EncryptionKeys keys = EncryptionKeys.Resolve("PRETZEL_MYGAME", KeySource.Provider, out string origin);
 if (keys == null)
 {
     // Fail loudly in development. In release, show an error, do not fall back to plain text.
 }
 
-DataIO.Default = DataStoreFactory.Create(DataRoots.PersistentData("SaveData"), DataFormat.Encrypted, keys);
+DataIO.Default = DataStoreFactory.Create(DataRoots.PersistentData("SaveData"), DataFormat.Encrypted, keys.ForClient(EncryptionMode.Aes));
 ```
 
 ## 10. Release checklist
@@ -229,13 +239,14 @@ DataIO.Default = DataStoreFactory.Create(DataRoots.PersistentData("SaveData"), D
 - [ ] A wrong key, an edited file and a missing key each end in a handled result, not a crash and not a silent overwrite.
 - [ ] HTTPS only, with certificate validation on.
 - [ ] You decided how a key is rotated or revoked, and wrote it down.
+- [ ] **Check build setup** is clean, and a build without the Editor key file or your environment variables can read and write saves.
 - [ ] Anything that must stay secret from the player is on a server, not in the game.
 
 ## 11. Limits of this implementation
 
 - RSA key wrapping uses OAEP with SHA-1, because Mono's RSA does not support OAEP with SHA-256. It is safe for wrapping a random key.
 - Encryption is AES-CBC plus HMAC, not AES-GCM, because `AesGcm` is not available in Unity's .NET profile. The result gives the same guarantees when used as described.
-- One key per store, and no key id in the file. Rotation is a copy (section 6).
+- One current key per store. AES files hold no key id, so reading tries the current key and then each previous key; the HMAC check makes that safe. RSA has no key history.
 - Keys live in normal managed memory and are not wiped after use. This is the same for every Unity encryption library.
 - The key file in `UserSettings` is plain text, protected only by your user account and your `.gitignore`.
 - Whole files are processed in memory. Split very large data into several smaller files.

@@ -5,7 +5,7 @@ using UnityEngine.UIElements;
 
 namespace Pretzel.Data.Editor
 {
-    /// <summary>Configures how <see cref="Pretzel.Data.DataIO"/> saves: format, encryption, key storage, shipping and a decrypt tool.</summary>
+    /// <summary>Configures how <see cref="Pretzel.Data.DataIO"/> saves: setup code, format, encryption, key storage, shipping and a decrypt tool.</summary>
     public sealed class DataFormatWindow : EditorWindow
     {
         private const string TabKey = "Pretzel.DataFormat.Tab";
@@ -38,6 +38,7 @@ namespace Pretzel.Data.Editor
             UpdateUnsaved();
 
             _panels.Clear();
+            _panels.Add(new SetupPanel());
             _panels.Add(new FormatPanel());
             _panels.Add(new EncryptionPanel());
             _panels.Add(new KeysPanel());

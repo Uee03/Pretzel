@@ -124,7 +124,6 @@ namespace Pretzel.Data
 
             byte mode = data[5];
             int offset = HeaderSize;
-            byte[] master;
             if (mode == ModeAes)
             {
                 if (!_keys.HasAesKey)
@@ -132,32 +131,63 @@ namespace Pretzel.Data
                     throw new InvalidOperationException("This file was encrypted with an AES key, and no AES key is available.");
                 }
 
-                master = _keys.AesKey;
-            }
-            else if (mode == ModeRsa)
-            {
-                if (!_keys.HasPrivateKey)
+                // The authentication check makes trying earlier keys safe: only the key that wrote the file passes it.
+                // The first failure is reported, because the current key is the one the caller expects to work.
+                CryptographicException failure = null;
+                try
                 {
-                    throw new InvalidOperationException("This file was encrypted with an RSA public key. Decrypting needs the RSA private key.");
+                    return Decrypt(data, offset, _keys.AesKey);
+                }
+                catch (CryptographicException ex)
+                {
+                    failure = ex;
                 }
 
-                int length = (data[offset] << 8) | data[offset + 1];
-                offset += 2;
-                if (offset + length + IvSize + MacSize > data.Length)
+                foreach (byte[] previous in _keys.PreviousAesKeys)
                 {
-                    throw new InvalidDataException("The wrapped key length is invalid.");
+                    if (previous == null || previous.Length != EncryptionKeys.AesKeySize)
+                    {
+                        continue;
+                    }
+
+                    try
+                    {
+                        return Decrypt(data, offset, previous);
+                    }
+                    catch (CryptographicException)
+                    {
+                        // Not this key either.
+                    }
                 }
 
-                byte[] wrapped = new byte[length];
-                Buffer.BlockCopy(data, offset, wrapped, 0, length);
-                offset += length;
-                master = UnwrapKey(wrapped);
+                throw failure;
             }
-            else
+
+            if (mode != ModeRsa)
             {
                 throw new InvalidDataException($"Unknown encryption mode {mode}.");
             }
 
+            if (!_keys.HasPrivateKey)
+            {
+                throw new InvalidOperationException("This file was encrypted with an RSA public key. Decrypting needs the RSA private key.");
+            }
+
+            int length = (data[offset] << 8) | data[offset + 1];
+            offset += 2;
+            if (offset + length + IvSize + MacSize > data.Length)
+            {
+                throw new InvalidDataException("The wrapped key length is invalid.");
+            }
+
+            byte[] wrapped = new byte[length];
+            Buffer.BlockCopy(data, offset, wrapped, 0, length);
+            offset += length;
+            return Decrypt(data, offset, UnwrapKey(wrapped));
+        }
+
+        private static byte[] Decrypt(byte[] data, int offset, byte[] master)
+        {
             DeriveKeys(master, out byte[] encryptionKey, out byte[] macKey);
 
             int bodyLength = data.Length - MacSize;

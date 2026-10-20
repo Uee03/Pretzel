@@ -14,6 +14,13 @@ namespace Pretzel.Data
     {
         private static volatile IDataStore _default;
 
+        /// <summary>
+        /// Forgets the default store, so the next call builds a new one from <see cref="DataIOConfig"/>.
+        /// Runs automatically when Play mode starts, which keeps a disabled domain reload from reusing the last session's store.
+        /// </summary>
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+        public static void Reset() => _default = null;
+
         /// <summary>The store behind every method on this class. Replace it to change location, serializer or options.</summary>
         public static IDataStore Default
         {

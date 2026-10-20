@@ -1,10 +1,10 @@
 # Delivering encryption keys to a game
 
-See also [EncryptionBestPractices.md](EncryptionBestPractices.md).
+See also [EncryptionBestPractices.md](EncryptionBestPractices.md) and, for the whole setup, [DataIOSetup.md](DataIOSetup.md).
 
 Pretzel's `Encrypted` format is only as strong as the way you handle its keys. This guide explains what each key is, where it can live, and how to give a shipped game access to a key without hard-coding it.
 
-> A key that the game can use is a key the player's machine can reach. Anyone who can run the game and attach a debugger can get it. Everything below makes that harder or limits the damage. Nothing makes it impossible.
+> A key that the game can use is a key the player's machine can reach. Anyone who can run the game and attach a debugger can get it, with or without IL2CPP. Everything below makes that harder or limits the damage. Nothing makes it impossible.
 
 ## The keys
 
@@ -16,32 +16,45 @@ Pretzel's `Encrypted` format is only as strong as the way you handle its keys. T
 
 The IV is not a key. Pretzel creates a random IV for every file and writes it into the file, so there is no IV to store, protect or ship.
 
+## Choosing where the game reads its key
+
+`DataIOConfig.keySource` (Keys tab) decides where `DataIO` looks. Pick the source your build ships, so a stray environment variable or Editor key file cannot hide a missing key:
+
+| Key source | Reads |
+|---|---|
+| `Provider` | `EncryptionKeys.Provider` only: the embedded setup, a token flow, or your code |
+| `BundledJson` | `Assets/Resources/Pretzel/GameEncryptionKeys.json` only |
+| `Environment` | `<PREFIX>_AES_KEY`, `<PREFIX>_RSA_PUBLIC`, `<PREFIX>_RSA_PRIVATE` only. For servers and tools |
+| `Automatic` | Provider, environment, the Editor key file, then the bundled JSON. For development |
+
+The Setup tab, the Keys tab exports and the Shipping tab set the key source for you. The Keys tab shows which key is active and where it came from, by fingerprint. A build runs a check (Tools > Pretzel > DataIO > Check build setup) that fails when the chosen source would not give a player a key.
+
 ## Where each key can be stored
 
-- **Environment variables.** Names are `<PREFIX>_AES_KEY`, `<PREFIX>_RSA_PUBLIC` and `<PREFIX>_RSA_PRIVATE`. The values are Base64. The prefix is set per project in the Data Format window (default `PRETZEL_<PRODUCT>`). Variables belong to your user account on that machine, not to the project, so the prefix keeps projects apart. Good for development, build servers and dedicated servers.
-- **Project key file.** `UserSettings/Pretzel/pretzel-keys.json` inside the project. It is per project and per user, and it is plain text. Keep `UserSettings` in `.gitignore`. Only the Editor reads it. Builds never do.
-- **Game key config.** The Keys tab's **Game-specific keys** section writes `Assets/Resources/Pretzel/GameEncryptionKeys.json`. Unity includes it as a TextAsset in builds. `DataIO` reads it automatically, after the provider, environment variables and (in the Editor) the local project key file. It contains only the selected mode's AES key or RSA public key, never the private key. Missing configs are optional; malformed configs throw.
+- **Environment variables.** Names are `<PREFIX>_AES_KEY`, `<PREFIX>_RSA_PUBLIC` and `<PREFIX>_RSA_PRIVATE`. The values are Base64. The prefix is set per project in the Data Format window (default `PRETZEL_<PRODUCT>`). Variables belong to your user account on that machine, not to the project, so the prefix keeps projects apart. They hold the current AES key only, not its history. Good for development, build servers and dedicated servers.
+- **Project key file.** `UserSettings/Pretzel/pretzel-keys.json` inside the project. It is per project and per user, and it is plain text. Keep `UserSettings` in `.gitignore`. Only the Editor reads it. Builds never do. It also keeps the previous AES keys.
+- **Game key config.** `Assets/Resources/Pretzel/GameEncryptionKeys.json`, written by the Setup button or the Keys tab. Unity includes it as a TextAsset in builds. It contains only the selected mode's AES key (with a `keyId` fingerprint and any `previousAesKeys`) or RSA public key, never the private key. A malformed config throws instead of being ignored.
 - **Public key only.** Because it is public, the RSA public key can also be put in the project key file, an environment variable, the game key config, or compiled into the game.
 
 ## Four ways to get a key into a build
 
 ### 1. Environment variables on the machine running the game
 
-Best for servers, tools and tests. Not practical for players. `DataIO` finds the variables by itself.
+Best for servers, tools and tests. Not practical for players. Set the key source to `Environment`.
 
 ### 2. Bundled JSON config (simple offline setup)
 
-Generate a key on the Encryption tab, then choose **Keys > Game-specific keys > Save game key config (JSON)**. No startup code is required. AES allows both reading and writing offline; RSA exports only the public key, so the game can write but your server must decrypt.
+Use the Setup tab (**Generate AES / RSA encryption setup**, delivery *Bundled JSON*), or **Keys > Game-specific keys > Save game key config (JSON)**. The key source becomes `BundledJson`. No startup code is needed for the key. AES allows both reading and writing offline; RSA exports only the public key, so the game can write but your server must decrypt.
 
-The config is plain text, not a secret store. Exclude `Assets/Resources/Pretzel/GameEncryptionKeys.json` and its `.meta` from version control when it contains an AES key. Keep backups separately. Restart Play mode after exporting; existing stores retain their keys. Re-exporting replaces the config, but does not migrate saves encrypted with an older key. RSA exports do not back up the private key; store it separately using the Editor-only options.
+The config is plain text, not a secret store. Exclude it and its `.meta` from version control when it contains an AES key. Keep backups separately. Restart Play mode after exporting; an existing store keeps its keys. A new key does not change what an old save needs: the old key stays as a previous key.
 
 ### 3. Embedded in the game (obfuscated)
 
-The Shipping tab, or **Keys > Game-specific keys > Generate embedded C# setup**, writes `PretzelDataSetup.cs`. It stores the AES key as two XOR-masked arrays and registers `EncryptionKeys.Provider` before the first scene loads.
+Use the Setup tab (delivery *Embedded C#*), the Shipping tab, or **Keys > Game-specific keys > Generate embedded C# setup**. It writes `PretzelDataSetup.cs`, which stores each AES key as two XOR-masked arrays and registers `EncryptionKeys.Provider` before the first scene loads. The key source becomes `Provider`.
 
-This only defeats a string search of the build. IL2CPP compiles this to native code and can increase reverse-engineering effort, but is not a guarantee of secrecy. A determined player can still recover the key. Use it when the aim is to stop casual save editing. Keep the generated AES script out of version control.
+This only defeats a string search of the build. IL2CPP compiles it to native code, which makes it less convenient to read but not secret. A determined player can still recover the key. Use it when the aim is to stop casual save editing. Keep the generated AES script out of version control.
 
-Choose JSON or embedded C#, not both: the generated provider takes precedence over the JSON config. Remove stale exports when switching methods.
+With the key source set, only one of JSON and embedded C# is read. A JSON you no longer use still ships, so delete it; the build check warns about it.
 
 With RSA, embed the public key. That is safe by design, because the public key cannot decrypt anything.
 
@@ -58,11 +71,11 @@ sequenceDiagram
     P->>G: Starts the game
     G->>A: Sign in (Steam, Epic, PlayFab, Firebase, Unity Authentication...)
     A-->>G: Short-lived access token (JWT)
-    G->>K: GET /save-key with Authorization: Bearer <token>
+    G->>K: GET /save-key, sending the access token
     K->>K: Validate token, check entitlement, rate limit
     K-->>G: Key for this player (over TLS)
     G->>G: EncryptionKeys.Provider = () => keys (memory only)
-    G->>G: DataIO now reads and writes encrypted saves
+    G->>G: ProjectDataIO.Initialize(), DataIO reads and writes encrypted saves
 ```
 
 Recommendations for the key service:
@@ -88,64 +101,30 @@ byte[] playerKey = HKDF.DeriveKey(
 return Convert.ToBase64String(playerKey);
 ```
 
-Game side, using the generated `PretzelDataSetup`:
+Game side, with the key source set to `Provider` and the generated token `PretzelDataSetup` (Shipping tab, *Fetch with a token*):
 
 ```csharp
 // After sign-in succeeds:
-bool ok = await PretzelDataSetup.LoadKeysAsync(accessToken);
-if (!ok)
+if (!await PretzelDataSetup.LoadKeysAsync(accessToken))
 {
     // Offer offline play without saves, or ask the player to try again.
+    return;
 }
+
+ProjectDataIO.Initialize();   // creates the store with the key that just arrived
 ```
 
-Open `PretzelDataSetup.cs` and fill in `RequestKeyAsync` with your own request (for example with `Pretzel.Api.ApiClient`).
+Or fetch the key yourself and pass it in: `ProjectDataIO.InitializeWithKeys(new EncryptionKeys { AesKey = key })`. Open `PretzelDataSetup.cs` and fill in `RequestKeyAsync` with your own request (for example with `Pretzel.Api.ApiClient`).
 
-## Runnable usage examples
+## Changing an AES key
 
-### Explicit JSON or embedded-script keys
+Generate a new AES key on the Encryption tab. The old key is kept as a previous key:
 
-The generated companion has **Encryption/JSON** and **Encryption/Embedded script** context-menu actions for AES save/load and RSA writing. JSON actions read only the bundled config; embedded actions read only the currently registered provider, without falling back to Editor keys or environment variables.
+- the key file, the bundled JSON (`previousAesKeys`) and the embedded setup all carry the history,
+- saves written with an older key still open, and new files use the current key, so old files move to it as they are saved again,
+- environment variables and a token flow carry the current key only, so supply the history yourself (`EncryptionKeys.PreviousAesKeys`) when a player may still hold older saves.
 
-```csharp
-// JSON: export on Keys > Save game key config (JSON).
-EncryptionKeys jsonKeys = GameEncryptionKeyConfig.Load();
-
-// Embedded C#: export the setup, enter Play mode, then call from Start or later.
-// PretzelDataSetup has already registered its provider; no direct setup-class reference is needed.
-if (EncryptionKeys.Provider == null)
-    throw new InvalidOperationException("Export embedded C# and restart Play mode first.");
-EncryptionKeys embeddedKeys = EncryptionKeys.Provider.Invoke();
-
-// Choose the source matching your export. The export must contain an AES key.
-DataStore saves = DataStoreFactory.Create(DataRoots.PersistentData("MySaves"),
-    DataFormat.Encrypted, jsonKeys, EncryptionMode.Aes);
-saves.Save("profile", new PretzelEncryptionExample.Profile { level = 7 });
-LoadResult<PretzelEncryptionExample.Profile> loaded =
-    saves.Load<PretzelEncryptionExample.Profile>("profile");
-if (!loaded.Ok)
-    Debug.LogWarning($"Load failed ({loaded.Status}): {loaded.Error}");
-
-// For an RSA export, use jsonKeys OR embeddedKeys containing its public key.
-// The client writes; a trusted server with the private key reads.
-DataStore outbox = DataStoreFactory.Create(DataRoots.PersistentData("Reports"),
-    DataFormat.Encrypted, embeddedKeys, EncryptionMode.Rsa);
-outbox.Save("report", new PretzelEncryptionExample.Profile { level = 12 });
-```
-
-The JSON and embedded snippets show alternative sources, not a requirement to export both. Run the AES or RSA portion matching your key. In a game using the global configuration, `DataIO.Save` / `DataIO.Load` already resolve the exported keys automatically; the explicit stores above demonstrate the source directly. Handle `NotFound` and `Corrupt` rather than automatically overwriting existing data. A token/custom provider replaces the embedded provider, so these embedded actions then use that provider instead.
-
-Existing companion files are preserved. To obtain updated examples, rename or back up your old companion, then re-export. Do not leave two scripts defining `PretzelEncryptionExample` in the project.
-
-Both **Keys > Game-specific keys** exports automatically create `Assets/Pretzel/Generated/PretzelEncryptionExample.cs`. No sample import is needed. Add it to a GameObject, enter Play mode, and use the separate AES save/load or RSA write context-menu actions. Nothing runs automatically, and it uses a dedicated example save folder. The script contains no keys; it includes async/token call-site examples, explicit key-source options, and a trusted-server RSA reader. Re-exporting preserves any existing example script and your edits. JSON remains under Resources; scripts remain under the generated scripts folder. Shipping creates the same companion alongside its setup.
-
-Import **Data Usage** in Package Manager and add `EncryptionUsageExample` to a GameObject. Use its component context menu in Play mode for configured AES save/load or RSA report writing. Its source also shows explicit JSON/environment/provider stores, a trusted-server RSA reader, and async token-based AES setup with a supplied HTTPS request function.
-
-In the repository test project, add `DataEncryptionExample` from `Assets/Pretzel/Examples` to a GameObject. Its component context menu includes a no-configuration AES round trip, configured AES save/load, RSA writing, and an Editor-only server simulation. Choose **Encrypted + AES** or **Encrypted + RSA** in Data Format before running the configured examples. Back up the RSA private key through the Editor-only Keys storage options before exporting the public key.
-
-JSON and environment delivery need no startup call. Embedded setup registers before the first scene; call save/load from `Start` or later. Token delivery must finish after sign-in and before any save/load. The generated setup includes commented call-site examples for these flows.
-
-**AES reads and writes on the client. RSA writes on the client and reads on a trusted server.** If a load returns `Corrupt`, report a wrong key or damaged file rather than silently replacing the player's data. Do not generate new keys on each launch or overwrite existing saves just to test loading.
+When every old save was loaded and saved again, use **Clear previous AES keys** on the Keys tab and export again, so builds stop carrying old keys. Keep a separate backup of every key your players' saves still need.
 
 ## Protecting the private key
 
@@ -155,8 +134,10 @@ If you use RSA mode, the private key is the one that matters.
 - Keep it in a secret manager (Azure Key Vault, AWS Secrets Manager, HashiCorp Vault), a password manager, or an encrypted backup.
 - Give your server access through its secret store or environment, not through a file in the repository.
 - On a build server, use the CI system's secret variables.
-- Decrypt on your server. If a tool needs to open files, use the Decrypt tab on a machine you trust.
+- Decrypt on your server (`ProjectDataIO.CreateServerStore` in an RSA setup). If a tool needs to open files, use the Decrypt tab on a machine you trust.
 - If it leaks, generate a new pair, ship the new public key, and re-encrypt the data you still need.
+
+`ProjectDataIO` gives a game client only what it needs: `EncryptionKeys.ForClient` drops the private key, and `Describe()` warns if one was loaded.
 
 ## Choosing a key size
 
@@ -174,6 +155,7 @@ The file encryption itself is always AES-256, whatever the RSA size.
 
 - [ ] The RSA private key is not in the repository, the build or the logs. The AES key is not in the repository or logs; if bundled for offline saves, its extractability is an accepted trade-off.
 - [ ] `UserSettings` is in `.gitignore`.
-- [ ] You chose a delivery option above, and tested a fresh install.
-- [ ] A save written by the previous build still opens (keep old keys until saves are re-saved).
+- [ ] The key source matches your delivery, and **Check build setup** is clean.
+- [ ] You tested a build without the Editor key file or your environment variables.
+- [ ] A save written by the previous build still opens (keep old keys as previous keys until saves are re-saved).
 - [ ] Wrong key and edited file both load as `Corrupt`, and the game handles that.

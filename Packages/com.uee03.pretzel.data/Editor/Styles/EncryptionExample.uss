@@ -1,0 +1,10 @@
+.pretzel-encryption-example {
+    --pretzel-example-gap: 4px;
+}
+
+.pretzel-encryption-example__actions {
+    flex-direction: row;
+    flex-wrap: wrap;
+    margin-top: var(--pretzel-example-gap);
+    margin-bottom: var(--pretzel-example-gap);
+}

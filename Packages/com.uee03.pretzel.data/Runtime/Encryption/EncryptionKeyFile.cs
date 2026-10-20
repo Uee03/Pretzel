@@ -36,6 +36,14 @@ namespace Pretzel.Data
                     RsaPublicKey = EncryptionKeys.DecodeXml(dto.rsaPublicKey),
                     RsaPrivateKey = EncryptionKeys.DecodeXml(dto.rsaPrivateKey)
                 };
+                if (dto.previousAesKeys != null)
+                {
+                    foreach (string old in dto.previousAesKeys)
+                    {
+                        keys.AddPreviousAesKey(string.IsNullOrWhiteSpace(old) ? null : EncryptionKeys.DecodeAesKey(old));
+                    }
+                }
+
                 return keys.IsEmpty ? null : keys;
             }
             catch (System.Exception ex) when (ex is IOException or JsonException or System.UnauthorizedAccessException)
@@ -51,11 +59,12 @@ namespace Pretzel.Data
             {
                 aesKey = keys.HasAesKey ? EncryptionKeys.EncodeAesKey(keys.AesKey) : null,
                 rsaPublicKey = EncryptionKeys.EncodeXml(keys.RsaPublicKey),
-                rsaPrivateKey = EncryptionKeys.EncodeXml(keys.RsaPrivateKey)
+                rsaPrivateKey = EncryptionKeys.EncodeXml(keys.RsaPrivateKey),
+                previousAesKeys = keys.PreviousAesKeys.Count == 0 ? null : keys.PreviousAesKeys.ConvertAll(EncryptionKeys.EncodeAesKey).ToArray()
             };
 
             Directory.CreateDirectory(System.IO.Path.GetDirectoryName(Path));
-            File.WriteAllText(Path, JsonConvert.SerializeObject(dto, Formatting.Indented));
+            File.WriteAllText(Path, JsonConvert.SerializeObject(dto, Formatting.Indented, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore }));
         }
 
         public static void Delete()
@@ -68,6 +77,7 @@ namespace Pretzel.Data
             public string aesKey;
             public string rsaPublicKey;
             public string rsaPrivateKey;
+            public string[] previousAesKeys;
         }
     }
 }

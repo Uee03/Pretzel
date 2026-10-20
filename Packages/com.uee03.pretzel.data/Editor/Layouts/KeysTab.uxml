@@ -14,6 +14,19 @@
         </engine:VisualElement>
 
         <engine:VisualElement class="pretzel-section">
+            <engine:Label text="Key source and active key" class="pretzel-section__title" />
+            <engine:Label class="pretzel-section__hint"
+                          text="DataIO reads encrypted keys from one source. For a shipped game choose the one you export below: Provider (embedded C#, or a token flow) or Bundled Json. A stray environment variable or Editor key file then cannot hide a missing key. Automatic is for development." />
+            <engine:EnumField name="keys-panel__source" label="Key source" />
+            <engine:Label name="keys-panel__active" class="pretzel-chip" />
+            <engine:Label name="keys-panel__active-detail" class="pretzel-section__hint" />
+            <engine:VisualElement class="pretzel-button-row">
+                <engine:Button name="keys-panel__previous-clear" text="Clear previous AES keys"
+                               class="pretzel-section__action pretzel-section__action--danger" />
+            </engine:VisualElement>
+        </engine:VisualElement>
+
+        <engine:VisualElement class="pretzel-section">
             <engine:Label text="Environment variables" class="pretzel-section__title" />
             <engine:Label name="keys-panel__env-hint" class="pretzel-section__hint" />
             <engine:VisualElement class="pretzel-button-row">
@@ -48,7 +61,7 @@
             <engine:HelpBox message-type="Warning"
                             text="A shipped AES key can be extracted from JSON or compiled code. IL2CPP and the generated script's XOR masking only raise the effort; they do not keep it secret. Keep generated AES files out of version control. RSA private keys are never exported." />
             <engine:Label class="pretzel-section__hint"
-                          text="JSON is loaded automatically by DataIO through Resources, including in player builds. Providers, environment variables and the Editor-only project key file take precedence. Embedded C# uses the existing Shipping generator and registers a provider before the first scene. Choose one delivery method to avoid stale keys." />
+                          text="Saving the JSON sets the key source to Bundled Json. Generating the embedded C# setup sets it to Provider. Both keep older AES keys so existing saves still open. Choose one delivery; the other file is not read, but a stale JSON would still ship, so remove it." />
             <engine:VisualElement class="pretzel-button-row">
                 <engine:Button name="keys-panel__game-json" text="Save game key config (JSON)"
                                class="pretzel-section__action pretzel-section__action--primary" />

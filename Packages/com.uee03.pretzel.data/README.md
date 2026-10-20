@@ -15,7 +15,7 @@ await DataIO.SaveAsync(slot, profile, token);
 ## Concepts
 
 - `DataKey`: a name, an optional slot and an optional folder. Validated, so a key cannot leave the store root. A `string` converts to a key.
-- `DataStore`: the instance that does the work. `new DataStore(root, serializer, extension, options)`. `DataIO` is a thin static facade over `DataIO.Default`, which you can replace.
+- `DataStore`: the instance that does the work. `new DataStore(root, serializer, extension, options)`. `DataIO` is a thin static facade over `DataIO.Default`, which you can replace or reset with `DataIO.Reset()`.
 - `IDataRoot` / `DataRoots`: where files go. `PersistentData`, `TemporaryCache`, `Absolute`, and in the editor `ProjectSettings` and `UserSettings`. Roots resolve on first use.
 - `ISerializer`: `NewtonsoftSerializer` by default, `JsonUtilitySerializer` for ScriptableObjects. Converters for `Vector2`, `Vector3`, `Quaternion`, `Color` and `SerializableGuid` are included.
 - `LoadResult<T>`: `Ok`, `NotFound` or `Corrupt`. Missing and corrupt files are results, not exceptions or silent defaults.
@@ -37,33 +37,81 @@ JSON is the default. The other formats are optional providers that run after the
 
 Any format except plain text can also be written as Base64 text (`Base64Transform`, about 33 percent bigger), for pasting or putting in a JSON field.
 
-`DataIO.Default` follows `DataIOConfig`, an asset at `Assets/Resources/Pretzel/DataIOConfig.asset` that the **Pretzel/Data Format** window creates and edits. It holds no secrets. Without it, `DataIO` saves plain JSON. The window has these tabs:
+## Set up a project in two steps
 
-- **Format**: Plain text, Compressed, Binary or Encrypted, each with pros, cons and when to use it. Serializer, save folder, extension, pretty print, backup and Base64 text.
-- **Encryption**: AES-256 or RSA public key + AES-256, RSA key size (2048, 3072 or 4096, with 4096 recommended), key generation, and a checklist for what to do with an encrypted JSON.
-- **Keys**: store keys as user environment variables, or in the per-project key file `UserSettings/Pretzel/pretzel-keys.json`, which is plain text and must stay out of version control. Environment variables are per user, not per project, so each project gets its own variable prefix. The **Game-specific keys** section exports a game-readable JSON config or generates the existing embedded C# setup. Both export only the current mode's AES key or RSA public key, never the RSA private key.
-- **Shipping**: writes `PretzelDataSetup.cs` (environment check, embedded key, or token fetch), a standalone `PretzelEncryptionExample.cs`, and a copy of the key delivery guide into your Assets.
-- **Decrypt**: paste plain JSON, or the Base64 text of a Compressed, Binary or Encrypted file, to decode it. It can also encode JSON with the current format, and take other keys without saving them.
+Open **Pretzel > Data Format**. The **Setup** tab has two buttons. Each one generates `Assets/Pretzel/DataIO/ProjectDataIO.cs`, a small static class you call once at startup:
 
-Generated keys that are not stored yet survive a script reload, and closing the window asks whether to save them to the key file. In code:
+| Button | What it does |
+|---|---|
+| **Generate plain / GZip / BSON setup** | Sets the format and writes the setup code. No keys. |
+| **Generate AES / RSA encryption setup** | One step: switches the settings to Encrypted, creates an AES key if there is none, exports the key the game will read (embedded C# or bundled JSON), sets the key source to match, and writes the setup code. For RSA, generate the key pair on the Encryption tab first. |
 
 ```csharp
-EncryptionKeys keys = EncryptionKeys.Resolve("PRETZEL_MYGAME");
-DataStore store = DataStoreFactory.Create(DataRoots.PersistentData("SaveData"), DataFormat.Encrypted, keys);
+void Start()
+{
+    ProjectDataIO.Initialize();                 // once, after the key is available
+    DataIO.Save("profile", profile);
+    LoadResult<Profile> result = DataIO.Load<Profile>("profile");
+}
 ```
 
-`EncryptionKeys.Resolve` takes each key from the first source that has it: `EncryptionKeys.Provider` (your code, for example keys fetched with a token), the environment variables `<PREFIX>_AES_KEY`, `<PREFIX>_RSA_PUBLIC` and `<PREFIX>_RSA_PRIVATE` (Base64), in the Editor `UserSettings/Pretzel/pretzel-keys.json`, then the optional bundled `Assets/Resources/Pretzel/GameEncryptionKeys.json`. The JSON is loaded automatically in both the Editor and player builds; no startup script is needed. A missing config is optional; a malformed config throws rather than silently ignoring it. A wrong key, or an edited file, loads as `Corrupt`.
+Every setting can be changed in two places, whichever suits you:
 
-For offline encrypted saves, generate an AES key, then choose **Keys > Game-specific keys > Save game key config (JSON)**. Alternatively, **Generate embedded C# setup** writes `Assets/Pretzel/Generated/PretzelDataSetup.cs`, using the same generator as Shipping. Choose one method and remove stale generated files when switching. Restart Play mode after exporting; an already-created store keeps its keys. Keep a separate backup of every key needed by existing saves: exporting a new key does not migrate old saves. RSA exports leave the private key unstored, so save that separately through the Editor-only storage options.
+- **The settings asset** `Assets/Resources/Pretzel/DataIOConfig.asset` (the Format, Encryption and Keys tabs, or its Inspector). It holds no secrets, so it is safe to commit.
+- **Code**, for one game start, without touching the asset: `ProjectDataIO.Initialize(config => config.saveFolder = "MyGameSaves");`. The overrides apply to a copy.
 
-Bundling an AES key is a convenience for discouraging casual save editing, not secure secret storage. JSON is plain text; the generated C# uses XOR-masked arrays. IL2CPP compiles the code to native code but does not make embedded keys secret. Exclude generated AES files (including their `.meta` files) from version control; unlike `DataIOConfig.asset`, these exports contain key material.
+`ProjectDataIO` also covers the rest of the lifecycle, so no other initializer is needed:
+
+- `Initialize()` is idempotent. `Shutdown()` forgets the store and resets `DataIO`; it also runs when Play mode starts, so a disabled domain reload never reuses an old session.
+- `InitializeWithKeys(keys)` is for keys that arrive after startup, such as a token flow. Keep them in memory.
+- `ProjectDataIO.CreateStore("Settings", config => ...)` makes a second store from the same settings in its own folder. This is how you use stores and factories correctly: create each one once, keep it, and use a different folder when the format differs.
+- `ProjectDataIO.Describe()` (encrypted setups) names the active key by fingerprint and source, never the key itself.
+- RSA setups add `CreateServerStore(folder, serverKeys)` for a trusted server that holds the private key.
+
+The generated file is yours to edit. Regenerating asks before replacing a file that differs, and refuses to create a second copy of the class elsewhere in the project.
+
+**Add examples** (Setup tab) adds a save service, a profile data class and a demo component that use `ProjectDataIO`, plus `DataIOSetup.md` (a longer guide). Encrypted setups also get a text encrypt/decrypt demo with a custom Inspector. Existing files are never replaced. Read [Documentation~/DataIOSetup.md](Documentation~/DataIOSetup.md).
+
+## The Data Format window
+
+- **Setup**: the two buttons above, plus **Add examples** and **Check build setup**.
+- **Format**: Plain text, Compressed, Binary or Encrypted, each with pros, cons and when to use it. Serializer, save folder, extension, pretty print, backup and Base64 text.
+- **Encryption**: AES-256 or RSA public key + AES-256, RSA key size (2048, 3072 or 4096, with 4096 recommended) and key generation. Generating a new AES key keeps the old one as a previous key.
+- **Keys**: the key source, the active key, storage, and the game-specific exports. Store keys as user environment variables, or in the per-project key file `UserSettings/Pretzel/pretzel-keys.json`, which is plain text and must stay out of version control. Environment variables are per user, not per project, so each project gets its own prefix.
+- **Shipping**: writes the small `PretzelDataSetup.cs` for environment, embedded or token delivery. It delivers the key only.
+- **Decrypt**: paste plain JSON, or the Base64 text of a Compressed, Binary or Encrypted file, to decode it. It can also encode JSON with the current format, and take other keys without saving them.
+
+Generated keys that are not stored yet survive a script reload, and closing the window asks whether to save them to the key file.
+
+## Keys
+
+`DataIOConfig.keySource` decides where encrypted formats look for keys, so a stray environment variable or Editor key file cannot hide a missing key in a build:
+
+| Key source | Reads | Use it for |
+|---|---|---|
+| `Provider` | `EncryptionKeys.Provider` only: the generated embedded `PretzelDataSetup`, a token flow, or your code | A shipped game (recommended) |
+| `BundledJson` | `Assets/Resources/Pretzel/GameEncryptionKeys.json` only | A shipped game, simplest |
+| `Environment` | The variables `<PREFIX>_AES_KEY`, `<PREFIX>_RSA_PUBLIC`, `<PREFIX>_RSA_PRIVATE` (Base64) only | Servers and tools. Players do not have these |
+| `Automatic` | Provider, then environment, then (in the Editor) the key file, then the bundled JSON | Development. The default |
+
+The Setup button, the Keys tab exports and the Shipping tab set the key source for you. The Keys tab shows which key is active and where it came from, by fingerprint.
+
+```csharp
+EncryptionKeys keys = EncryptionKeys.Resolve("PRETZEL_MYGAME", KeySource.Provider, out string origin);
+```
+
+**Rotating an AES key.** Generate a new key on the Encryption tab and the old one is kept as a previous key. The key file, the bundled JSON (`previousAesKeys`) and the embedded setup all carry the history. Saves written with an older key still open; new files use the current key, so old files move to it as they are saved again. Once every old save was loaded and saved again, **Clear previous AES keys** on the Keys tab and export again so builds stop carrying them. Environment variables hold the current key only. The bundled JSON also stores a `keyId` fingerprint, and a mismatch is reported as an invalid file.
+
+**Build check.** Before a build, `DataIOBuildCheck` fails with a clear message when an encrypted setup has no key that really ships (the Editor key file and your environment variables are not part of a player), when the bundled JSON is invalid or has the wrong key, or when the embedded setup is for the other mode. It warns that an AES key ships and can be extracted, and about a stale key file. Run it any time with **Tools > Pretzel > DataIO > Check build setup** or **Check build setup** on the Setup tab. Define `PRETZEL_SKIP_DATAIO_CHECK` to turn it off.
+
+**What shipping a key means.** An AES key that ships with the game can be recovered by a determined player, with or without IL2CPP. IL2CPP compiles the code to native code, and the embedded setup masks the key with XOR, but neither makes it secret. It stops casual editing of saves and settings, not a cheater. Keep keys that must stay secret on a server, and fetch a per-player key with a token. Exclude generated AES files (including their `.meta` files) from version control; unlike `DataIOConfig.asset`, they contain key material. Encryption also does not stop rollback: a player can restore an older valid save.
 
 Two encryption modes:
 
 - **AES**: one secret key encrypts and decrypts. The game needs the key, so it is only as safe as the key's delivery.
 - **RSA**: each file gets a random AES key that is wrapped with an RSA public key. The game only needs the public key to write. Reading needs the private key, which must never ship with the game. Use it for data you send to a server.
 
-The IV is random per file and stored in the file. There is no IV to store. Read [Documentation~/EncryptionBestPractices.md](Documentation~/EncryptionBestPractices.md) for the best practices behind this and how to apply them (passphrase keys, key rotation, reading files on a server), and [Documentation~/EncryptionKeyDelivery.md](Documentation~/EncryptionKeyDelivery.md) for where keys can live, how to ship them, and how to fetch them with a token.
+The IV is random per file and stored in the file. There is no IV to store. Read [Documentation~/EncryptionBestPractices.md](Documentation~/EncryptionBestPractices.md) for the best practices behind this (passphrase keys, key rotation, reading files on a server), and [Documentation~/EncryptionKeyDelivery.md](Documentation~/EncryptionKeyDelivery.md) for where keys can live, how to ship them, and how to fetch them with a token.
 
 Notes: the RSA padding is OAEP with SHA-1, the only OAEP Mono supports. `Binary` uses the BSON types of the bundled Newtonsoft, which are marked obsolete but still work. In a small test the byte counts were JSON 179, GZip 157, BSON 201 and Encrypted 246.
 
@@ -89,18 +137,6 @@ Slot methods are gone. A slot is part of the key. `PathType` is replaced by `IDa
 
 ## Sample
 
-`Samples~/DataUsage`: keys, slots, a ScriptableObject, a migration and an async save.
+`Samples~/DataUsage`: keys, slots, a ScriptableObject, a migration, an async save, and AES save/load and RSA client/server encryption. For a project's own setup use the **Setup** tab instead; it generates code that fits your settings.
 
-Import **Data Usage** from Package Manager, add `EncryptionUsageExample` to a GameObject, and use its component context menu in Play mode:
-
-1. For offline saves, select **Encrypted + AES** in **Pretzel > Data Format**, generate a key, then export JSON or embedded C# on **Keys** (or supply environment variables). **Save and load configured AES profile** demonstrates `DataIO.Save` / `DataIO.Load` with slots and explicit load-error handling.
-2. For client-to-server data, select **Encrypted + RSA**, generate a pair, store the private key in Editor-only storage, and export only the public key. **Write RSA report for server** creates `report.pretzel` in `persistentDataPath/EncryptionExamples/RsaOutbox`. Send that file over HTTPS; `ReadRsaReportOnServer` shows how a trusted server/tool decrypts it using its private key. RSA is not a client-side save/load replacement.
-3. Read `CreateAesStore` for explicit stores and JSON/environment/provider sources. `LoadAesKeyAfterSignInAsync` accepts your own authenticated key-service request, installs the returned AES key, and demonstrates async saving/loading with cancellation. Do not call `DataIO` before the key arrives. The generated token setup has a similar flow, but its request stub must be implemented first.
-
-The repository test project includes `TestPretzel/Assets/Pretzel/Examples/DataEncryptionExample.cs`. Add it to a GameObject and enter Play mode. Its context menu includes an AES demo that needs no configuration, configured AES save/load, RSA report writing, and an **Editor-only** trusted-server read. The no-configuration AES demo uses a disposable random key and temporary folder; real saves must reuse the same backed-up key across launches.
-
-Both **Game-specific keys** exports also create `Assets/Pretzel/Generated/PretzelEncryptionExample.cs`, without needing a sample import. Add it to a GameObject and use its context menu in Play mode for separate AES save/load actions or RSA report writing. It contains no keys and does not run automatically. It uses a dedicated example save folder and includes async token usage, explicit key-source comments and a trusted-server RSA reader. Existing example scripts are preserved on re-export so your edits are not lost. The JSON key remains in Resources; the example script stays in the generated scripts folder.
-
-Shipping creates the same companion beside its setup script. Newly generated `PretzelDataSetup.cs` files also include commented examples; token setups include the sign-in call sequence. Exporting another key does not migrate existing files.
-
-The companion's **Encryption/JSON** context-menu actions explicitly read `GameEncryptionKeyConfig.Load()`; **Encryption/Embedded script** actions explicitly call the provider registered by `PretzelDataSetup` before the first scene. Each source has separate AES save/load and RSA write examples, using separate `Json` and `Embedded` subfolders so testing one source cannot overwrite the other's example saves. These explicit stores do not require the global DataIO format to match; the exported key must match the chosen mode. The embedded actions use whichever provider is currently registered, so run them before replacing it with a token/custom provider. If you already have a companion script, preserve your edits and delete or rename it before re-exporting to get the updated template.
+Generated files now go to `Assets/Pretzel/DataIO`. Files from the older `Assets/Pretzel/Generated` folder are not moved or deleted. Move a generated script and its `.meta` there, or remove the old copy after backing it up; the generator refuses to create a second copy of a class.

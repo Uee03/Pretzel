@@ -1,7 +1,5 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
-using System.Security.Cryptography;
-using System.Text;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -21,6 +19,9 @@ namespace Pretzel.Data.Editor
         public const string Ok = "ok";
         public const string Warn = "warn";
         public const string Missing = "missing";
+
+        /// <summary>Asks the user to confirm. Replaceable, so automated checks can answer without a window.</summary>
+        public static Func<string, string, string, string, bool> Confirm = UnityEditor.EditorUtility.DisplayDialog;
 
         public static void FillBullets(VisualElement container, IReadOnlyList<string> items, bool numbered = false)
         {
@@ -56,22 +57,7 @@ namespace Pretzel.Data.Editor
         }
 
         /// <summary>A short fingerprint, so a key can be recognised without showing it.</summary>
-        public static string Fingerprint(byte[] data)
-        {
-            using SHA256 sha = SHA256.Create();
-            byte[] hash = sha.ComputeHash(data);
-            StringBuilder text = new();
-            for (int i = 0; i < 6; i++)
-            {
-                text.Append(hash[i].ToString("X2"));
-                if (i < 5)
-                {
-                    text.Append(':');
-                }
-            }
-
-            return text.ToString();
-        }
+        public static string Fingerprint(byte[] data) => EncryptionKeys.Fingerprint(data);
 
         public static void Copy(string text)
         {

@@ -36,6 +36,18 @@ namespace Pretzel.Data
                     }
 
                     config["aesKey"] = EncryptionKeys.EncodeAesKey(keys.AesKey);
+                    config["keyId"] = EncryptionKeys.Fingerprint(keys.AesKey);
+                    if (keys.PreviousAesKeys.Count > 0)
+                    {
+                        JArray previous = new();
+                        foreach (byte[] old in keys.PreviousAesKeys)
+                        {
+                            previous.Add(EncryptionKeys.EncodeAesKey(old));
+                        }
+
+                        config["previousAesKeys"] = previous;
+                    }
+
                     break;
                 case EncryptionMode.Rsa:
                     if (!keys.HasPublicKey)
@@ -68,6 +80,36 @@ namespace Pretzel.Data
                 if (!keys.HasAesKey)
                 {
                     throw new FormatException("The game key config AES key must contain exactly 32 bytes.");
+                }
+
+                // keyId is only a fingerprint. A mismatch means the file was edited or half-copied.
+                string keyId = ReadString(config, "keyId");
+                if (keyId != null && keyId != EncryptionKeys.Fingerprint(keys.AesKey))
+                {
+                    throw new FormatException("The game key config keyId does not match its AES key. Export the key again.");
+                }
+
+                if (config["previousAesKeys"] is JArray previous)
+                {
+                    foreach (JToken item in previous)
+                    {
+                        if (item.Type != JTokenType.String)
+                        {
+                            throw new FormatException("The game key config previousAesKeys must be a list of Base64 strings.");
+                        }
+
+                        byte[] old = Convert.FromBase64String((string)item);
+                        if (old.Length != EncryptionKeys.AesKeySize)
+                        {
+                            throw new FormatException("Every previous AES key in the game key config must contain exactly 32 bytes.");
+                        }
+
+                        keys.AddPreviousAesKey(old);
+                    }
+                }
+                else if (config["previousAesKeys"] != null)
+                {
+                    throw new FormatException("The game key config previousAesKeys must be a list.");
                 }
             }
 

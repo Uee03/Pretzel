@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Security.Cryptography;
 using System.Text;
@@ -13,20 +13,50 @@ namespace Pretzel.Data.Editor
         Token
     }
 
-    /// <summary>Writes the per-game setup script that gets keys to a shipped build, and a copy of the key delivery guide.</summary>
+    /// <summary>
+    /// Writes the small PretzelDataSetup script that gets a key to a shipped build. It only delivers the key:
+    /// the store is created by the generated ProjectDataIO (Setup tab).
+    /// </summary>
     internal static class ShippingGenerator
     {
         public const string ScriptName = "PretzelDataSetup.cs";
-        public const string GuideName = "PretzelDataKeyDelivery.md";
-        public const string ExampleName = "PretzelEncryptionExample.cs";
-        public const string DefaultFolder = "Assets/Pretzel/Generated";
+        public const string DefaultFolder = "Assets/Pretzel/DataIO";
 
         public static string GuideSourcePath() => DocumentPath("EncryptionKeyDelivery.md");
 
-        public static string DocumentPath(string fileName)
+        public static string DocumentPath(string fileName) => PackagePath("Documentation~", fileName);
+
+        public static string TemplatePath(string relativePath) => PackagePath("Templates~", relativePath);
+
+        private static string PackagePath(string folder, string relativePath)
         {
             UnityEditor.PackageManager.PackageInfo info = UnityEditor.PackageManager.PackageInfo.FindForAssembly(typeof(DataIOConfig).Assembly);
-            return info == null ? null : Path.Combine(info.resolvedPath, "Documentation~", fileName);
+            return info == null ? null : Path.Combine(info.resolvedPath, folder, relativePath);
+        }
+
+        /// <summary>Throws when <paramref name="folder"/> is not a plain folder inside Assets.</summary>
+        public static void ValidateFolder(string folder)
+        {
+            if (string.IsNullOrWhiteSpace(folder)
+                || (folder != "Assets" && !folder.StartsWith("Assets/", StringComparison.Ordinal))
+                || folder.Contains(".."))
+            {
+                throw new ArgumentException("The output folder must be inside Assets and cannot contain '..'.", nameof(folder));
+            }
+        }
+
+        /// <summary>Two copies of one script define the same class twice. Refuse to create the second.</summary>
+        public static void EnsureNoOtherScriptCopy(string name, string destination)
+        {
+            foreach (string guid in AssetDatabase.FindAssets(Path.GetFileNameWithoutExtension(name) + " t:MonoScript"))
+            {
+                string existing = AssetDatabase.GUIDToAssetPath(guid);
+                if (Path.GetFileName(existing) == name && !string.Equals(existing, destination, StringComparison.OrdinalIgnoreCase))
+                {
+                    throw new IOException($"'{name}' already exists at '{existing}'. Move that script and its .meta to "
+                        + $"'{destination}' first, or use the existing folder, to avoid duplicate classes.");
+                }
+            }
         }
 
         /// <summary>Returns null on success, otherwise the reason it could not be written.</summary>
@@ -35,7 +65,7 @@ namespace Pretzel.Data.Editor
             scriptPath = null;
             if (folder != "Assets" && !folder.StartsWith("Assets/", StringComparison.Ordinal))
             {
-                return "The folder must be inside Assets, for example Assets/Pretzel/Generated.";
+                return "The folder must be inside Assets, for example Assets/Pretzel/DataIO.";
             }
 
             if (folder.Contains(".."))
@@ -63,81 +93,24 @@ namespace Pretzel.Data.Editor
                         return "A token is used to fetch an AES key. In RSA mode embed the public key instead, and keep the private key on your server.";
                     }
 
-                    source = TokenScript(config);
+                    source = TokenScript();
                     break;
             }
 
+            string path = folder + "/" + ScriptName;
+            EnsureNoOtherScriptCopy(ScriptName, path);
             Directory.CreateDirectory(folder);
-            scriptPath = folder + "/" + ScriptName;
-            File.WriteAllText(scriptPath, source, new UTF8Encoding(false));
-            GenerateUsageExample(folder);
-
-            string guide = GuideSourcePath();
-            if (guide != null && File.Exists(guide))
-            {
-                File.Copy(guide, folder + "/" + GuideName, true);
-            }
-
-            AssetDatabase.Refresh();
-            return null;
-        }
-
-        /// <summary>Creates the key-free companion once, preserving any user edits on later exports.</summary>
-        public static string GenerateUsageExample(string folder)
-        {
-            if ((folder != "Assets" && !folder.StartsWith("Assets/", StringComparison.Ordinal)) || folder.Contains(".."))
-            {
-                throw new ArgumentException("The example folder must be inside Assets and cannot contain '..'.", nameof(folder));
-            }
-
-            string path = folder + "/" + ExampleName;
-            if (!File.Exists(path))
-            {
-                string template = DocumentPath(ExampleName + ".txt");
-                if (template == null || !File.Exists(template))
-                {
-                    throw new FileNotFoundException("The encryption usage example template was not found in the package.", template);
-                }
-
-                Directory.CreateDirectory(folder);
-                File.Copy(template, path);
-            }
-
+            File.WriteAllText(path, source, new UTF8Encoding(false));
             AssetDatabase.ImportAsset(path);
-            return path;
+            scriptPath = path;
+            return null;
         }
 
         private static string Header(string what)
         {
-            return "// Generated by Pretzel/Data Format (Shipping tab). " + what + "\n"
-                   + "// See " + GuideName + " for how to deliver keys safely. Delete this file to remove the setup.\n"
-                   + "// See " + ExampleName + " alongside this script for a runnable example.\n"
-                   + "// The optional Data Usage sample also includes EncryptionUsageExample.\n"
-                   + "/*\n"
-                   + "GAME USAGE (choose Encrypted on the Format tab first):\n"
-                   + "Call from Start or later, after this setup has registered its keys.\n"
-                   + "JSON config, environment variables and embedded C# all use the same save API.\n\n"
-                   + "[Serializable] public class Profile { public int level = 1; }\n\n"
-                   + "// AES: the same key encrypts AND decrypts. Reuse it across launches.\n"
-                   + "DataIO.Save(\"profile\", new Profile { level = 7 });\n"
-                   + "LoadResult<Profile> loaded = DataIO.Load<Profile>(\"profile\");\n"
-                   + "if (loaded.Ok) Debug.Log(loaded.Value.level);\n"
-                   + "else if (loaded.Status == DataStatus.NotFound) Debug.Log(\"Start a new profile.\");\n"
-                   + "else Debug.LogError($\"Wrong key or corrupt save: {loaded.Error}\");\n\n"
-                   + "// RSA: DataIO.Save encrypts with the public key. Send the file over HTTPS to your server.\n"
-                   + "// Do NOT load it in the client: decryption requires the private key. Never ship that key.\n"
-                   + "// Trusted server/tool only, with its private key from a secret store:\n"
-                   + "// DataStore server = DataStoreFactory.Create(DataRoots.Absolute(receivedFolder),\n"
-                   + "//     DataFormat.Encrypted, serverKeys, EncryptionMode.Rsa);\n"
-                   + "// LoadResult<Profile> report = server.Load<Profile>(\"profile\");\n\n"
-                   + "// Explicit AES store, independent of DataIO.Default:\n"
-                   + "// EncryptionKeys keys = EncryptionKeys.Resolve(\"YOUR_PROJECT_PREFIX\");\n"
-                   + "// Or GameEncryptionKeyConfig.Load() for JSON, or EncryptionKeys.FromEnvironment(prefix).\n"
-                   + "// DataStore saves = DataStoreFactory.Create(DataRoots.PersistentData(\"MySaves\"),\n"
-                   + "//     DataFormat.Encrypted, keys, EncryptionMode.Aes);\n"
-                   + "// saves.Save(\"profile\", new Profile());\n"
-                   + "// Never generate a new AES key at every startup; old saves would become unreadable.\n"
-                   + "*/\n"
+            return "// Generated by Pretzel > Data Format. " + what + "\n"
+                   + "// This delivers the key only. Create the store with ProjectDataIO.Initialize() (Setup tab) after this has run.\n"
+                   + "// Delete this file to remove it. Delivery options: Documentation~/EncryptionKeyDelivery.md in the Pretzel Data package.\n"
                    + "using System;\nusing System.Threading;\nusing Pretzel.Data;\nusing UnityEngine;\n\n";
         }
 
@@ -148,7 +121,7 @@ namespace Pretzel.Data.Editor
                    + $"    private const string EnvironmentPrefix = \"{config.environmentPrefix}\";\n\n"
                    + "    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]\n"
                    + "    private static void CheckKeys()\n    {\n"
-                   + "        if (EncryptionKeys.Resolve(EnvironmentPrefix) == null)\n        {\n"
+                   + "        if (EncryptionKeys.Resolve(EnvironmentPrefix, KeySource.Environment, out _) == null)\n        {\n"
                    + "            Debug.LogError($\"No encryption keys found. Set {EncryptionKeys.AesVariable(EnvironmentPrefix)}, \" +\n"
                    + "                           $\"or {EncryptionKeys.PublicVariable(EnvironmentPrefix)} and {EncryptionKeys.PrivateVariable(EnvironmentPrefix)}.\");\n"
                    + "        }\n    }\n}\n";
@@ -170,27 +143,43 @@ namespace Pretzel.Data.Editor
                     return null;
                 }
 
-                byte[] mask = new byte[keys.AesKey.Length];
-                using (RandomNumberGenerator random = RandomNumberGenerator.Create())
-                {
-                    random.GetBytes(mask);
-                }
-
-                byte[] masked = new byte[mask.Length];
-                for (int i = 0; i < mask.Length; i++)
-                {
-                    masked[i] = (byte)(keys.AesKey[i] ^ mask[i]);
-                }
-
-                code.Append("    // The key is split in two arrays and combined at runtime. This only defeats a plain search of the build.\n");
+                code.Append("    // Each key is split in two arrays and combined at runtime. This only defeats a plain search of the build:\n");
+                code.Append("    // a determined player can still recover it, with or without IL2CPP.\n");
+                Mask(keys.AesKey, out byte[] masked, out byte[] mask);
                 code.Append("    private static readonly byte[] PartA = " + ByteArray(masked) + ";\n");
-                code.Append("    private static readonly byte[] PartB = " + ByteArray(mask) + ";\n\n");
-                code.Append("    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]\n");
+                code.Append("    private static readonly byte[] PartB = " + ByteArray(mask) + ";\n");
+
+                bool history = keys.PreviousAesKeys.Count > 0;
+                if (history)
+                {
+                    code.Append("\n    // Earlier keys, so saves written before a key change still open.\n");
+                    StringBuilder partsA = new();
+                    StringBuilder partsB = new();
+                    foreach (byte[] previous in keys.PreviousAesKeys)
+                    {
+                        Mask(previous, out byte[] oldMasked, out byte[] oldMask);
+                        partsA.Append("        ").Append(ByteArray(oldMasked)).Append(",\n");
+                        partsB.Append("        ").Append(ByteArray(oldMask)).Append(",\n");
+                    }
+
+                    code.Append("    private static readonly byte[][] OldPartsA =\n    {\n" + partsA + "    };\n");
+                    code.Append("    private static readonly byte[][] OldPartsB =\n    {\n" + partsB + "    };\n");
+                }
+
+                code.Append("\n    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]\n");
                 code.Append("    private static void Register()\n    {\n        EncryptionKeys.Provider = BuildKeys;\n    }\n\n");
                 code.Append("    private static EncryptionKeys BuildKeys()\n    {\n");
-                code.Append("        byte[] key = new byte[PartA.Length];\n");
-                code.Append("        for (int i = 0; i < key.Length; i++)\n        {\n            key[i] = (byte)(PartA[i] ^ PartB[i]);\n        }\n\n");
-                code.Append("        return new EncryptionKeys { AesKey = key };\n    }\n}\n");
+                code.Append("        EncryptionKeys keys = new() { AesKey = Combine(PartA, PartB) };\n");
+                if (history)
+                {
+                    code.Append("        for (int i = 0; i < OldPartsA.Length; i++)\n        {\n            keys.PreviousAesKeys.Add(Combine(OldPartsA[i], OldPartsB[i]));\n        }\n\n");
+                }
+
+                code.Append("        return keys;\n    }\n\n");
+                code.Append("    private static byte[] Combine(byte[] a, byte[] b)\n    {\n");
+                code.Append("        byte[] key = new byte[a.Length];\n");
+                code.Append("        for (int i = 0; i < key.Length; i++)\n        {\n            key[i] = (byte)(a[i] ^ b[i]);\n        }\n\n");
+                code.Append("        return key;\n    }\n}\n");
             }
             else
             {
@@ -209,16 +198,15 @@ namespace Pretzel.Data.Editor
             return code.ToString();
         }
 
-        private static string TokenScript(DataIOConfig config)
+        private static string TokenScript()
         {
             return Header("The game fetches its AES key from your server with an access token.")
                    + "public static class PretzelDataSetup\n{\n"
-                   + "    // After sign-in, before ANY DataIO calls (implement RequestKeyAsync below first):\n"
-                   + "    // if (!await PretzelDataSetup.LoadKeysAsync(accessToken, destroyCancellationToken))\n"
-                   + "    // { Debug.LogError(\"No save key received. Offer retry; do not overwrite existing saves.\"); return; }\n"
-                   + "    // await DataIO.SaveAsync(\"profile\", new Profile { level = 7 }, destroyCancellationToken);\n"
-                   + "    // LoadResult<Profile> result = await DataIO.LoadAsync<Profile>(\"profile\", destroyCancellationToken);\n\n"
-                   + "    /// <summary>Call once after sign-in, before the first DataIO call. Returns false when no key could be fetched.</summary>\n"
+                   + "    // After sign-in, with the config's key source set to Provider (Keys tab):\n"
+                   + "    //   if (!await PretzelDataSetup.LoadKeysAsync(accessToken, destroyCancellationToken))\n"
+                   + "    //   { Debug.LogError(\"No save key received. Offer retry; do not overwrite existing saves.\"); return; }\n"
+                   + "    //   ProjectDataIO.Initialize();\n\n"
+                   + "    /// <summary>Call once after sign-in, before ProjectDataIO.Initialize. Returns false when no key could be fetched.</summary>\n"
                    + "    public static async Awaitable<bool> LoadKeysAsync(string accessToken, CancellationToken cancellationToken = default)\n    {\n"
                    + "        string encodedKey = await RequestKeyAsync(accessToken, cancellationToken);\n"
                    + "        byte[] key = string.IsNullOrEmpty(encodedKey) ? null : EncryptionKeys.DecodeAesKey(encodedKey);\n"
@@ -226,13 +214,27 @@ namespace Pretzel.Data.Editor
                    + "        // The key stays in memory. Do not write it to disk or PlayerPrefs.\n"
                    + "        EncryptionKeys keys = new() { AesKey = key };\n"
                    + "        EncryptionKeys.Provider = () => keys;\n"
-                   + "        DataIO.Default = DataIOConfig.Load().CreateStore(null, keys);\n"
                    + "        return true;\n    }\n\n"
-                   + "    // TODO: call your key service with the token. It must validate the token on the server and return the key as Base64.\n"
-                   + "    // For example with Pretzel.Api.ApiClient: GET /save-key with the header \"Authorization: Bearer \" + accessToken.\n"
+                   + "    // TODO: call your key service with the access token. It must validate the token on the server and return the key as Base64.\n"
+                   + "    // For example with Pretzel.Api.ApiClient: GET /save-key, sending the token in the Authorization header.\n"
                    + "    private static async Awaitable<string> RequestKeyAsync(string accessToken, CancellationToken cancellationToken)\n    {\n"
                    + "        await Awaitable.NextFrameAsync(cancellationToken);\n"
                    + "        throw new NotImplementedException(\"Implement PretzelDataSetup.RequestKeyAsync to fetch the key from your server.\");\n    }\n}\n";
+        }
+
+        private static void Mask(byte[] key, out byte[] masked, out byte[] mask)
+        {
+            mask = new byte[key.Length];
+            using (RandomNumberGenerator random = RandomNumberGenerator.Create())
+            {
+                random.GetBytes(mask);
+            }
+
+            masked = new byte[key.Length];
+            for (int i = 0; i < key.Length; i++)
+            {
+                masked[i] = (byte)(key[i] ^ mask[i]);
+            }
         }
 
         private static string ByteArray(byte[] bytes)

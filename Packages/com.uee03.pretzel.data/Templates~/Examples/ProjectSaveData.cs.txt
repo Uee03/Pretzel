@@ -1,0 +1,11 @@
+using System;
+using Pretzel.Data;
+
+/// <summary>The data one save slot holds. Add your own fields; bump SchemaVersion and add a migration when their meaning changes.</summary>
+[Serializable, SchemaVersion(1)]
+public sealed class ProjectSaveData
+{
+    public string playerName = "Player";
+    public int level = 1;
+    public int coins;
+}

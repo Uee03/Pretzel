@@ -115,13 +115,38 @@ namespace Pretzel.Data.Editor
 
         #region KEY FILE
 
+        /// <summary>The keys of <paramref name="mode"/> as Editor storage should hold them: AES with its history, or the RSA pair.</summary>
+        public static EncryptionKeys ForMode(EncryptionKeys keys, EncryptionMode mode)
+        {
+            EncryptionKeys copy = new();
+            if (mode == EncryptionMode.Aes)
+            {
+                copy.AesKey = keys.AesKey;
+                copy.PreviousAesKeys.AddRange(keys.PreviousAesKeys);
+            }
+            else
+            {
+                copy.RsaPublicKey = keys.RsaPublicKey;
+                copy.RsaPrivateKey = keys.RsaPrivateKey;
+            }
+
+            return copy;
+        }
+
         /// <summary>Writes the keys into the project key file. Keys that are not part of <paramref name="scope"/> are left as they were.</summary>
         public static void SaveFile(EncryptionKeys keys, KeyScope scope)
         {
             EncryptionKeys merged = EncryptionKeyFile.Load() ?? new EncryptionKeys();
             if (scope == KeyScope.All)
             {
-                merged.AesKey = keys.HasAesKey ? keys.AesKey : merged.AesKey;
+                if (keys.HasAesKey)
+                {
+                    // The history follows the key: clearing it in memory clears it in the file too.
+                    merged.AesKey = keys.AesKey;
+                    merged.PreviousAesKeys.Clear();
+                    merged.PreviousAesKeys.AddRange(keys.PreviousAesKeys);
+                }
+
                 merged.RsaPrivateKey = keys.HasPrivateKey ? keys.RsaPrivateKey : merged.RsaPrivateKey;
             }
 

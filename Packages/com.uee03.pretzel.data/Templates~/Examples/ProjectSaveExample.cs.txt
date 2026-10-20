@@ -1,0 +1,141 @@
+using System;
+using System.IO;
+using System.Threading;
+using UnityEngine;
+
+/// <summary>
+/// Optional demo: load a profile slot, change it in memory, and save it. It needs the generated ProjectDataIO and no other setup.
+/// Remove it when you write your own gameplay code. Nothing is saved automatically.
+/// </summary>
+public sealed class ProjectSaveExample : MonoBehaviour
+{
+    [Tooltip("Enable when your sign-in code calls ProjectDataIO.InitializeWithKeys and then LoadProfile.")]
+    [SerializeField] private bool _waitForKeys;
+    [SerializeField, Min(0)] private int _slot;
+
+    private ProjectSaveData _profile;
+    private int _loadedSlot;
+    private bool _busy;
+
+    private void Start()
+    {
+        if (_waitForKeys)
+        {
+            Debug.Log("After the keys arrive, call ProjectDataIO.InitializeWithKeys, then LoadProfile.", this);
+            return;
+        }
+
+        try
+        {
+            ProjectDataIO.Initialize();
+            LoadProfile();
+        }
+        catch (Exception ex) when (ex is InvalidOperationException or ArgumentException or FormatException or IOException
+            or UnauthorizedAccessException or System.Security.Cryptography.CryptographicException
+            or Newtonsoft.Json.JsonException or System.Xml.XmlException)
+        {
+            Debug.LogError($"Project save setup failed: {ex.Message}", this);
+        }
+    }
+
+    [ContextMenu("Project saves/Load selected slot")]
+    public async void LoadProfile()
+    {
+        if (!CanStartOperation())
+        {
+            return;
+        }
+
+        _busy = true;
+        int slot = _slot;
+        CancellationToken cancellationToken = destroyCancellationToken;
+        // Prevent an old in-memory profile from being saved over a different or corrupt slot after a failure.
+        _profile = null;
+        try
+        {
+            _profile = await Saves().LoadOrCreateAsync(slot, cancellationToken);
+            _loadedSlot = slot;
+            Debug.Log($"Slot {slot}: {_profile.playerName}, level {_profile.level}, coins {_profile.coins}.", this);
+        }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+        {
+            // Scene teardown cancelled the operation; no new save is started.
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+        {
+            Debug.LogError($"Profile load failed: {ex.Message}", this);
+        }
+        finally
+        {
+            _busy = false;
+        }
+    }
+
+    [ContextMenu("Project saves/Add coin in memory")]
+    public void AddCoin()
+    {
+        if (!CanStartOperation())
+        {
+            return;
+        }
+
+        if (_profile == null || _loadedSlot != _slot)
+        {
+            Debug.LogError("Load the selected slot successfully before changing progress.", this);
+            return;
+        }
+
+        _profile.coins++;
+        Debug.Log($"Coins in memory: {_profile.coins}. Use Save selected slot to persist them.", this);
+    }
+
+    [ContextMenu("Project saves/Save selected slot")]
+    public async void SaveProgress()
+    {
+        if (!CanStartOperation())
+        {
+            return;
+        }
+
+        if (_profile == null || _loadedSlot != _slot)
+        {
+            Debug.LogError("Load the selected slot successfully before saving.", this);
+            return;
+        }
+
+        _busy = true;
+        int slot = _loadedSlot;
+        CancellationToken cancellationToken = destroyCancellationToken;
+        try
+        {
+            await Saves().SaveAsync(slot, _profile, cancellationToken);
+            Debug.Log($"Saved slot {slot}. Coins: {_profile.coins}.", this);
+        }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+        {
+            // Do not report success for a cancelled save.
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+        {
+            Debug.LogError($"Save failed; keep progress in memory and offer retry: {ex.Message}", this);
+        }
+        finally
+        {
+            _busy = false;
+        }
+    }
+
+    // A thin wrapper around the one store ProjectDataIO created, so it is cheap to create where needed.
+    private static ProjectSaveService Saves() => new(ProjectDataIO.Store);
+
+    private bool CanStartOperation()
+    {
+        if (!Application.isPlaying || !ProjectDataIO.IsReady || _busy)
+        {
+            Debug.LogWarning("Enter Play mode, finish key setup, and wait for the previous save or load before continuing.", this);
+            return false;
+        }
+
+        return true;
+    }
+}

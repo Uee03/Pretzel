@@ -23,7 +23,7 @@
         "com.uee03.pretzel.extensions": "0.1.0",
         "com.unity.nuget.newtonsoft-json": "3.2.2"
       },
-      "hash": "32fc9dcaf80353faf11a14aa9e3e4b253a6faba3"
+      "hash": "d600512982659bb21753f28254ceaff453e2f252"
     },
     "com.uee03.pretzel.extensions": {
       "version": "https://github.com/Uee03/Pretzel.git?path=Packages/com.uee03.pretzel.extensions",

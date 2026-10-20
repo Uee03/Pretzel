@@ -30,7 +30,9 @@ namespace Pretzel.Data.Tests
                 RsaPrivateKey = _rsa.RsaPrivateKey
             };
             string json = GameEncryptionKeyConfig.ToJson(original, EncryptionMode.Aes);
-            Assert.That(JObject.Parse(json).Count, Is.EqualTo(1));
+            JObject parsed = JObject.Parse(json);
+            Assert.That(parsed.Count, Is.EqualTo(2), "Only the AES key and its fingerprint are exported.");
+            Assert.That(parsed.ContainsKey("aesKey") && parsed.ContainsKey("keyId"), Is.True);
             EncryptionKeys restored = GameEncryptionKeyConfig.FromJson(json);
             Assert.That(restored.AesKey, Is.EqualTo(original.AesKey));
             Assert.That(restored.HasPublicKey || restored.HasPrivateKey, Is.False);
@@ -85,6 +87,10 @@ namespace Pretzel.Data.Tests
         [TestCase("{\"aesKey\":null}")]
         [TestCase("{\"rsaPublicKey\":\"invalid\"}")]
         [TestCase("{\"rsaPrivateKey\":\"never ship this\"}")]
+        [TestCase("{\"aesKey\":\"AAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGxwdHh8=\",\"keyId\":\"00:00:00:00:00:00\"}")]
+        [TestCase("{\"aesKey\":\"AAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGxwdHh8=\",\"previousAesKeys\":[\"AQIDBA==\"]}")]
+        [TestCase("{\"aesKey\":\"AAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGxwdHh8=\",\"previousAesKeys\":\"not a list\"}")]
+        [TestCase("{\"aesKey\":\"AAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGxwdHh8=\",\"previousAesKeys\":[42]}")]
         public void InvalidConfigThrowsInsteadOfReturningMissingKeys(string json)
         {
             Assert.Throws<FormatException>(() => GameEncryptionKeyConfig.FromJson(json));

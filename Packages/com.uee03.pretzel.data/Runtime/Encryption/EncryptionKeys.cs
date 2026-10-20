@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Security.Cryptography;
 using System.Text;
 using UnityEngine;
@@ -24,6 +25,12 @@ namespace Pretzel.Data
 
         /// <summary>32 random bytes.</summary>
         public byte[] AesKey { get; set; }
+
+        /// <summary>
+        /// Earlier AES keys, kept so saves written before a key change still open. They are only used to read:
+        /// new files always use <see cref="AesKey"/>, so old files move to the new key as they are saved again.
+        /// </summary>
+        public List<byte[]> PreviousAesKeys { get; } = new();
 
         /// <summary>RSA key in XML form. Safe to publish.</summary>
         public string RsaPublicKey { get; set; }
@@ -126,20 +133,129 @@ namespace Pretzel.Data
         /// <summary>
         /// Finds keys in this order, taking each key from the first source that has it:
         /// <see cref="Provider"/>, environment variables, in the Editor the per-project key file,
-        /// then the optional bundled <see cref="GameEncryptionKeyConfig"/>.
+        /// then the optional bundled <see cref="GameEncryptionKeyConfig"/>. Use <see cref="Resolve(string, KeySource, out string)"/> to pin one source.
         /// </summary>
-        public static EncryptionKeys Resolve(string environmentPrefix)
+        public static EncryptionKeys Resolve(string environmentPrefix) => Resolve(environmentPrefix, KeySource.Automatic, out _);
+
+        /// <summary>
+        /// Finds keys from <paramref name="source"/>. <paramref name="origin"/> names the sources that supplied them, for diagnostics.
+        /// It never contains a key.
+        /// </summary>
+        public static EncryptionKeys Resolve(string environmentPrefix, KeySource source, out string origin)
         {
             EncryptionKeys result = new();
-            result.FillMissing(Provider?.Invoke());
-            result.FillMissing(FromEnvironment(environmentPrefix));
-            if (Application.isEditor)
+            List<string> used = new();
+
+            void Take(EncryptionKeys keys, string name)
             {
-                result.FillMissing(EncryptionKeyFile.Load());
+                if (result.FillMissing(keys))
+                {
+                    used.Add(name);
+                }
             }
 
-            result.FillMissing(GameEncryptionKeyConfig.Load());
+            if (source is KeySource.Automatic or KeySource.Provider)
+            {
+                Take(Provider?.Invoke(), "Provider (embedded setup or your code)");
+            }
+
+            if (source is KeySource.Automatic or KeySource.Environment)
+            {
+                Take(FromEnvironment(environmentPrefix), "environment variables");
+            }
+
+            if (source == KeySource.Automatic && Application.isEditor)
+            {
+                Take(EncryptionKeyFile.Load(), "Editor key file");
+            }
+
+            if (source is KeySource.Automatic or KeySource.BundledJson)
+            {
+                Take(GameEncryptionKeyConfig.Load(), "bundled JSON config");
+            }
+
+            origin = used.Count == 0 ? "none" : string.Join(" + ", used);
             return result.IsEmpty ? null : result;
+        }
+
+        /// <summary>A short fingerprint, so a key can be recognised in logs and the Editor without showing it.</summary>
+        public static string Fingerprint(byte[] data)
+        {
+            using SHA256 sha = SHA256.Create();
+            byte[] hash = sha.ComputeHash(data);
+            StringBuilder text = new();
+            for (int i = 0; i < 6; i++)
+            {
+                text.Append(hash[i].ToString("X2"));
+                if (i < 5)
+                {
+                    text.Append(':');
+                }
+            }
+
+            return text.ToString();
+        }
+
+        public EncryptionKeys Clone()
+        {
+            EncryptionKeys copy = new() { AesKey = AesKey, RsaPublicKey = RsaPublicKey, RsaPrivateKey = RsaPrivateKey };
+            copy.PreviousAesKeys.AddRange(PreviousAesKeys);
+            return copy;
+        }
+
+        /// <summary>
+        /// The keys a game client should hold for <paramref name="mode"/>: the AES key and its previous keys, or only the RSA public key.
+        /// The RSA private key is never included.
+        /// </summary>
+        public EncryptionKeys ForClient(EncryptionMode mode)
+        {
+            EncryptionKeys copy = new();
+            if (mode == EncryptionMode.Aes)
+            {
+                copy.AesKey = AesKey;
+                copy.PreviousAesKeys.AddRange(PreviousAesKeys);
+            }
+            else
+            {
+                copy.RsaPublicKey = RsaPublicKey;
+            }
+
+            return copy;
+        }
+
+        /// <summary>True when this holds what a client needs to write in <paramref name="mode"/>.</summary>
+        public bool CanWrite(EncryptionMode mode) => mode == EncryptionMode.Aes ? HasAesKey : HasPublicKey;
+
+        /// <summary>Adds an earlier key that old saves may still use. Ignores duplicates, the current key and wrong sizes.</summary>
+        public void AddPreviousAesKey(byte[] key)
+        {
+            if (key == null || key.Length != AesKeySize || SameKey(key, AesKey))
+            {
+                return;
+            }
+
+            foreach (byte[] existing in PreviousAesKeys)
+            {
+                if (SameKey(existing, key))
+                {
+                    return;
+                }
+            }
+
+            PreviousAesKeys.Add(key);
+        }
+
+        /// <summary>One line for logs and the Editor. Fingerprints only, never key material.</summary>
+        public string Describe(EncryptionMode mode, string origin)
+        {
+            if (mode == EncryptionMode.Aes)
+            {
+                string text = HasAesKey ? $"AES key {Fingerprint(AesKey)} from {origin}" : $"no AES key (looked in: {origin})";
+                return PreviousAesKeys.Count > 0 ? $"{text}, {PreviousAesKeys.Count} previous key(s) for older saves" : text;
+            }
+
+            string rsa = HasPublicKey ? $"RSA public key {Fingerprint(Encoding.UTF8.GetBytes(RsaPublicKey))} from {origin} (writes only)" : $"no RSA public key (looked in: {origin})";
+            return HasPrivateKey ? rsa + ". WARNING: a private key is loaded here and must never ship" : rsa;
         }
 
         public static string EncodeAesKey(byte[] key) => Convert.ToBase64String(key);
@@ -183,27 +299,44 @@ namespace Pretzel.Data
             }
         }
 
-        private void FillMissing(EncryptionKeys other)
+        private bool FillMissing(EncryptionKeys other)
         {
             if (other == null)
             {
-                return;
+                return false;
             }
 
+            bool used = false;
             if (!HasAesKey && other.HasAesKey)
             {
                 AesKey = other.AesKey;
+                used = true;
             }
 
             if (!HasPublicKey && other.HasPublicKey)
             {
                 RsaPublicKey = other.RsaPublicKey;
+                used = true;
             }
 
             if (!HasPrivateKey && other.HasPrivateKey)
             {
                 RsaPrivateKey = other.RsaPrivateKey;
+                used = true;
             }
+
+            int before = PreviousAesKeys.Count;
+            foreach (byte[] previous in other.PreviousAesKeys)
+            {
+                AddPreviousAesKey(previous);
+            }
+
+            return used || PreviousAesKeys.Count != before;
+        }
+
+        private static bool SameKey(byte[] a, byte[] b)
+        {
+            return a != null && b != null && a.Length == b.Length && CryptographicOperations.FixedTimeEquals(a, b);
         }
     }
 }

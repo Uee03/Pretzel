@@ -117,8 +117,10 @@ namespace Pretzel.Data.Editor
                 return;
             }
 
-            PanelUi.SetText(_result, $"Created {path}, {ShippingGenerator.GuideName}, and {ShippingGenerator.ExampleName} "
-                + "(existing example edits preserved). Add the example to a GameObject and use its context menu in Play mode.");
+            KeySource source = Selected == KeyDelivery.Environment ? KeySource.Environment : KeySource.Provider;
+            GameKeyExport.SyncKeySource(_state, source);
+            PanelUi.SetText(_result, $"Created {path}. Key source set to {source}. Generate the setup code on the Setup tab "
+                + "and call ProjectDataIO.Initialize() once at startup, after this has run.");
             Object script = AssetDatabase.LoadAssetAtPath<Object>(path);
             if (script)
             {

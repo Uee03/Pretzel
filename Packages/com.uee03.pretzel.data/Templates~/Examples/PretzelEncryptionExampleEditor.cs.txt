@@ -1,0 +1,62 @@
+using System;
+using System.IO;
+using System.Security.Cryptography;
+using UnityEditor;
+using UnityEditor.UIElements;
+using UnityEngine.UIElements;
+
+[CustomEditor(typeof(PretzelEncryptionExample))]
+public sealed class PretzelEncryptionExampleEditor : Editor
+{
+    public override VisualElement CreateInspectorGUI()
+    {
+        VisualElement root = new();
+        root.AddToClassList("pretzel-encryption-example");
+        root.styleSheets.Add(AssetDatabase.LoadAssetAtPath<StyleSheet>(
+            "Packages/com.uee03.pretzel.data/Editor/Styles/EncryptionExample.uss"));
+        root.Add(new PropertyField(serializedObject.FindProperty("source"), "Key source"));
+        root.Add(new PropertyField(serializedObject.FindProperty("mode"), "Encryption"));
+        root.Add(new HelpBox("JSON works in Edit or Play mode. Embedded script requires Play mode. "
+            + "RSA encrypts with the exported public key; decrypting here uses the matching private key from "
+            + "Editor-only storage, never from the game export. This demo changes text only; it writes no save files.",
+            HelpBoxMessageType.Info));
+        root.Add(new PropertyField(serializedObject.FindProperty("plainText"), "Plain text"));
+        root.Add(new PropertyField(serializedObject.FindProperty("encryptedText"), "Encrypted text (Base64)"));
+        HelpBox status = new("Ready. Choose your key source and encryption mode.", HelpBoxMessageType.Info);
+        PretzelEncryptionExample example = (PretzelEncryptionExample)target;
+
+        void Run(Action action, string message)
+        {
+            serializedObject.ApplyModifiedProperties();
+            Undo.RecordObject(example, "Encryption example");
+            try
+            {
+                action();
+                EditorUtility.SetDirty(example);
+                serializedObject.Update();
+                status.text = message;
+                status.messageType = HelpBoxMessageType.Info;
+            }
+            catch (Exception ex) when (ex is InvalidOperationException or ArgumentException or FormatException or IOException
+                or UnauthorizedAccessException or CryptographicException or Newtonsoft.Json.JsonException
+                or System.Xml.XmlException)
+            {
+                status.text = ex.Message;
+                status.messageType = HelpBoxMessageType.Error;
+            }
+        }
+
+        VisualElement actions = new();
+        actions.AddToClassList("pretzel-encryption-example__actions");
+        actions.Add(new Button(() => Run(example.Encrypt, "Encrypted. Copy the Base64 text or press Decrypt.")) { text = "Encrypt" });
+        actions.Add(new Button(() => Run(example.Decrypt, "Decrypted. The plain text field shows the result.")) { text = "Decrypt" });
+        root.Add(actions);
+        VisualElement display = new();
+        display.AddToClassList("pretzel-encryption-example__actions");
+        display.Add(new Button(() => Run(example.DisplayPlainText, "Plain text displayed in the Console.")) { text = "Display plain text" });
+        display.Add(new Button(() => Run(example.DisplayEncryptedText, "Encrypted text displayed in the Console.")) { text = "Display encrypted text" });
+        root.Add(display);
+        root.Add(status);
+        return root;
+    }
+}

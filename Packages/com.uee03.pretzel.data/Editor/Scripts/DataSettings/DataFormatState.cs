@@ -31,6 +31,7 @@ namespace Pretzel.Data.Editor
             public string aes;
             public string publicKey;
             public string privateKey;
+            public string[] previous;
         }
 
         public void Initialize(VisualElement host)
@@ -49,6 +50,14 @@ namespace Pretzel.Data.Editor
                     RsaPublicKey = EncryptionKeys.DecodeXml(saved.publicKey),
                     RsaPrivateKey = EncryptionKeys.DecodeXml(saved.privateKey)
                 };
+                if (saved.previous != null)
+                {
+                    foreach (string old in saved.previous)
+                    {
+                        Keys.AddPreviousAesKey(string.IsNullOrEmpty(old) ? null : EncryptionKeys.DecodeAesKey(old));
+                    }
+                }
+
                 KeysUnstored = true;
                 return;
             }
@@ -77,7 +86,8 @@ namespace Pretzel.Data.Editor
                 {
                     aes = keys.HasAesKey ? EncryptionKeys.EncodeAesKey(keys.AesKey) : null,
                     publicKey = EncryptionKeys.EncodeXml(keys.RsaPublicKey),
-                    privateKey = EncryptionKeys.EncodeXml(keys.RsaPrivateKey)
+                    privateKey = EncryptionKeys.EncodeXml(keys.RsaPrivateKey),
+                    previous = keys.PreviousAesKeys.ConvertAll(EncryptionKeys.EncodeAesKey).ToArray()
                 }));
             }
             else
@@ -110,10 +120,7 @@ namespace Pretzel.Data.Editor
         /// <summary>Writes the keys of the current mode to the project key file.</summary>
         public void SaveKeysToFile()
         {
-            EncryptionKeys keys = Config.encryptionMode == EncryptionMode.Aes
-                ? new EncryptionKeys { AesKey = Keys.AesKey }
-                : new EncryptionKeys { RsaPublicKey = Keys.RsaPublicKey, RsaPrivateKey = Keys.RsaPrivateKey };
-            KeyStorage.SaveFile(keys, KeyScope.All);
+            KeyStorage.SaveFile(KeyStorage.ForMode(Keys, Config.encryptionMode), KeyScope.All);
             MarkKeysStored();
         }
 

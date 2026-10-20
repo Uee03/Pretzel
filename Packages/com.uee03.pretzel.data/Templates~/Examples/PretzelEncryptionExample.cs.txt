@@ -1,0 +1,99 @@
+using System;
+using System.Text;
+using Pretzel.Data;
+using UnityEngine;
+
+// No keys are stored here. Export them on the Keys tab, then use the Inspector buttons.
+public sealed class PretzelEncryptionExample : MonoBehaviour
+{
+    public enum KeyOrigin { Json, EmbeddedScript }
+
+    public KeyOrigin source = KeyOrigin.Json;
+    public EncryptionMode mode = EncryptionMode.Aes;
+    [TextArea(3, 10)] public string plainText = "Hello from Pretzel!";
+    [TextArea(3, 10)] public string encryptedText = "";
+
+    public void Encrypt()
+    {
+        EncryptionTransform encryption = new(mode, GetKeys(false));
+        encryptedText = Convert.ToBase64String(encryption.Encode(Encoding.UTF8.GetBytes(plainText ?? "")));
+    }
+
+    public void Decrypt()
+    {
+        if (string.IsNullOrWhiteSpace(encryptedText))
+        {
+            throw new InvalidOperationException("Paste or generate encrypted text first.");
+        }
+
+        EncryptionTransform encryption = new(mode, GetKeys(true));
+        byte[] decrypted = encryption.Decode(Convert.FromBase64String(encryptedText));
+        plainText = Encoding.UTF8.GetString(decrypted);
+    }
+
+    public void DisplayPlainText() => Debug.Log(plainText, this);
+    public void DisplayEncryptedText() => Debug.Log(encryptedText, this);
+
+    private EncryptionKeys GetKeys(bool decrypt)
+    {
+        EncryptionKeys keys;
+        switch (source)
+        {
+            case KeyOrigin.Json:
+                keys = GameEncryptionKeyConfig.Load();
+                break;
+            case KeyOrigin.EmbeddedScript:
+                if (!Application.isPlaying || EncryptionKeys.Provider == null)
+                {
+                    throw new InvalidOperationException("Export embedded C# and enter Play mode so the setup registers its provider.");
+                }
+
+                keys = EncryptionKeys.Provider.Invoke();
+                break;
+            default:
+                throw new ArgumentOutOfRangeException(nameof(source));
+        }
+
+        if (mode != EncryptionMode.Aes && mode != EncryptionMode.Rsa)
+        {
+            throw new ArgumentOutOfRangeException(nameof(mode));
+        }
+
+        if (mode == EncryptionMode.Aes)
+        {
+            if (keys == null || !keys.HasAesKey)
+            {
+                throw new InvalidOperationException("No AES key in the selected export. Generate and export one on the Keys tab.");
+            }
+
+            return new EncryptionKeys { AesKey = keys.AesKey };
+        }
+
+        if (keys == null || !keys.HasPublicKey)
+        {
+            throw new InvalidOperationException("No RSA public key in the selected export. Generate and export one on the Keys tab.");
+        }
+
+        if (!decrypt)
+        {
+            return new EncryptionKeys { RsaPublicKey = keys.RsaPublicKey };
+        }
+
+        // A trusted Editor can simulate the server. The private key is never serialized or shipped.
+#if UNITY_EDITOR
+        DataIOConfig config = DataIOConfig.Load();
+        EncryptionKeys local = config ? EncryptionKeys.FromEnvironment(config.environmentPrefix) : null;
+        if (local == null || !local.HasPrivateKey)
+        {
+            local = EncryptionKeyFile.Load();
+        }
+
+        if (local != null && local.HasPrivateKey)
+        {
+            return new EncryptionKeys { RsaPrivateKey = local.RsaPrivateKey };
+        }
+#endif
+        throw new InvalidOperationException("RSA decryption needs the matching private key. In the Editor, store it using "
+            + "Keys > Environment variables or Project key file. Never export it into the game; decrypt on your server.");
+    }
+}
