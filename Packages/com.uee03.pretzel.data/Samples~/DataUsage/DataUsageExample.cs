@@ -1,70 +1,139 @@
 using System;
+using System.IO;
+using System.Security.Cryptography;
 using System.Threading;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Pretzel.Data;
 using UnityEngine;
 
 namespace Pretzel.Samples.Data
 {
-    public class DataUsageExample : MonoBehaviour
+    /// <summary>
+    /// Keys, slots, a custom store with migrations, async saves and ScriptableObject settings.
+    /// Everything is written under a sample folder, so importing it never touches your game's saves.
+    /// </summary>
+    public sealed class DataUsageExample : MonoBehaviour
     {
+        private const string SampleFolder = "PretzelSamples";
+
         [SerializeField] private SampleAudioSettings _audioSettings;
 
-        private readonly CancellationTokenSource _lifetime = new();
+        private DataStore _profileStore;
+        private DataStore _settingsStore;
+        private SampleAudioSettings _runtimeAudio;
+
+        private void Awake()
+        {
+            // Create each store once and keep it. A store snapshots its options when constructed.
+            DataStoreOptions options = new();
+            options.Transforms.Add(new BinaryDataStrategy());
+            // Old files without a schema (0) and schema 1 files both used "name".
+            options.AddMigration<PlayerProfile>(new DelegateMigration(0, 2, RenameNameToDisplayName));
+            options.AddMigration<PlayerProfile>(new DelegateMigration(1, 2, RenameNameToDisplayName));
+            _profileStore = new DataStore(DataRoots.PersistentData(SampleFolder + "/Profiles"), extension: "sav", options: options);
+
+            // ScriptableObjects load into an existing instance and need the JsonUtility serializer.
+            _settingsStore = new DataStore(DataRoots.PersistentData(SampleFolder + "/Settings"), new JsonUtilitySerializer());
+        }
 
         private async void Start()
         {
-            // Default store: JSON under persistentDataPath/SaveData.
-            DataIO.Save("profile", new PlayerProfile { displayName = "Pretzel", level = 3 });
-
-            LoadResult<PlayerProfile> result = DataIO.Load<PlayerProfile>("profile");
-            if (result.Ok)
-            {
-                Debug.Log($"Loaded {result.Value.displayName}, level {result.Value.level}.");
-            }
-            else
-            {
-                Debug.Log($"No profile ({result.Status}): {result.Error}");
-            }
-
-            // Slots and folders live in the key.
-            DataKey slotKey = new("profile", slot: 2, folder: "Profiles");
-            DataIO.Save(slotKey, new PlayerProfile());
-            Debug.Log($"Slots: {string.Join(", ", DataIO.ListSlots("Profiles"))}");
-
-            await UseCustomStoreAsync();
-        }
-
-        private async Awaitable UseCustomStoreAsync()
-        {
-            DataStoreOptions options = new() { PrettyPrint = true };
-            options.Transforms.Add(new GZipTransform());
-            options.AddMigration<PlayerProfile>(new DelegateMigration(0, 2, MigrateToV2));
-            options.AddMigration<PlayerProfile>(new DelegateMigration(1, 2, MigrateToV2));
-
-            DataStore store = new(DataRoots.PersistentData("SampleStore"), extension: "sav", options: options);
-
+            CancellationToken cancellationToken = destroyCancellationToken;
             try
             {
-                await store.SaveAsync("profile", new PlayerProfile { level = 10 }, _lifetime.Token);
-                LoadResult<PlayerProfile> loaded = await store.LoadAsync<PlayerProfile>("profile", _lifetime.Token);
-                Debug.Log($"Async load: {loaded.Status}, level {loaded.Value?.level}.");
+                UseDefaultStore();
+                await UseCustomStoreAsync(cancellationToken);
+                LoadAudioSettings();
             }
-            catch (OperationCanceledException)
+            catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
             {
-                // The component was destroyed while the save was running.
+                // Destroyed while a save or load was running. The store finishes or skips the write safely.
             }
-
-            // ScriptableObjects load into the existing asset, and need the JsonUtility serializer.
-            if (_audioSettings)
+            catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or InvalidOperationException
+                or ArgumentException or NotSupportedException or JsonException or CryptographicException)
             {
-                DataStore settingsStore = new(DataRoots.PersistentData("Settings"), new JsonUtilitySerializer());
-                settingsStore.Save("audio", _audioSettings);
-                settingsStore.LoadInto("audio", _audioSettings);
+                // Saves throw on I/O or configuration problems. Keep progress in memory and offer a retry.
+                Debug.LogException(ex, this);
             }
         }
 
-        private static string MigrateToV2(string payload)
+        private void OnDestroy()
+        {
+            if (_runtimeAudio)
+            {
+                Destroy(_runtimeAudio);
+            }
+        }
+
+        private void UseDefaultStore()
+        {
+            // DataIO.Default follows the DataIOConfig asset (Pretzel > Data Format), or plain JSON under
+            // persistentDataPath/SaveData when there is none. An Encrypted config needs its key first.
+            DataKey profileKey = new("profile", folder: SampleFolder);
+            DataIO.Save(profileKey, new PlayerProfile { displayName = "Pretzel", level = 3 });
+            Report("Default store", DataIO.Load<PlayerProfile>(profileKey));
+
+            // Slots and folders are part of the key, so one API covers every save.
+            DataIO.Save(new DataKey("profile", slot: 2, folder: SampleFolder), new PlayerProfile());
+            Debug.Log($"Sample slots: {string.Join(", ", DataIO.ListSlots(SampleFolder))}", this);
+        }
+
+        private async Awaitable UseCustomStoreAsync(CancellationToken cancellationToken)
+        {
+            // Serialization happens here on the main thread; file I/O runs on a background thread.
+            await _profileStore.SaveAsync("profile", new PlayerProfile { level = 10 }, cancellationToken);
+            Report("Custom store", await _profileStore.LoadAsync<PlayerProfile>("profile", cancellationToken));
+        }
+
+        private void LoadAudioSettings()
+        {
+            if (!_audioSettings)
+            {
+                return;
+            }
+
+            // Load into a runtime copy, so Play mode never changes the asset in the Editor.
+            _runtimeAudio = Instantiate(_audioSettings);
+            LoadResult<SampleAudioSettings> result = _settingsStore.LoadInto("audio", _runtimeAudio);
+            switch (result.Status)
+            {
+                case DataStatus.Ok:
+                    Debug.Log($"Audio settings loaded. Master volume: {_runtimeAudio.masterVolume}.", this);
+                    break;
+                case DataStatus.NotFound:
+                    _settingsStore.Save("audio", _runtimeAudio);
+                    break;
+                default:
+                    // Keep the defaults and leave the damaged file for the player or support to recover.
+                    Debug.LogError($"Audio settings could not be read ({result.ErrorCode}): {result.Error}", this);
+                    break;
+            }
+        }
+
+        private void Report(string source, LoadResult<PlayerProfile> result)
+        {
+            switch (result.Status)
+            {
+                case DataStatus.Ok:
+                    if (result.RecoveredFromBackup)
+                    {
+                        Debug.LogWarning($"{source}: the main file was damaged, so the backup was loaded.", this);
+                    }
+
+                    Debug.Log($"{source}: loaded {result.Value.displayName}, level {result.Value.level}.", this);
+                    break;
+                case DataStatus.NotFound:
+                    Debug.Log($"{source}: no profile yet.", this);
+                    break;
+                default:
+                    // Never overwrite a corrupt save with a new profile. Offer recovery instead.
+                    Debug.LogError($"{source}: the profile could not be read ({result.ErrorCode}): {result.Error}", this);
+                    break;
+            }
+        }
+
+        private static string RenameNameToDisplayName(string payload)
         {
             JObject json = JObject.Parse(payload);
             if (json.TryGetValue("name", out JToken name))
@@ -73,13 +142,7 @@ namespace Pretzel.Samples.Data
                 json.Remove("name");
             }
 
-            return json.ToString();
-        }
-
-        private void OnDestroy()
-        {
-            _lifetime.Cancel();
-            _lifetime.Dispose();
+            return json.ToString(Formatting.None);
         }
     }
 }

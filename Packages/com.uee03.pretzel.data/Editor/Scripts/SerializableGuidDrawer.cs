@@ -34,18 +34,26 @@ namespace Pretzel.Data.Editor
                     return;
                 }
 
-                SetGuid(guid, SerializableGuid.NewGuidString());
+                SetEachGuid(guid, SerializableGuid.NewGuidString);
             }));
-            root.Add(CreateButton("TreeEditor.Trash", "Clear", "Set the GUID to empty", () => SetGuid(guid, SerializableGuid.EmptyGuidString())));
+            root.Add(CreateButton("TreeEditor.Trash", "Clear", "Set the GUID to empty", () => SetEachGuid(guid, SerializableGuid.EmptyGuidString)));
 
             return root;
         }
 
-        // Going through the SerializedProperty keeps undo, prefab overrides and multi-edit working.
-        private static void SetGuid(SerializedProperty guid, string value)
+        // Each selected object gets its own value, so multi-editing never gives two objects the same GUID.
+        // Going through SerializedObject keeps undo and prefab overrides working.
+        private static void SetEachGuid(SerializedProperty guid, System.Func<string> value)
         {
-            guid.stringValue = value;
-            guid.serializedObject.ApplyModifiedProperties();
+            string path = guid.propertyPath;
+            foreach (Object target in guid.serializedObject.targetObjects)
+            {
+                using SerializedObject single = new(target);
+                single.FindProperty(path).stringValue = value();
+                single.ApplyModifiedProperties();
+            }
+
+            guid.serializedObject.Update();
         }
 
         private static Button CreateButton(string iconName, string fallbackText, string tooltip, System.Action onClick)

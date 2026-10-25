@@ -5,6 +5,7 @@
 // for this game start without touching the asset:
 //
 //     ProjectDataIO.Initialize(config => { config.saveFolder = "MyGameSaves"; });
+//     ProjectDataIO.Initialize(configureStore: options => options.AddMigration<Profile>(new ProfileV1ToV2()));
 //
 // Call Initialize once from your startup code (Start or later), after the key is available, before any DataIO call.
 // The key comes from the config's Key source (Keys tab): the generated PretzelDataSetup (Provider), the bundled
@@ -48,20 +49,25 @@ public static class ProjectDataIO
 
     /// <summary>Creates the store once and installs it as DataIO.Default. Calling it again does nothing.</summary>
     /// <param name="configure">Optional overrides applied to a copy of the asset's settings.</param>
-    public static void Initialize(Action<DataIOConfig> configure = null) => Create(null, configure);
+    /// <param name="configureStore">Optional store options, including schema migrations, applied before the store takes its snapshot.</param>
+    public static void Initialize(Action<DataIOConfig> configure = null, Action<DataStoreOptions> configureStore = null)
+        => Create(null, configure, configureStore);
 
     /// <summary>Same as Initialize, with keys you already have (a token flow, a key service). Keep them in memory only.</summary>
-    public static void InitializeWithKeys(EncryptionKeys keys, Action<DataIOConfig> configure = null)
+    public static void InitializeWithKeys(EncryptionKeys keys, Action<DataIOConfig> configure = null, Action<DataStoreOptions> configureStore = null)
     {
         if (keys == null)
         {
             throw new ArgumentNullException(nameof(keys));
         }
 
-        Create(keys, configure);
+        Create(keys, configure, configureStore);
     }
 
-    /// <summary>Forgets the store and its keys and resets DataIO. Finish outstanding saves first. Also runs when Play mode starts.</summary>
+    /// <summary>
+    /// Forgets the store and its keys and resets DataIO. Finish outstanding saves first. Also runs when Play mode starts.
+    /// On sign-out, also clear any key you supplied (EncryptionKeys.Provider = null, or PretzelDataSetup.ClearKeys()).
+    /// </summary>
     public static void Shutdown()
     {
         Release(_config);
@@ -76,49 +82,25 @@ public static class ProjectDataIO
     /// A second store for other data, such as settings or a cache. It starts from the same settings and keys in its own folder
     /// under the persistent data path, and you can override anything for this store only. Create it once and keep it.
     /// </summary>
-    public static DataStore CreateStore(string subFolder, Action<DataIOConfig> configure = null)
+    public static DataStore CreateStore(string subFolder, Action<DataIOConfig> configure = null, Action<DataStoreOptions> configureStore = null)
     {
         DataIOConfig copy = UnityEngine.Object.Instantiate(Config);
         try
         {
             configure?.Invoke(copy);
-            return copy.CreateStore(DataRoots.PersistentData(subFolder), copy.format == DataFormat.Encrypted ? _clientKeys : null);
+            return copy.CreateStore(DataRoots.PersistentData(subFolder), copy.format == DataFormat.Encrypted ? _clientKeys : null, configureStore);
         }
         finally
         {
             Release(copy);
         }
     }
-//@@IF_RSA
-    /// <summary>
-    /// For a TRUSTED SERVER or tool that holds the RSA private key: reads the files a game wrote with the public key.
-    /// Never call this in a shipped game, and never ship the private key.
-    /// </summary>
-    public static DataStore CreateServerStore(string receivedFolder, EncryptionKeys serverKeys)
-    {
-        if (serverKeys == null || !serverKeys.HasPrivateKey)
-        {
-            throw new ArgumentException("The server needs its RSA private key.", nameof(serverKeys));
-        }
 
-        DataIOConfig copy = CreateConfig(null);
-        try
-        {
-            copy.format = DataFormat.Encrypted;
-            copy.encryptionMode = EncryptionMode.Rsa;
-            return copy.CreateStore(DataRoots.Absolute(receivedFolder), new EncryptionKeys { RsaPrivateKey = serverKeys.RsaPrivateKey });
-        }
-        finally
-        {
-            Release(copy);
-        }
-    }
-//@@END_IF
-    private static void Create(EncryptionKeys given, Action<DataIOConfig> configure)
+    private static void Create(EncryptionKeys given, Action<DataIOConfig> configure, Action<DataStoreOptions> configureStore)
     {
         if (IsReady)
         {
-            if (configure != null || given != null)
+            if (configure != null || given != null || configureStore != null)
             {
                 throw new InvalidOperationException("ProjectDataIO is already initialized. Call Shutdown first to apply different settings or keys.");
             }
@@ -135,7 +117,12 @@ public static class ProjectDataIO
             if (config.format != DataFormat.Encrypted)
             {
                 throw new InvalidOperationException("The DataIOConfig is not set to Encrypted, but this setup is for encrypted data. "
-                    + "Choose Encrypted on the Format tab, or generate the plain, GZip or BSON setup on the Setup tab.");
+                    + "Choose Encrypted on the Format tab, or generate the plain or binary setup on the Setup tab.");
+            }
+
+            if (config.encryptionMode != EncryptionMode.Aes)
+            {
+                throw new NotSupportedException("Only AES encryption is supported.");
             }
 
             string origin = "keys passed to InitializeWithKeys";
@@ -146,9 +133,8 @@ public static class ProjectDataIO
                     + "Export the key on the Keys tab and make the key source match it, or pass keys to InitializeWithKeys.");
             }
 
-            // A game client only ever holds what it needs: the AES key, or just the RSA public key.
             clientKeys = keys.ForClient(config.encryptionMode);
-            store = config.CreateStore(null, clientKeys);
+            store = config.CreateStore(null, clientKeys, configureStore);
             description = clientKeys.Describe(config.encryptionMode, origin);
         }
         catch
@@ -162,7 +148,10 @@ public static class ProjectDataIO
         _clientKeys = clientKeys;
         _description = description;
         DataIO.Default = store;
-        Debug.Log("[ProjectDataIO] Ready. " + description);
+        if (Debug.isDebugBuild)
+        {
+            Debug.Log("[ProjectDataIO] Ready. " + description);
+        }
     }
 
     private static DataIOConfig CreateConfig(Action<DataIOConfig> configure)

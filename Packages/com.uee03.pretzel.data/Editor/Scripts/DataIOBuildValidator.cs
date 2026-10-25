@@ -52,7 +52,7 @@ namespace Pretzel.Data.Editor
             List<BuildIssue> issues = Validate();
             if (issues.Count == 0)
             {
-                Debug.Log("[Pretzel.Data] Build setup looks good.");
+                Debug.Log("[Pretzel.Data] No issues found by the limited key-delivery checks. Verify runtime startup and save/load in a player.");
                 return;
             }
 
@@ -84,6 +84,12 @@ namespace Pretzel.Data.Editor
             void Error(string message) => issues.Add(new BuildIssue(IssueSeverity.Error, message));
             void Warn(string message) => issues.Add(new BuildIssue(IssueSeverity.Warning, message));
 
+            if (config != null && config.format == DataFormat.Encrypted && config.encryptionMode != EncryptionMode.Aes)
+            {
+                Error("The saved encryption mode is unsupported. Set up AES again.");
+                return issues;
+            }
+
             EncryptionKeys bundled = null;
             string jsonError = null;
             if (keyJson != null)
@@ -92,8 +98,8 @@ namespace Pretzel.Data.Editor
                 {
                     bundled = GameEncryptionKeyConfig.FromJson(keyJson);
                 }
-                catch (Exception ex) when (ex is FormatException or Newtonsoft.Json.JsonException
-                                               or System.Security.Cryptography.CryptographicException or System.Xml.XmlException)
+                catch (Exception ex) when (ex is FormatException or ArgumentException or InvalidDataException or NotSupportedException or Newtonsoft.Json.JsonException
+                                               or System.Security.Cryptography.CryptographicException)
                 {
                     jsonError = ex.Message;
                 }
@@ -116,22 +122,15 @@ namespace Pretzel.Data.Editor
             bool jsonUsable = bundled != null && bundled.CanWrite(mode);
             bool jsonRead = source is KeySource.Automatic or KeySource.BundledJson;
 
-            if (delivery == DeliveryScript.Embedded)
-            {
-                bool scriptHoldsAes = deliveryScript.Contains("PartA");
-                if (mode == EncryptionMode.Aes && !scriptHoldsAes)
-                {
-                    Error("The embedded setup holds an RSA public key, but the settings use AES. Generate the setup again for AES.");
-                }
-                else if (mode == EncryptionMode.Rsa && scriptHoldsAes)
-                {
-                    Error("The embedded setup holds an AES key, but the settings use RSA. Generate the setup again for RSA.");
-                }
-            }
-
             if (jsonError != null && jsonRead)
             {
                 Error("The bundled key config is invalid and would throw at startup: " + jsonError);
+            }
+
+            if (delivery == DeliveryScript.Token && deliveryScript.Contains(ShippingGenerator.TokenStubMarker)
+                && source is KeySource.Automatic or KeySource.Provider)
+            {
+                Error("PretzelDataSetup.RequestKeyAsync is still the generated stub, so the game can never fetch its key. Implement it before building.");
             }
 
             switch (source)
@@ -197,7 +196,7 @@ namespace Pretzel.Data.Editor
             return issues;
         }
 
-        private static DeliveryScript Classify(string source)
+        internal static DeliveryScript Classify(string source)
         {
             if (string.IsNullOrEmpty(source))
             {
@@ -209,7 +208,7 @@ namespace Pretzel.Data.Editor
                 return DeliveryScript.Token;
             }
 
-            if (source.Contains("PartA") || source.Contains("const string PublicKey"))
+            if (source.Contains("PartA"))
             {
                 return DeliveryScript.Embedded;
             }

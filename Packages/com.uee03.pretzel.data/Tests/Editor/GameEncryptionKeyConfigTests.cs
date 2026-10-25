@@ -1,6 +1,5 @@
 using System;
 using System.IO;
-using System.Security.Cryptography;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using NUnit.Framework;
@@ -12,22 +11,12 @@ namespace Pretzel.Data.Tests
 {
     public sealed class GameEncryptionKeyConfigTests
     {
-        private EncryptionKeys _rsa;
-
-        [OneTimeSetUp]
-        public void CreateRsaKeys()
-        {
-            _rsa = EncryptionKeys.GenerateRsa(2048);
-        }
-
         [Test]
         public void AesExportContainsOnlyAesKeyAndRoundTripsEncryptedData()
         {
             EncryptionKeys original = new()
             {
-                AesKey = EncryptionKeys.GenerateAesKey(),
-                RsaPublicKey = _rsa.RsaPublicKey,
-                RsaPrivateKey = _rsa.RsaPrivateKey
+                AesKey = EncryptionKeys.GenerateAesKey()
             };
             string json = GameEncryptionKeyConfig.ToJson(original, EncryptionMode.Aes);
             JObject parsed = JObject.Parse(json);
@@ -35,7 +24,6 @@ namespace Pretzel.Data.Tests
             Assert.That(parsed.ContainsKey("aesKey") && parsed.ContainsKey("keyId"), Is.True);
             EncryptionKeys restored = GameEncryptionKeyConfig.FromJson(json);
             Assert.That(restored.AesKey, Is.EqualTo(original.AesKey));
-            Assert.That(restored.HasPublicKey || restored.HasPrivateKey, Is.False);
 
             byte[] data = { 1, 2, 3, 4 };
             EncryptionTransform writer = new(EncryptionMode.Aes, original);
@@ -43,38 +31,7 @@ namespace Pretzel.Data.Tests
             Assert.That(reader.Decode(writer.Encode(data)), Is.EqualTo(data));
         }
 
-        [Test]
-        public void RsaExportContainsOnlyPublicKeyAndCanEncryptForServer()
-        {
-            EncryptionKeys original = new()
-            {
-                AesKey = EncryptionKeys.GenerateAesKey(),
-                RsaPublicKey = _rsa.RsaPublicKey,
-                RsaPrivateKey = _rsa.RsaPrivateKey
-            };
-            string json = GameEncryptionKeyConfig.ToJson(original, EncryptionMode.Rsa);
-            Assert.That(JObject.Parse(json).Count, Is.EqualTo(1));
-            EncryptionKeys restored = GameEncryptionKeyConfig.FromJson(json);
-            Assert.That(restored.RsaPublicKey, Is.EqualTo(_rsa.RsaPublicKey));
-            Assert.That(restored.HasAesKey || restored.HasPrivateKey, Is.False);
-
-            byte[] data = { 5, 6, 7, 8 };
-            EncryptionTransform writer = new(EncryptionMode.Rsa, restored);
-            EncryptionTransform server = new(EncryptionMode.Rsa, _rsa);
-            Assert.That(server.Decode(writer.Encode(data)), Is.EqualTo(data));
-        }
-
-        [Test]
-        public void RsaExportStripsPrivateParametersEvenFromPublicKeyField()
-        {
-            string json = GameEncryptionKeyConfig.ToJson(
-                new EncryptionKeys { RsaPublicKey = _rsa.RsaPrivateKey }, EncryptionMode.Rsa);
-            Assert.That(GameEncryptionKeyConfig.FromJson(json).RsaPublicKey, Is.EqualTo(_rsa.RsaPublicKey));
-            Assert.That(json, Does.Not.Contain("rsaPrivateKey"));
-        }
-
         [TestCase(EncryptionMode.Aes)]
-        [TestCase(EncryptionMode.Rsa)]
         public void MissingKeyCannotBeExported(EncryptionMode mode)
         {
             Assert.Throws<InvalidOperationException>(() => GameEncryptionKeyConfig.ToJson(new EncryptionKeys(), mode));
@@ -85,8 +42,6 @@ namespace Pretzel.Data.Tests
         [TestCase("{\"aesKey\":\"AQIDBA==\"}")]
         [TestCase("{\"aesKey\":42}")]
         [TestCase("{\"aesKey\":null}")]
-        [TestCase("{\"rsaPublicKey\":\"invalid\"}")]
-        [TestCase("{\"rsaPrivateKey\":\"never ship this\"}")]
         [TestCase("{\"aesKey\":\"AAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGxwdHh8=\",\"keyId\":\"00:00:00:00:00:00\"}")]
         [TestCase("{\"aesKey\":\"AAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGxwdHh8=\",\"previousAesKeys\":[\"AQIDBA==\"]}")]
         [TestCase("{\"aesKey\":\"AAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGxwdHh8=\",\"previousAesKeys\":\"not a list\"}")]
@@ -103,9 +58,10 @@ namespace Pretzel.Data.Tests
         }
 
         [Test]
-        public void InvalidRsaXmlThrows()
+        public void UnsupportedModeCannotBeExported()
         {
-            Assert.Throws<CryptographicException>(() => GameEncryptionKeyConfig.FromJson("{\"rsaPublicKey\":\"<RSAKeyValue/>\"}"));
+            Assert.Throws<ArgumentOutOfRangeException>(() => GameEncryptionKeyConfig.ToJson(
+                new EncryptionKeys { AesKey = EncryptionKeys.GenerateAesKey() }, (EncryptionMode)1));
         }
 
         [Test]

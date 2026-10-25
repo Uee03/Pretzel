@@ -36,18 +36,18 @@ namespace Pretzel.Editor.Windows
         [MenuItem("Tools/Pretzel/Example")]
         static void Open()
         {
-            var window = GetWindow<ExampleWindow>();
+            ExampleWindow window = GetWindow<ExampleWindow>();
             window.titleContent = new GUIContent("Example");
             window.minSize = new Vector2(360, 240);
         }
 
         void CreateGUI()
         {
-            var root = rootVisualElement;
+            VisualElement root = rootVisualElement;
             AssetDatabase.LoadAssetAtPath<VisualTreeAsset>(k_Layout).CloneTree(root);
             root.styleSheets.Add(AssetDatabase.LoadAssetAtPath<StyleSheet>(k_Style));
 
-            var button = root.Q<Button>("example-window__apply-button");
+            Button button = root.Q<Button>("example-window__apply-button");
             button.clicked += OnApply;
         }
 

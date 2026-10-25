@@ -1,6 +1,5 @@
 ﻿using System;
 using System.IO;
-using System.Security.Cryptography;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -20,9 +19,6 @@ namespace Pretzel.Data.Editor
         private Label _envHint;
         private Label _filePath;
         private Label _git;
-        private VisualElement _publicSection;
-        private Button _envStorePublic;
-        private Button _fileStorePublic;
         private Button _envStore;
         private Button _fileStore;
         private Button _envCopy;
@@ -35,8 +31,6 @@ namespace Pretzel.Data.Editor
         private Label _gameResult;
 
         private KeyRow _aesRow;
-        private KeyRow _publicRow;
-        private KeyRow _privateRow;
 
         private sealed class KeyRow
         {
@@ -64,12 +58,9 @@ namespace Pretzel.Data.Editor
             _envHint = view.Q<Label>("keys-panel__env-hint");
             _filePath = view.Q<Label>("keys-panel__file-path");
             _git = view.Q<Label>("keys-panel__git");
-            _publicSection = view.Q("keys-panel__public-section");
             _envStore = view.Q<Button>("keys-panel__env-store");
-            _envStorePublic = view.Q<Button>("keys-panel__env-store-public");
             _envCopy = view.Q<Button>("keys-panel__env-copy");
             _fileStore = view.Q<Button>("keys-panel__file-store");
-            _fileStorePublic = view.Q<Button>("keys-panel__file-store-public");
             _fileReveal = view.Q<Button>("keys-panel__file-reveal");
             _fileDelete = view.Q<Button>("keys-panel__file-delete");
             _gameJson = view.Q<Button>("keys-panel__game-json");
@@ -80,8 +71,6 @@ namespace Pretzel.Data.Editor
 
             VisualElement rows = view.Q("keys-panel__rows");
             _aesRow = AddRow(rows, "AES key");
-            _publicRow = AddRow(rows, "RSA public key");
-            _privateRow = AddRow(rows, "RSA private key");
 
             _envHint.text = KeyStorage.CanPersistEnvironment
                 ? "Saved to your Windows user environment, so every program started afterwards sees them. Restart Unity Hub and Unity if they are not picked up. This Editor session gets them immediately."
@@ -91,16 +80,14 @@ namespace Pretzel.Data.Editor
             _prefix.RegisterValueChangedCallback(evt => OnPrefixChanged(evt.newValue.Trim()));
             _source.Init(KeySource.Automatic);
             _source.RegisterValueChangedCallback(evt => _state.Edit("Change key source", c => c.keySource = (KeySource)evt.newValue));
-            _previousClear.clicked += OnClearPrevious;
+            _previousClear.clicked += () => RunStorageAction(OnClearPrevious);
             view.Q<Button>("keys-panel__reload").clicked += OnReload;
-            _envStore.clicked += () => StoreEnvironment(KeyScope.All);
-            _envStorePublic.clicked += () => StoreEnvironment(KeyScope.PublicOnly);
-            _envCopy.clicked += OnCopyCommands;
-            view.Q<Button>("keys-panel__env-remove").clicked += OnRemoveEnvironment;
-            _fileStore.clicked += () => StoreFile(KeyScope.All);
-            _fileStorePublic.clicked += () => StoreFile(KeyScope.PublicOnly);
+            _envStore.clicked += () => RunStorageAction(() => StoreEnvironment(KeyScope.All));
+            _envCopy.clicked += () => RunStorageAction(OnCopyCommands);
+            view.Q<Button>("keys-panel__env-remove").clicked += () => RunStorageAction(OnRemoveEnvironment);
+            _fileStore.clicked += () => RunStorageAction(() => StoreFile(KeyScope.All));
             _fileReveal.clicked += () => EditorUtility.RevealInFinder(File.Exists(EncryptionKeyFile.Path) ? EncryptionKeyFile.Path : Path.GetDirectoryName(EncryptionKeyFile.Path));
-            _fileDelete.clicked += OnDeleteFile;
+            _fileDelete.clicked += () => RunStorageAction(OnDeleteFile);
             _gameJson.clicked += () => ExportGameKeys(false);
             _gameEmbedded.clicked += () => ExportGameKeys(true);
             _gameSelect.clicked += () => SelectAsset(GameKeyExport.JsonPath);
@@ -111,6 +98,18 @@ namespace Pretzel.Data.Editor
         }
 
         public void OnSelected() => Refresh();
+
+        private void RunStorageAction(Action action)
+        {
+            try
+            {
+                action();
+            }
+            catch (Exception ex) when (PanelUi.IsExpectedFailure(ex))
+            {
+                PanelUi.SetText(_result, "Key storage operation failed: " + PanelUi.ErrorText(ex), "error");
+            }
+        }
 
         private static KeyRow AddRow(VisualElement parent, string name)
         {
@@ -139,20 +138,27 @@ namespace Pretzel.Data.Editor
 
             string prefix = config.environmentPrefix;
             _prefix.SetValueWithoutNotify(prefix);
-            _prefixHint.text = $"Variables: {EncryptionKeys.AesVariable(prefix)}, {EncryptionKeys.PublicVariable(prefix)}, {EncryptionKeys.PrivateVariable(prefix)}";
-
-            bool rsa = config.encryptionMode == EncryptionMode.Rsa;
-            PanelUi.SetVisible(_aesRow.Root, !rsa);
-            PanelUi.SetVisible(_publicRow.Root, rsa);
-            PanelUi.SetVisible(_privateRow.Root, rsa);
+            _prefixHint.text = $"Variable: {EncryptionKeys.AesVariable(prefix)}. Environment delivery carries the current key only; use the key file or game export to retain previous keys.";
 
             EncryptionKeys keys = _state.Keys;
-            EncryptionKeys onFile = EncryptionKeyFile.Load() ?? new EncryptionKeys();
-            ShowRow(_aesRow, keys.HasAesKey, onFile.HasAesKey, EncryptionKeys.AesVariable(prefix));
-            ShowRow(_publicRow, keys.HasPublicKey, onFile.HasPublicKey, EncryptionKeys.PublicVariable(prefix));
-            ShowRow(_privateRow, keys.HasPrivateKey, onFile.HasPrivateKey, EncryptionKeys.PrivateVariable(prefix));
+            EncryptionKeys onFile = new();
+            string fileError = null;
+            try
+            {
+                onFile = EncryptionKeyFile.Load() ?? new EncryptionKeys();
+            }
+            catch (Exception ex) when (PanelUi.IsExpectedFailure(ex))
+            {
+                fileError = "Project key file was rejected: " + PanelUi.ErrorText(ex);
+            }
 
-            bool hasKeys = rsa ? keys.HasPublicKey : keys.HasAesKey;
+            if (fileError != null || _state.KeyLoadError != null)
+            {
+                PanelUi.SetText(_result, fileError ?? _state.KeyLoadError, "error");
+            }
+
+            ShowRow(_aesRow, keys.HasAesKey, onFile.HasAesKey, EncryptionKeys.AesVariable(prefix));
+            bool hasKeys = config.encryptionMode == EncryptionMode.Aes && keys.HasAesKey;
             _envStore.SetEnabled(hasKeys);
             _fileStore.SetEnabled(hasKeys);
             _envCopy.SetEnabled(hasKeys);
@@ -160,21 +166,13 @@ namespace Pretzel.Data.Editor
             _gameEmbedded.SetEnabled(hasKeys);
             _gameSelect.SetEnabled(GameKeyExport.JsonExists);
             _gameHint.text = $"JSON: {GameKeyExport.JsonPath}\nC#: {ShippingGenerator.DefaultFolder}/{ShippingGenerator.ScriptName}\n"
-                             + (rsa
-                                 ? "Exports only the RSA public key. The game can write encrypted files, but reading them requires the private key on your server."
-                                 : "Exports the current AES key so the game can both save and load encrypted files offline.");
+                             + "Exports the AES key and previous keys so the game can save and load encrypted files offline.";
 
             _source.SetValueWithoutNotify(config.keySource);
             RefreshActiveKey(config);
             int previous = keys.PreviousAesKeys.Count;
             PanelUi.SetVisible(_previousClear, previous > 0);
             _previousClear.text = $"Clear {previous} previous AES key(s)";
-
-            // The public key section only matters when there is a public key.
-            bool showPublic = keys.HasPublicKey;
-            PanelUi.SetVisible(_publicSection, showPublic);
-            PanelUi.SetVisible(_envStorePublic, showPublic);
-            PanelUi.SetVisible(_fileStorePublic, showPublic);
 
             _fileDelete.SetEnabled(EncryptionKeyFile.Exists);
 
@@ -206,6 +204,13 @@ namespace Pretzel.Data.Editor
 
         private void RefreshActiveKey(DataIOConfig config)
         {
+            if (config.encryptionMode != EncryptionMode.Aes)
+            {
+                PanelUi.SetChip(_active, "Unsupported saved encryption mode", PanelUi.Missing);
+                _activeDetail.text = "Set up AES first. The saved mode has not been changed.";
+                return;
+            }
+
             if (config.format != DataFormat.Encrypted)
             {
                 PanelUi.SetChip(_active, "Not encrypted", PanelUi.Warn);
@@ -227,9 +232,8 @@ namespace Pretzel.Data.Editor
                 PanelUi.SetChip(_active, ready ? "Keys found" : "No usable key", ready ? PanelUi.Ok : PanelUi.Missing);
                 _activeDetail.text = (active ?? new EncryptionKeys()).Describe(config.encryptionMode, origin);
             }
-            catch (Exception ex)
+            catch (Exception ex) when (PanelUi.IsExpectedFailure(ex))
             {
-                // A malformed bundled config or a throwing provider must not break the window.
                 PanelUi.SetChip(_active, "Key source failed", PanelUi.Missing);
                 _activeDetail.text = PanelUi.ErrorText(ex);
             }
@@ -278,25 +282,26 @@ namespace Pretzel.Data.Editor
             }
 
             _state.ReloadKeys();
-            PanelUi.SetText(_result, "Keys reloaded from storage.");
+            PanelUi.SetText(_result, _state.KeyLoadError ?? "Keys reloaded from storage.", _state.KeyLoadError == null ? null : "error");
         }
 
         private void StoreEnvironment(KeyScope scope)
         {
             EncryptionKeys keys = KeysForMode();
             KeyStorage.SaveEnvironment(_state.Config.environmentPrefix, keys, scope);
-            if (scope == KeyScope.All)
+            if (keys.PreviousAesKeys.Count == 0)
             {
                 _state.MarkKeysStored();
             }
             string suffix = KeyStorage.CanPersistEnvironment ? " Restart other programs to see them." : " They last until the Editor closes.";
-            PanelUi.SetText(_result, (scope == KeyScope.PublicOnly ? "Public key" : "Keys") + " stored as environment variables." + suffix);
+            PanelUi.SetText(_result, "AES key stored as an environment variable (previous keys are not included)." + suffix
+                + (keys.PreviousAesKeys.Count > 0 ? " Save the full key ring to the project key file or export it before closing." : string.Empty));
         }
 
         private void OnCopyCommands()
         {
             EncryptionKeys keys = KeysForMode();
-            if (keys.HasPrivateKey && !EditorUtility.DisplayDialog("Copy the private key?", "The commands contain the private key in plain text. Paste them only into a trusted shell or secret store.", "Copy", "Cancel"))
+            if (!EditorUtility.DisplayDialog("Copy the AES key?", "The commands contain the AES key in plain text. Paste them only into a trusted shell or secret store.", "Copy", "Cancel"))
             {
                 return;
             }
@@ -324,7 +329,7 @@ namespace Pretzel.Data.Editor
             {
                 _state.MarkKeysStored();
             }
-            PanelUi.SetText(_result, (scope == KeyScope.PublicOnly ? "Public key" : "Keys") + " saved to the project key file.");
+            PanelUi.SetText(_result, "AES key and previous keys saved to the project key file.");
         }
 
         private void OnDeleteFile()
@@ -342,11 +347,10 @@ namespace Pretzel.Data.Editor
         private void ExportGameKeys(bool embedded)
         {
             string path = embedded ? ShippingGenerator.DefaultFolder + "/" + ShippingGenerator.ScriptName : GameKeyExport.JsonPath;
-            bool aes = _state.Config.encryptionMode == EncryptionMode.Aes;
-            if ((aes || File.Exists(path)) && !PanelUi.Confirm("Export game key?",
-                    $"This writes {(aes ? "the AES key" : "only the RSA public key")} to {path} and includes it in builds. "
+            if (!PanelUi.Confirm("Export game key?",
+                    $"This writes the AES key to {path} and includes it in builds. "
                     + "Any existing file at this path will be replaced. Older AES keys are kept so existing saves still open."
-                    + (aes ? " Anyone with the game can recover this key. Keep a separate backup and do not commit the generated file." : ""),
+                    + " Anyone with the game can recover this key. Keep a separate backup and do not commit the generated file.",
                     "Export", "Cancel"))
             {
                 return;
@@ -366,8 +370,7 @@ namespace Pretzel.Data.Editor
                     + $"Use the Setup tab to generate the code that creates the store.");
                 SelectAsset(path);
             }
-            catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or ArgumentException
-                                       or InvalidOperationException or CryptographicException or System.Xml.XmlException)
+            catch (Exception ex) when (PanelUi.IsExpectedFailure(ex))
             {
                 PanelUi.SetText(_gameResult, $"Could not export game keys: {PanelUi.ErrorText(ex)}", "error");
             }

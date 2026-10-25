@@ -1,0 +1,64 @@
+using System;
+using System.IO;
+using System.Security.Cryptography;
+using Pretzel.Data;
+using UnityEngine;
+using UnityEngine.Scripting;
+
+// Protected local profile: the same AES key reads and writes; never regenerate it on each launch.
+public sealed class PretzelAesExample : MonoBehaviour
+{
+    // Preserve keeps the type and constructor Newtonsoft needs when IL2CPP strips code.
+    [Serializable, Preserve]
+    private sealed class Profile
+    {
+        public string playerName = "Player";
+        public int level = 1;
+    }
+
+    [ContextMenu("Pretzel/Run example")]
+    public void RunExample()
+    {
+        if (!Application.isPlaying)
+        {
+            Debug.LogWarning("Enter Play mode before running the example.", this);
+            return;
+        }
+
+        try
+        {
+            DataIOConfig config = DataIOConfig.Load();
+            EncryptionKeys keys = EncryptionKeys.Resolve(config ? config.environmentPrefix : "PRETZEL_GAME",
+                config ? config.keySource : KeySource.Automatic, out _);
+            if (keys == null || !keys.HasAesKey)
+            {
+                throw new InvalidOperationException("Generate and export an AES key in DataIO and select the matching key source first.");
+            }
+
+            IDataStore store = DataStoreFactory.CreateWithStrategy(DataRoots.PersistentData("PretzelExamples/ProtectedProfile"),
+                new EncryptedDataStrategy(keys.ForClient(EncryptionMode.Aes), EncryptionMode.Aes));
+            LoadResult<Profile> loaded = store.Load<Profile>("profile");
+            if (loaded.Status == DataStatus.Corrupt)
+            {
+                Debug.LogError("Profile failed authentication or parsing; preserve it and check the key: " + loaded.Error, this);
+                return;
+            }
+
+            Profile profile = loaded.Ok ? loaded.Value : new Profile();
+            store.Save("profile", profile);
+            LoadResult<Profile> verified = store.Load<Profile>("profile");
+            if (!verified.Ok)
+            {
+                Debug.LogError("Encrypted profile verification failed: " + verified.Error, this);
+                return;
+            }
+            Debug.Log($"AES profile round trip: {verified.Value.playerName}, level {verified.Value.level}. "
+                + "Keep a backup of the key. Keys shipped with a game can be extracted.", this);
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or ArgumentException or FormatException
+            or InvalidOperationException or CryptographicException or Newtonsoft.Json.JsonException or System.Xml.XmlException)
+        {
+            Debug.LogError("AES profile example failed: " + ex.Message, this);
+        }
+    }
+}

@@ -22,7 +22,7 @@
             <engine:Label text="Options" class="pretzel-section__title" />
             <engine:DropdownField name="format-panel__extension" label="File extension" />
             <engine:EnumField name="format-panel__serializer" label="Serializer" />
-            <engine:TextField name="format-panel__folder" label="Save folder" />
+            <engine:TextField name="format-panel__folder" label="Save folder" is-delayed="true" />
             <engine:Toggle name="format-panel__pretty" label="Pretty print JSON" />
             <engine:Toggle name="format-panel__backup" label="Keep .bak backup" />
             <engine:Toggle name="format-panel__base64" label="Store as Base64 text" />

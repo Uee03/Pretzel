@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
+using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
@@ -32,6 +33,10 @@ namespace Pretzel.Data
         private readonly ConcurrentDictionary<Type, int> _versions = new();
         private readonly object _ioLock = new();
 
+        // Last write or delete sequence per path, guarded by _ioLock. Stops a stale background save from replacing a newer one.
+        private readonly Dictionary<string, long> _committed = new(StringComparer.Ordinal);
+        private long _sequence;
+
         private volatile string _rootPath;
 
         public ISerializer Serializer { get; }
@@ -55,6 +60,12 @@ namespace Pretzel.Data
             _prettyPrint = options.PrettyPrint;
             _keepBackup = options.KeepBackup;
             _slotPrefix = string.IsNullOrEmpty(options.SlotPrefix) ? "Slot_" : options.SlotPrefix;
+            string slotError = DataNames.ValidateName(_slotPrefix + "0");
+            if (slotError != null)
+            {
+                throw new ArgumentException($"SlotPrefix: {slotError}", nameof(options));
+            }
+
             _transforms = options.Transforms.ToArray();
             foreach (KeyValuePair<Type, List<IMigration>> pair in options.Migrations)
             {
@@ -67,7 +78,7 @@ namespace Pretzel.Data
         public void Save<T>(DataKey key, T value)
         {
             string path = PathOf(key);
-            WriteText(path, BuildText(value));
+            WriteText(path, BuildText(value), NextSequence());
         }
 
         public LoadResult<T> Load<T>(DataKey key)
@@ -93,19 +104,40 @@ namespace Pretzel.Data
         public bool Exists(DataKey key)
         {
             string path = PathOf(key);
-            return File.Exists(path) || (_keepBackup && File.Exists(BackupPath(path)));
+            return ExistsFile(path);
         }
 
-        public bool Delete(DataKey key) => DeleteFile(PathOf(key));
-
-        private bool DeleteFile(string path)
+        private bool ExistsFile(string path)
         {
             lock (_ioLock)
             {
+                DataFileCommit.Recover(path);
+                return File.Exists(path) || (_keepBackup && File.Exists(BackupPath(path)));
+            }
+        }
+
+        public bool Delete(DataKey key) => DeleteFile(PathOf(key), NextSequence());
+
+        private bool DeleteFile(string path, long sequence)
+        {
+            lock (_ioLock)
+            {
+                if (!TryClaim(path, sequence))
+                {
+                    return false;
+                }
+
+                if (!Directory.Exists(Path.GetDirectoryName(path)))
+                {
+                    return false;
+                }
+
+                DataFileCommit.Recover(path);
                 bool existed = File.Exists(path);
                 File.Delete(path);
                 File.Delete(BackupPath(path));
                 File.Delete(TempPath(path));
+                File.Delete(DataFileCommit.RollbackPath(path));
                 return existed;
             }
         }
@@ -129,9 +161,10 @@ namespace Pretzel.Data
             string path = PathOf(key);
             // Serialize on the main thread, because JsonUtility is main-thread only.
             string text = BuildText(value);
+            long sequence = NextSequence();
             await OnBackground(() =>
             {
-                WriteText(path, text);
+                WriteText(path, text, sequence);
                 return true;
             }, cancellationToken);
         }
@@ -154,13 +187,14 @@ namespace Pretzel.Data
         public Awaitable<bool> ExistsAsync(DataKey key, CancellationToken cancellationToken = default)
         {
             string path = PathOf(key);
-            return OnBackground(() => File.Exists(path) || (_keepBackup && File.Exists(BackupPath(path))), cancellationToken);
+            return OnBackground(() => ExistsFile(path), cancellationToken);
         }
 
         public Awaitable<bool> DeleteAsync(DataKey key, CancellationToken cancellationToken = default)
         {
             string path = PathOf(key);
-            return OnBackground(() => DeleteFile(path), cancellationToken);
+            long sequence = NextSequence();
+            return OnBackground(() => DeleteFile(path, sequence), cancellationToken);
         }
 
         public Awaitable<IReadOnlyList<DataKey>> ListAsync(string folder = null, int? slot = null, CancellationToken cancellationToken = default)
@@ -268,7 +302,21 @@ namespace Pretzel.Data
             return "{\"schemaVersion\":" + version + ",\"data\":" + payload + "}";
         }
 
-        private void WriteText(string path, string text)
+        private long NextSequence() => Interlocked.Increment(ref _sequence);
+
+        // Call inside _ioLock. False when a newer write or delete of the same path has already run.
+        private bool TryClaim(string path, long sequence)
+        {
+            if (_committed.TryGetValue(path, out long last) && last > sequence)
+            {
+                return false;
+            }
+
+            _committed[path] = sequence;
+            return true;
+        }
+
+        private void WriteText(string path, string text, long sequence)
         {
             byte[] bytes = Utf8.GetBytes(text);
             foreach (IDataTransform transform in _transforms)
@@ -276,37 +324,23 @@ namespace Pretzel.Data
                 bytes = transform.Encode(bytes);
             }
 
-            Directory.CreateDirectory(Path.GetDirectoryName(path));
             string temp = TempPath(path);
             lock (_ioLock)
             {
+                if (!TryClaim(path, sequence))
+                {
+                    return;
+                }
+
+                Directory.CreateDirectory(Path.GetDirectoryName(path));
+                DataFileCommit.Recover(path);
                 using (FileStream stream = new(temp, FileMode.Create, FileAccess.Write, FileShare.None))
                 {
                     stream.Write(bytes, 0, bytes.Length);
                     stream.Flush(true);
                 }
 
-                if (!File.Exists(path))
-                {
-                    File.Move(temp, path);
-                    return;
-                }
-
-                string backup = _keepBackup ? BackupPath(path) : null;
-                try
-                {
-                    File.Replace(temp, path, backup);
-                }
-                catch (Exception ex) when (ex is IOException or PlatformNotSupportedException or NotSupportedException)
-                {
-                    if (backup != null)
-                    {
-                        File.Copy(path, backup, true);
-                    }
-
-                    File.Delete(path);
-                    File.Move(temp, path);
-                }
+                DataFileCommit.Commit(temp, path, _keepBackup ? BackupPath(path) : null);
             }
         }
 
@@ -319,12 +353,14 @@ namespace Pretzel.Data
             public readonly bool Exists;
             public readonly string Text;
             public readonly string Error;
+            public readonly DataError ErrorCode;
 
-            public RawRead(bool exists, string text, string error)
+            public RawRead(bool exists, string text, string error, DataError errorCode = DataError.None)
             {
                 Exists = exists;
                 Text = text;
                 Error = error;
+                ErrorCode = errorCode;
             }
         }
 
@@ -340,18 +376,18 @@ namespace Pretzel.Data
             byte[] bytes;
             lock (_ioLock)
             {
-                if (!File.Exists(path))
-                {
-                    return new RawRead(false, null, null);
-                }
-
                 try
                 {
+                    DataFileCommit.Recover(path);
+                    if (!File.Exists(path))
+                    {
+                        return new RawRead(false, null, null);
+                    }
                     bytes = File.ReadAllBytes(path);
                 }
                 catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
                 {
-                    return new RawRead(true, null, ex.Message);
+                    return new RawRead(true, null, ex.Message, DataError.IoFailure);
                 }
             }
 
@@ -366,9 +402,9 @@ namespace Pretzel.Data
                 string text = hasBom ? Utf8.GetString(bytes, 3, bytes.Length - 3) : Utf8.GetString(bytes);
                 return new RawRead(true, text, null);
             }
-            catch (Exception ex)
+            catch (Exception ex) when (IsReadFailure(ex))
             {
-                return new RawRead(true, null, ex.Message);
+                return new RawRead(true, null, ex.Message, ErrorOf(ex));
             }
         }
 
@@ -376,6 +412,7 @@ namespace Pretzel.Data
         private LoadResult<T> Resolve<T>(RawRead main, RawRead? preReadBackup, string path, T target, bool populate)
         {
             string mainError = null;
+            DataError mainCode = DataError.None;
             if (main.Exists)
             {
                 if (main.Error == null)
@@ -387,36 +424,44 @@ namespace Pretzel.Data
                     }
 
                     mainError = parsed.Error;
+                    mainCode = parsed.ErrorCode;
                 }
                 else
                 {
                     mainError = main.Error;
+                    mainCode = main.ErrorCode;
                 }
             }
 
-            if (!_keepBackup)
+            // A newer schema, unknown format or missing key also fails on the backup, and restoring an older backup would downgrade the save.
+            if (!_keepBackup || mainCode is DataError.UnsupportedFormat or DataError.SchemaMismatch or DataError.MissingKey)
             {
-                return main.Exists ? LoadResult<T>.Corrupt(mainError) : LoadResult<T>.NotFound();
+                return main.Exists ? LoadResult<T>.Corrupt(mainError, mainCode) : LoadResult<T>.NotFound();
             }
 
             RawRead backup = preReadBackup ?? ReadRaw(BackupPath(path));
             if (!backup.Exists)
             {
-                return main.Exists ? LoadResult<T>.Corrupt(mainError) : LoadResult<T>.NotFound();
+                return main.Exists ? LoadResult<T>.Corrupt(mainError, mainCode) : LoadResult<T>.NotFound();
             }
 
             if (backup.Error != null)
             {
-                return LoadResult<T>.Corrupt(mainError ?? backup.Error);
+                return LoadResult<T>.Corrupt(mainError ?? backup.Error, mainError == null ? backup.ErrorCode : mainCode);
             }
 
             LoadResult<T> recovered = Parse(backup.Text, target, populate);
             if (!recovered.Ok)
             {
-                return LoadResult<T>.Corrupt(mainError ?? recovered.Error);
+                return LoadResult<T>.Corrupt(mainError ?? recovered.Error, mainError == null ? recovered.ErrorCode : mainCode);
             }
 
-            RestoreFromBackup(path);
+            // A locked or unreadable main file may still hold the newest save, so only repair a missing or corrupt one.
+            if (mainCode != DataError.IoFailure)
+            {
+                RestoreFromBackup(path);
+            }
+
             return LoadResult<T>.Success(recovered.Value, true);
         }
 
@@ -443,6 +488,12 @@ namespace Pretzel.Data
                 string payload = Unwrap(typeof(T), text);
                 if (populate)
                 {
+                    // Reject malformed JSON before it can partly overwrite the live target.
+                    if (Serializer is NewtonsoftSerializer or JsonUtilitySerializer)
+                    {
+                        Newtonsoft.Json.Linq.JToken.Parse(payload);
+                    }
+
                     Serializer.Populate(payload, target);
                     return LoadResult<T>.Success(target);
                 }
@@ -450,10 +501,30 @@ namespace Pretzel.Data
                 T value = Serializer.Deserialize<T>(payload);
                 return value is null ? LoadResult<T>.Corrupt("The file contained no data.") : LoadResult<T>.Success(value);
             }
-            catch (Exception ex)
+            catch (Exception ex) when (IsReadFailure(ex))
             {
-                return LoadResult<T>.Corrupt(ex.Message);
+                return LoadResult<T>.Corrupt(ex.Message, ErrorOf(ex));
             }
+        }
+
+        private static bool IsReadFailure(Exception ex)
+        {
+            return ex is DataReadException or IOException or UnauthorizedAccessException or InvalidDataException
+                or CryptographicException or NotSupportedException or Newtonsoft.Json.JsonException
+                or FormatException or ArgumentException or InvalidOperationException;
+        }
+
+        private static DataError ErrorOf(Exception ex)
+        {
+            return ex switch
+            {
+                DataReadException failure => failure.Reason,
+                CryptographicException => DataError.AuthenticationFailed,
+                NotSupportedException => DataError.UnsupportedFormat,
+                InvalidDataException or EndOfStreamException => DataError.InvalidData,
+                IOException or UnauthorizedAccessException => DataError.IoFailure,
+                _ => DataError.InvalidData
+            };
         }
 
         #endregion
@@ -473,20 +544,25 @@ namespace Pretzel.Data
                 return text;
             }
 
+            Newtonsoft.Json.Linq.JToken.Parse(text);
             int version = 0;
             string payload = text;
             Match match = EnvelopeStart.Match(text);
             int end = text.LastIndexOf('}');
             if (match.Success && end > match.Length)
             {
-                version = int.Parse(match.Groups[1].Value);
+                if (!int.TryParse(match.Groups[1].Value, out version))
+                {
+                    throw new DataReadException(DataError.InvalidData, $"{type.Name} has an invalid schema version.");
+                }
+
                 payload = text.Substring(match.Length, end - match.Length).Trim();
             }
             // Otherwise the file is unversioned data from before the type had a schema version.
 
             if (version > current)
             {
-                throw new InvalidDataException($"{type.Name} was saved with schema {version}, but this build supports up to {current}.");
+                throw new DataReadException(DataError.SchemaMismatch, $"{type.Name} was saved with schema {version}, but this build supports up to {current}.");
             }
 
             _migrations.TryGetValue(type, out IMigration[] steps);
@@ -495,7 +571,7 @@ namespace Pretzel.Data
                 IMigration step = steps == null ? null : Array.Find(steps, m => m.FromVersion == version);
                 if (step == null)
                 {
-                    throw new InvalidDataException($"No migration registered for {type.Name} from schema {version} to {current}.");
+                    throw new DataReadException(DataError.SchemaMismatch, $"No migration registered for {type.Name} from schema {version} to {current}.");
                 }
 
                 payload = step.Migrate(payload);
@@ -515,6 +591,14 @@ namespace Pretzel.Data
             if (!Directory.Exists(directory))
             {
                 return keys;
+            }
+
+            lock (_ioLock)
+            {
+                foreach (string rollback in Directory.EnumerateFiles(directory, "*" + _extension + ".rollback", SearchOption.TopDirectoryOnly))
+                {
+                    DataFileCommit.Recover(rollback.Substring(0, rollback.Length - ".rollback".Length));
+                }
             }
 
             foreach (string file in Directory.EnumerateFiles(directory, "*" + _extension, SearchOption.TopDirectoryOnly))

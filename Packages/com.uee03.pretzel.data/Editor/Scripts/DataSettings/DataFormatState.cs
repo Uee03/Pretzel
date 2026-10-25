@@ -22,6 +22,8 @@ namespace Pretzel.Data.Editor
         /// <summary>True while generated keys exist only in memory.</summary>
         public bool KeysUnstored { get; private set; }
 
+        public string KeyLoadError { get; private set; }
+
         /// <summary>Raised after the config or the keys changed, so tabs can refresh.</summary>
         public event Action Changed;
 
@@ -29,8 +31,6 @@ namespace Pretzel.Data.Editor
         private sealed class Pending
         {
             public string aes;
-            public string publicKey;
-            public string privateKey;
             public string[] previous;
         }
 
@@ -41,29 +41,51 @@ namespace Pretzel.Data.Editor
 
             // Generated keys that were not stored yet survive a domain reload, so a script recompile does not lose them.
             string pending = SessionState.GetString(PendingKey, string.Empty);
-            if (pending.Length > 0)
+            try
             {
-                Pending saved = JsonUtility.FromJson<Pending>(pending);
-                Keys = new EncryptionKeys
+                if (pending.Length > 0)
                 {
-                    AesKey = string.IsNullOrEmpty(saved.aes) ? null : EncryptionKeys.DecodeAesKey(saved.aes),
-                    RsaPublicKey = EncryptionKeys.DecodeXml(saved.publicKey),
-                    RsaPrivateKey = EncryptionKeys.DecodeXml(saved.privateKey)
-                };
-                if (saved.previous != null)
-                {
-                    foreach (string old in saved.previous)
-                    {
-                        Keys.AddPreviousAesKey(string.IsNullOrEmpty(old) ? null : EncryptionKeys.DecodeAesKey(old));
-                    }
+                    Keys = RestorePending(pending);
+                    KeysUnstored = true;
+                    return;
                 }
 
-                KeysUnstored = true;
-                return;
+                Keys = EncryptionKeys.Resolve(Config.environmentPrefix) ?? new EncryptionKeys();
+                KeysUnstored = false;
+            }
+            catch (Exception ex) when (PanelUi.IsExpectedFailure(ex))
+            {
+                // Unreadable pending keys would fail again on every open.
+                SessionState.EraseString(PendingKey);
+                Keys = new EncryptionKeys();
+                KeyLoadError = "Stored keys were rejected: " + ex.Message;
+            }
+        }
+
+        internal static EncryptionKeys RestorePending(string json)
+        {
+            Pending saved = JsonUtility.FromJson<Pending>(json);
+            EncryptionKeys keys = new() { AesKey = string.IsNullOrEmpty(saved.aes) ? null : EncryptionKeys.DecodeAesKey(saved.aes) };
+            if (!keys.HasAesKey)
+            {
+                throw new FormatException("Pending keys must contain a 32 byte AES key.");
             }
 
-            Keys = EncryptionKeys.Resolve(Config.environmentPrefix) ?? new EncryptionKeys();
-            KeysUnstored = false;
+            if (saved.previous != null)
+            {
+                foreach (string old in saved.previous)
+                {
+                    byte[] key = string.IsNullOrEmpty(old) ? null : EncryptionKeys.DecodeAesKey(old);
+                    if (key == null || key.Length != EncryptionKeys.AesKeySize)
+                    {
+                        throw new FormatException("A pending previous AES key must contain 32 bytes.");
+                    }
+
+                    keys.AddPreviousAesKey(key);
+                }
+            }
+
+            return keys;
         }
 
         public void Edit(string undoName, Action<DataIOConfig> change)
@@ -79,14 +101,13 @@ namespace Pretzel.Data.Editor
         public void SetKeys(EncryptionKeys keys, bool unstored)
         {
             Keys = keys;
+            KeyLoadError = null;
             KeysUnstored = unstored;
             if (unstored)
             {
                 SessionState.SetString(PendingKey, JsonUtility.ToJson(new Pending
                 {
                     aes = keys.HasAesKey ? EncryptionKeys.EncodeAesKey(keys.AesKey) : null,
-                    publicKey = EncryptionKeys.EncodeXml(keys.RsaPublicKey),
-                    privateKey = EncryptionKeys.EncodeXml(keys.RsaPrivateKey),
                     previous = keys.PreviousAesKeys.ConvertAll(EncryptionKeys.EncodeAesKey).ToArray()
                 }));
             }
@@ -108,7 +129,15 @@ namespace Pretzel.Data.Editor
         /// <summary>Re-reads the keys from their stored places, for example after the prefix changed.</summary>
         public void ReloadKeys()
         {
-            SetKeys(EncryptionKeys.Resolve(Config.environmentPrefix) ?? new EncryptionKeys(), false);
+            try
+            {
+                SetKeys(EncryptionKeys.Resolve(Config.environmentPrefix) ?? new EncryptionKeys(), false);
+            }
+            catch (Exception ex) when (PanelUi.IsExpectedFailure(ex))
+            {
+                KeyLoadError = "Stored keys were rejected: " + ex.Message;
+                Changed?.Invoke();
+            }
         }
 
         public void DiscardUnstoredKeys()

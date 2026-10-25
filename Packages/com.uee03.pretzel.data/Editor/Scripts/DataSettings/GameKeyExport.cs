@@ -11,7 +11,7 @@ namespace Pretzel.Data.Editor
 
         public static bool JsonExists => File.Exists(JsonPath);
 
-        /// <summary>Writes the JSON for <paramref name="mode"/>: the AES key with its history, or only the RSA public key.</summary>
+        /// <summary>Writes the AES key with its read history.</summary>
         public static string WriteJson(EncryptionKeys keys, EncryptionMode mode)
         {
             string json = GameEncryptionKeyConfig.ToJson(keys, mode);
@@ -22,21 +22,30 @@ namespace Pretzel.Data.Editor
         }
 
         /// <summary>Returns null on success, otherwise the reason it failed. Sets the config's key source to the exported one.</summary>
-        public static string Export(DataFormatState state, bool embedded, string folder, out string path)
+        public static string Export(DataFormatState state, bool embedded, string folder, out string path, bool replaceConfirmed = false)
         {
             DataIOConfig config = state.Config;
             EncryptionKeys keys = state.Keys;
             path = null;
+            if (config.encryptionMode != EncryptionMode.Aes)
+            {
+                return "Unsupported saved encryption mode. Set up AES first.";
+            }
+
             if (!keys.CanWrite(config.encryptionMode))
             {
-                return config.encryptionMode == EncryptionMode.Aes
-                    ? "There is no AES key yet. Generate one on the Encryption tab first."
-                    : "There is no RSA public key yet. Generate a pair on the Encryption tab first.";
+                return "There is no AES key yet. Generate one on the Encryption tab first.";
+            }
+
+            // The shipped copy must never be the only copy of a key.
+            if (state.KeysUnstored)
+            {
+                state.SaveKeysToFile();
             }
 
             if (embedded)
             {
-                string error = ShippingGenerator.Generate(folder, KeyDelivery.Embedded, config, keys, out path);
+                string error = ShippingGenerator.Generate(folder, KeyDelivery.Embedded, config, keys, out path, replaceConfirmed);
                 if (error != null)
                 {
                     return error;
@@ -45,12 +54,6 @@ namespace Pretzel.Data.Editor
             else
             {
                 path = WriteJson(keys, config.encryptionMode);
-            }
-
-            // The export now holds this AES key inside the project. An RSA private key is deliberately never exported.
-            if (config.encryptionMode == EncryptionMode.Aes)
-            {
-                state.MarkKeysStored();
             }
 
             SyncKeySource(state, embedded ? KeySource.Provider : KeySource.BundledJson);

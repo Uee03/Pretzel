@@ -28,11 +28,11 @@ namespace Pretzel.Api
         /// <summary>Settings used when a call does not override them. Starts with a 30 second timeout and no retries.</summary>
         public RequestOptions Defaults { get; } = new() { TimeoutSeconds = 30f, Retries = 0, RetryDelaySeconds = 0.5f, ContentType = JsonContentType };
 
-        /// <param name="serializer">Used by the JSON methods. Defaults to the serializer of <see cref="DataIO.Default"/>.</param>
+        /// <param name="serializer">Used by the JSON methods. Defaults to a <see cref="NewtonsoftSerializer"/>.</param>
         public ApiClient(string baseUrl = null, ISerializer serializer = null)
         {
             BaseUrl = baseUrl;
-            _serializer = serializer ?? DataIO.Default.Serializer;
+            _serializer = serializer ?? new NewtonsoftSerializer();
         }
 
         #region TEXT AND BYTES
@@ -156,20 +156,69 @@ namespace Pretzel.Api
                 cancellationToken);
         }
 
-        /// <summary>Streams to disk through <see cref="DownloadHandlerFile"/>, so large files never sit in memory. Returns the file path.</summary>
-        public Awaitable<Response<string>> DownloadFileAsync(string url, string path, RequestOptions options = null, CancellationToken cancellationToken = default)
+        /// <summary>
+        /// Streams to disk through <see cref="DownloadHandlerFile"/>, so large files never sit in memory. Returns the file path.
+        /// The download goes to a temporary file first, so a failed or cancelled request leaves an existing file untouched.
+        /// </summary>
+        public async Awaitable<Response<string>> DownloadFileAsync(string url, string path, RequestOptions options = null, CancellationToken cancellationToken = default)
         {
             Guard.NotNullOrEmpty(path, nameof(path));
             string target = ResolveUrl(url);
             string fullPath = Path.GetFullPath(path);
+            string tempPath = fullPath + ".download";
             Directory.CreateDirectory(Path.GetDirectoryName(fullPath));
 
-            return ExecuteAsync(
-                () => Build("GET", target, null, null, new DownloadHandlerFile(fullPath) { removeFileOnAbort = true }),
-                _ => fullPath,
-                false,
-                options,
-                cancellationToken);
+            try
+            {
+                Response<string> response = await ExecuteAsync(
+                    () => Build("GET", target, null, null, new DownloadHandlerFile(tempPath) { removeFileOnAbort = true }),
+                    _ => fullPath,
+                    false,
+                    options,
+                    cancellationToken);
+
+                if (!response.Ok)
+                {
+                    return response;
+                }
+
+                try
+                {
+                    ReplaceFile(tempPath, fullPath);
+                }
+                catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+                {
+                    return new Response<string>(false, response.StatusCode, null, "Could not write the file: " + ex.Message, null, false, response.Headers);
+                }
+
+                return response;
+            }
+            finally
+            {
+                if (File.Exists(tempPath))
+                {
+                    File.Delete(tempPath);
+                }
+            }
+        }
+
+        private static void ReplaceFile(string source, string destination)
+        {
+            if (!File.Exists(destination))
+            {
+                File.Move(source, destination);
+                return;
+            }
+
+            try
+            {
+                File.Replace(source, destination, null);
+            }
+            catch (NotSupportedException)
+            {
+                File.Delete(destination);
+                File.Move(source, destination);
+            }
         }
 
         #endregion

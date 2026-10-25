@@ -143,21 +143,17 @@ namespace Pretzel.Data.Tests
         }
 
         [Test]
-        public void ForClientNeverIncludesThePrivateKey()
+        public void ForClientCopiesAesAndOptionalHistoryAndRejectsRemovedModes()
         {
-            EncryptionKeys pair = EncryptionKeys.GenerateRsa(2048);
-            pair.AesKey = EncryptionKeys.GenerateAesKey();
+            EncryptionKeys pair = NewAes();
             pair.AddPreviousAesKey(EncryptionKeys.GenerateAesKey());
-
-            EncryptionKeys rsa = pair.ForClient(EncryptionMode.Rsa);
-            Assert.That(rsa.HasPublicKey, Is.True);
-            Assert.That(rsa.HasPrivateKey || rsa.HasAesKey, Is.False);
 
             EncryptionKeys aes = pair.ForClient(EncryptionMode.Aes);
             Assert.That(aes.HasAesKey, Is.True);
             Assert.That(aes.PreviousAesKeys, Has.Count.EqualTo(1));
-            Assert.That(aes.HasPublicKey || aes.HasPrivateKey, Is.False);
-            Assert.That(pair.CanWrite(EncryptionMode.Rsa) && pair.CanWrite(EncryptionMode.Aes), Is.True);
+            Assert.That(aes.AesKey, Is.Not.SameAs(pair.AesKey));
+            Assert.That(pair.CanWrite((EncryptionMode)1), Is.False);
+            Assert.Throws<NotSupportedException>(() => pair.ForClient((EncryptionMode)1));
             Assert.That(new EncryptionKeys().CanWrite(EncryptionMode.Aes), Is.False);
         }
 
@@ -173,9 +169,7 @@ namespace Pretzel.Data.Tests
             Assert.That(text, Does.Not.Contain(EncryptionKeys.EncodeAesKey(keys.AesKey)));
             Assert.That(new EncryptionKeys().Describe(EncryptionMode.Aes, "none"), Does.Contain("no AES key"));
 
-            EncryptionKeys pair = EncryptionKeys.GenerateRsa(2048);
-            Assert.That(pair.Describe(EncryptionMode.Rsa, "x"), Does.Contain("WARNING"), "A client holding a private key is flagged.");
-            Assert.That(pair.ForClient(EncryptionMode.Rsa).Describe(EncryptionMode.Rsa, "x"), Does.Not.Contain("WARNING"));
+            Assert.Throws<NotSupportedException>(() => keys.Describe((EncryptionMode)1, "x"));
         }
 
         [Test]

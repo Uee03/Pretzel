@@ -92,7 +92,8 @@ namespace Pretzel.UI.UGUI
 
         private void OnDisable()
         {
-            _fadeRoutine = null;
+            // Disabling only the component does not stop its coroutines.
+            StopFade();
         }
 
         public void FadeIn()

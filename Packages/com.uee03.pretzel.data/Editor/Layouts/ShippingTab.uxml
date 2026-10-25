@@ -3,7 +3,7 @@
         <engine:VisualElement class="pretzel-section">
             <engine:Label text="Shipping the keys with the game" class="pretzel-section__title" />
             <engine:Label class="pretzel-section__hint"
-                          text="Anything inside a game can be extracted by a determined player. The RSA public key is the exception: it can only encrypt, so it is safe to ship. Secret keys need one of the options below." />
+                          text="A shipped AES key can be extracted by a determined player. Choose how the game receives it below. Plain JSON and binary need no key delivery." />
             <engine:HelpBox name="shipping-panel__format-warning" message-type="Info" />
             <engine:DropdownField name="shipping-panel__delivery" label="How the game gets its key" />
             <engine:Label name="shipping-panel__delivery-hint" class="pretzel-section__hint" />

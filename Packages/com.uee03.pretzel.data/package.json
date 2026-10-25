@@ -8,13 +8,13 @@
   "license": "MIT",
   "dependencies": {
     "com.uee03.pretzel.core": "0.1.0",
-    "com.uee03.pretzel.extensions": "0.1.0",
+    "com.unity.modules.jsonserialize": "1.0.0",
     "com.unity.nuget.newtonsoft-json": "3.2.2"
   },
   "samples": [
     {
       "displayName": "Data Usage",
-      "description": "Keys, slots, ScriptableObjects, migrations, async saves, AES save/load and RSA client/server encryption.",
+      "description": "Keys, slots, ScriptableObjects, migrations, async saves and AES save/load.",
       "path": "Samples~/DataUsage"
     }
   ]

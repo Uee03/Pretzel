@@ -4,15 +4,12 @@ namespace Pretzel.Data
     public enum DataFormat
     {
         /// <summary>Readable JSON.</summary>
-        PlainText,
+        PlainText = 0,
 
-        /// <summary>JSON compressed with GZip.</summary>
-        Compressed,
+        /// <summary>Versioned BinaryWriter/BinaryReader encoding of JSON values.</summary>
+        Binary = 1,
 
-        /// <summary>BSON, a binary encoding of the JSON data model.</summary>
-        Binary,
-
-        /// <summary>JSON encrypted with AES-256, optionally with the AES key wrapped by an RSA public key.</summary>
-        Encrypted
+        /// <summary>JSON encrypted with authenticated AES-256.</summary>
+        Encrypted = 2
     }
 }

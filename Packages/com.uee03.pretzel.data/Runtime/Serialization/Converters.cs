@@ -126,8 +126,25 @@ namespace Pretzel.Data
                 return null;
             }
 
-            string text = reader.Value as string;
-            return SerializableGuid.TryParse(text, out SerializableGuid guid) ? guid : new SerializableGuid();
+            string text;
+            if (reader.TokenType == JsonToken.StartObject)
+            {
+                // JsonUtility writes the backing field, so accept saves made before switching serializers.
+                text = JObject.Load(reader).Value<string>(SerializableGuid.GuidFieldName);
+            }
+            else
+            {
+                text = reader.Value as string;
+            }
+
+            if (string.IsNullOrEmpty(text))
+            {
+                return new SerializableGuid();
+            }
+
+            return SerializableGuid.TryParse(text, out SerializableGuid guid)
+                ? guid
+                : throw new JsonSerializationException($"'{text}' is not a valid GUID.");
         }
     }
 }

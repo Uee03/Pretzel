@@ -9,12 +9,12 @@ namespace Pretzel.Data.Editor
     {
         private static readonly string[] FormatChoices =
         {
-            "Auto-detect", "Plain text JSON", "Compressed (GZip)", "Binary (BSON)", "Encrypted"
+            "Auto-detect", "Plain text JSON", "Binary", "Encrypted"
         };
 
         private static readonly DataFormat?[] FormatValues =
         {
-            null, DataFormat.PlainText, DataFormat.Compressed, DataFormat.Binary, DataFormat.Encrypted
+            null, DataFormat.PlainText, DataFormat.Binary, DataFormat.Encrypted
         };
 
         private DataFormatState _state;
@@ -23,8 +23,6 @@ namespace Pretzel.Data.Editor
         private TextField _output;
         private Label _status;
         private TextField _aes;
-        private TextField _private;
-        private TextField _public;
 
         public string Title => "Decrypt";
 
@@ -39,8 +37,6 @@ namespace Pretzel.Data.Editor
             _output = view.Q<TextField>("decrypt-panel__output");
             _status = view.Q<Label>("decrypt-panel__status");
             _aes = view.Q<TextField>("decrypt-panel__aes");
-            _private = view.Q<TextField>("decrypt-panel__private");
-            _public = view.Q<TextField>("decrypt-panel__public");
 
             _format.choices = new List<string>(FormatChoices);
             _format.SetValueWithoutNotify(FormatChoices[0]);
@@ -88,7 +84,16 @@ namespace Pretzel.Data.Editor
                 return;
             }
 
-            _input.value = DataCodec.FileToText(File.ReadAllBytes(path));
+            try
+            {
+                _input.value = DataCodec.FileToText(File.ReadAllBytes(path));
+            }
+            catch (System.Exception ex) when (ex is IOException or System.UnauthorizedAccessException)
+            {
+                PanelUi.SetText(_status, $"Could not read {Path.GetFileName(path)}: {ex.Message}", "error");
+                return;
+            }
+
             PanelUi.SetText(_status, $"Loaded {Path.GetFileName(path)}. Binary files are shown as Base64.");
         }
 
@@ -109,7 +114,7 @@ namespace Pretzel.Data.Editor
         private bool TryBuildKeys(out EncryptionKeys keys)
         {
             EncryptionKeys stored = _state.Keys;
-            keys = new EncryptionKeys { AesKey = stored.AesKey, RsaPublicKey = stored.RsaPublicKey, RsaPrivateKey = stored.RsaPrivateKey };
+            keys = stored.Clone();
 
             if (!string.IsNullOrWhiteSpace(_aes.value))
             {
@@ -119,16 +124,6 @@ namespace Pretzel.Data.Editor
                     PanelUi.SetText(_status, "The AES key must be 32 bytes as Base64.", "error");
                     return false;
                 }
-            }
-
-            if (!string.IsNullOrWhiteSpace(_private.value))
-            {
-                keys.RsaPrivateKey = EncryptionKeys.DecodeXml(_private.value);
-            }
-
-            if (!string.IsNullOrWhiteSpace(_public.value))
-            {
-                keys.RsaPublicKey = EncryptionKeys.DecodeXml(_public.value);
             }
 
             return true;

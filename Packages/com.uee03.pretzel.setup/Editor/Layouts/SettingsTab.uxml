@@ -10,7 +10,7 @@
         <engine:VisualElement class="pretzel-section">
             <engine:Label text="Data" class="pretzel-section__title" />
             <engine:Label class="pretzel-section__hint"
-                          text="The format DataIO saves in (plain text, compressed, binary or encrypted), its serializer, save folder, file extension and keys are set in the Data Format window." />
+                          text="The format DataIO saves in (plain text, binary or encrypted), its serializer, save folder, file extension and keys are set in the Data Format window." />
             <engine:Button name="settings-tab__open-data-format" text="Open Data Format window"
                            class="pretzel-section__action pretzel-section__action--primary" />
             <engine:TextField name="settings-tab__settings-folder" label="Settings folder" />

@@ -62,37 +62,31 @@ namespace Pretzel.Data.Editor
             if (_optionsFor != config.encryptionMode)
             {
                 _optionsFor = config.encryptionMode;
-                if (config.encryptionMode == EncryptionMode.Aes)
-                {
-                    _options = new[] { KeyDelivery.Environment, KeyDelivery.Embedded, KeyDelivery.Token };
-                    _delivery.choices = new List<string> { "Environment variables on the machine", "Embedded in the game (obfuscated)", "Fetch with a token at startup" };
-                }
-                else
-                {
-                    _options = new[] { KeyDelivery.Environment, KeyDelivery.Embedded };
-                    _delivery.choices = new List<string> { "Environment variables on the machine", "Embed the public key (safe)" };
-                }
+                _options = new[] { KeyDelivery.Environment, KeyDelivery.Embedded, KeyDelivery.Token };
+                _delivery.choices = new List<string> { "Environment variables on the machine", "Embedded in the game (obfuscated)", "Fetch with a token at startup" };
 
                 _delivery.SetValueWithoutNotify(_delivery.choices[0]);
             }
 
             bool encrypted = config.format == DataFormat.Encrypted;
-            _formatWarning.text = "Shipping keys only matters for the Encrypted format. Choose it on the Format tab.";
-            PanelUi.SetVisible(_formatWarning, !encrypted);
-            _create.SetEnabled(encrypted);
+            bool supported = config.encryptionMode == EncryptionMode.Aes;
+            _formatWarning.text = !supported
+                ? "Unsupported saved encryption mode. Set up AES first."
+                : "Shipping keys only matters for the Encrypted format. Plain JSON and binary need no key.";
+            PanelUi.SetVisible(_formatWarning, !encrypted || !supported);
+            _create.SetEnabled(encrypted && supported);
 
             KeyDelivery delivery = Selected;
-            bool rsa = config.encryptionMode == EncryptionMode.Rsa;
             _deliveryHint.text = delivery switch
             {
                 KeyDelivery.Environment => $"The game reads {config.environmentPrefix}_* at startup and logs an error when they are missing. Good for servers, tools and testing. Players cannot be expected to set variables.",
-                KeyDelivery.Embedded when rsa => "Only the public key is written into the script. That is safe: it can encrypt but not decrypt. The private key is never written, and never ship it.",
                 KeyDelivery.Embedded => "The AES key is written into the script as two XOR-masked arrays and registered before the first scene loads. This only stops a plain search of the build. A determined player can still extract it.",
                 _ => "The game contains no key. After sign-in it sends an access token to your server, which returns the key. The script has a stub for your own request."
             };
 
-            bool warn = delivery == KeyDelivery.Embedded && !rsa;
-            _embedWarning.text = "The generated script contains the AES key. Do not commit it to a public repository. Add the output folder to .gitignore.";
+            bool warn = delivery == KeyDelivery.Embedded;
+            _embedWarning.text = $"The generated script contains the AES key. Keep {ShippingGenerator.ScriptName} and its .meta out of public repositories, "
+                + "for example with a .gitignore entry for that file only. Keep ProjectDataIO.cs in version control.";
             PanelUi.SetVisible(_embedWarning, warn);
         }
 
@@ -103,6 +97,12 @@ namespace Pretzel.Data.Editor
             string path;
             try
             {
+                // The embedded script must never hold the only copy of a key.
+                if (Selected == KeyDelivery.Embedded && _state.KeysUnstored)
+                {
+                    _state.SaveKeysToFile();
+                }
+
                 error = ShippingGenerator.Generate(folder, Selected, _state.Config, _state.Keys, out path);
             }
             catch (System.Exception ex) when (ex is IOException or System.UnauthorizedAccessException)

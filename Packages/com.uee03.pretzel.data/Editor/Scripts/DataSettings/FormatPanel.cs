@@ -8,7 +8,7 @@ namespace Pretzel.Data.Editor
     {
         private static readonly DataFormat[] Formats =
         {
-            DataFormat.PlainText, DataFormat.Compressed, DataFormat.Binary, DataFormat.Encrypted
+            DataFormat.PlainText, DataFormat.Binary, DataFormat.Encrypted
         };
 
         private readonly List<Button> _buttons = new();
@@ -168,14 +168,10 @@ namespace Pretzel.Data.Editor
                 {
                     message = "Encrypted is selected, but there is no AES key yet. Generate one on the Encryption tab.";
                 }
-                else if (config.encryptionMode == EncryptionMode.Rsa && !keys.HasPublicKey)
+                else if (config.encryptionMode != EncryptionMode.Aes)
                 {
-                    message = "Encrypted with RSA is selected, but there is no public key yet. Generate a pair on the Encryption tab.";
-                }
-                else if (config.encryptionMode == EncryptionMode.Rsa)
-                {
-                    message = "RSA mode: the game can write these files but cannot read them back without the private key.";
-                    type = HelpBoxMessageType.Info;
+                    message = "Unsupported saved encryption mode. Set up AES again. This setting has not been changed.";
+                    type = HelpBoxMessageType.Error;
                 }
             }
 

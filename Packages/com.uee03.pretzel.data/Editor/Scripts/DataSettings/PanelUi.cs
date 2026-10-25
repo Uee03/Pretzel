@@ -76,5 +76,13 @@ namespace Pretzel.Data.Editor
         }
 
         public static string ErrorText(Exception ex) => ex.InnerException?.Message ?? ex.Message;
+
+        public static bool IsExpectedFailure(Exception ex)
+        {
+            return ex is System.IO.IOException or System.IO.InvalidDataException or UnauthorizedAccessException
+                or ArgumentException or InvalidOperationException or FormatException or NotSupportedException
+                or Newtonsoft.Json.JsonException or System.Security.Cryptography.CryptographicException
+                or System.Security.SecurityException;
+        }
     }
 }

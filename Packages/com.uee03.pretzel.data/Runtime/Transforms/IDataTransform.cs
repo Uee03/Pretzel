@@ -1,6 +1,6 @@
 namespace Pretzel.Data
 {
-    /// <summary>A reversible byte-level step applied between the serializer and the disk, for example compression or encryption.</summary>
+    /// <summary>A reversible byte-level step applied between the serializer and the disk, for example binary encoding or encryption.</summary>
     public interface IDataTransform
     {
         /// <summary>Applied on save. Transforms run in list order.</summary>

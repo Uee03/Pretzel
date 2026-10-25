@@ -61,7 +61,8 @@ namespace Pretzel.Data.Editor
 
             try
             {
-                byte[] decoded = TransformFor(format.Value, keys).Decode(bytes);
+                IDataTransform transform = TransformFor(format.Value, keys);
+                byte[] decoded = transform.Decode(bytes);
                 string json = Utf8.GetString(decoded).TrimStart('\uFEFF');
                 return CodecResult.Success(Pretty(json), $"Decoded {format.Value} data ({bytes.Length} bytes).");
             }
@@ -117,13 +118,7 @@ namespace Pretzel.Data.Editor
                 return DataFormat.Encrypted;
             }
 
-            if (bytes.Length >= 2 && bytes[0] == 0x1F && bytes[1] == 0x8B)
-            {
-                return DataFormat.Compressed;
-            }
-
-            // A BSON document starts with its own length and ends with a zero byte.
-            if (bytes.Length >= 5 && BitConverter.ToInt32(bytes, 0) == bytes.Length && bytes[bytes.Length - 1] == 0)
+            if (BinaryTransform.HasHeader(bytes))
             {
                 return DataFormat.Binary;
             }
@@ -151,8 +146,6 @@ namespace Pretzel.Data.Editor
         {
             switch (format)
             {
-                case DataFormat.Compressed:
-                    return new GZipTransform();
                 case DataFormat.Binary:
                     return new BinaryTransform();
                 case DataFormat.Encrypted:
@@ -161,7 +154,7 @@ namespace Pretzel.Data.Editor
                         throw new InvalidOperationException("No keys are available. Generate or store keys first, or paste keys under 'Use other keys'.");
                     }
 
-                    return new EncryptionTransform(keys.HasAesKey ? EncryptionMode.Aes : EncryptionMode.Rsa, keys);
+                    return new EncryptionTransform(keys);
                 default:
                     throw new ArgumentOutOfRangeException(nameof(format), format, null);
             }

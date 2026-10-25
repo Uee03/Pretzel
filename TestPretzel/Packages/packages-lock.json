@@ -7,43 +7,106 @@
       "dependencies": {},
       "hash": "a7c6b49a0141a5bff9b1983e38137522ef61977d"
     },
-    "com.uee03.pretzel.core": {
-      "version": "https://github.com/Uee03/Pretzel.git?path=Packages/com.uee03.pretzel.core",
+    "com.uee03.pretzel.api": {
+      "version": "file:../../Packages/com.uee03.pretzel.api",
       "depth": 0,
-      "source": "git",
-      "dependencies": {},
-      "hash": "affb0587c024bb1e9849592f9f57739534a44cdc"
-    },
-    "com.uee03.pretzel.data": {
-      "version": "https://github.com/Uee03/Pretzel.git?path=Packages/com.uee03.pretzel.data",
-      "depth": 0,
-      "source": "git",
+      "source": "local",
       "dependencies": {
         "com.uee03.pretzel.core": "0.1.0",
-        "com.uee03.pretzel.extensions": "0.1.0",
+        "com.uee03.pretzel.data": "0.1.0",
+        "com.unity.modules.unitywebrequest": "1.0.0",
+        "com.unity.modules.unitywebrequesttexture": "1.0.0",
+        "com.unity.modules.unitywebrequestaudio": "1.0.0"
+      }
+    },
+    "com.uee03.pretzel.core": {
+      "version": "file:../../Packages/com.uee03.pretzel.core",
+      "depth": 0,
+      "source": "local",
+      "dependencies": {}
+    },
+    "com.uee03.pretzel.data": {
+      "version": "file:../../Packages/com.uee03.pretzel.data",
+      "depth": 0,
+      "source": "local",
+      "dependencies": {
+        "com.uee03.pretzel.core": "0.1.0",
+        "com.unity.modules.jsonserialize": "1.0.0",
         "com.unity.nuget.newtonsoft-json": "3.2.2"
-      },
-      "hash": "d600512982659bb21753f28254ceaff453e2f252"
+      }
+    },
+    "com.uee03.pretzel.editor": {
+      "version": "file:../../Packages/com.uee03.pretzel.editor",
+      "depth": 0,
+      "source": "local",
+      "dependencies": {}
     },
     "com.uee03.pretzel.extensions": {
-      "version": "https://github.com/Uee03/Pretzel.git?path=Packages/com.uee03.pretzel.extensions",
+      "version": "file:../../Packages/com.uee03.pretzel.extensions",
       "depth": 0,
-      "source": "git",
+      "source": "local",
       "dependencies": {
         "com.uee03.pretzel.core": "0.1.0",
         "com.unity.modules.imageconversion": "1.0.0",
         "com.unity.modules.physics": "1.0.0"
-      },
-      "hash": "affb0587c024bb1e9849592f9f57739534a44cdc"
+      }
+    },
+    "com.uee03.pretzel.integrations": {
+      "version": "file:../../Packages/com.uee03.pretzel.integrations",
+      "depth": 0,
+      "source": "local",
+      "dependencies": {
+        "com.uee03.pretzel.core": "0.1.0",
+        "com.uee03.pretzel.tween": "0.1.0",
+        "com.uee03.pretzel.api": "0.1.0",
+        "com.uee03.pretzel.ui": "0.1.0"
+      }
     },
     "com.uee03.pretzel.setup": {
-      "version": "https://github.com/Uee03/Pretzel.git?path=Packages/com.uee03.pretzel.setup",
+      "version": "file:../../Packages/com.uee03.pretzel.setup",
       "depth": 0,
-      "source": "git",
+      "source": "local",
       "dependencies": {
         "com.unity.nuget.newtonsoft-json": "3.2.2"
-      },
-      "hash": "632bd288039d913db037d28a6307b2298f0d1b12"
+      }
+    },
+    "com.uee03.pretzel.templates": {
+      "version": "file:../../Packages/com.uee03.pretzel.templates",
+      "depth": 0,
+      "source": "local",
+      "dependencies": {
+        "com.uee03.pretzel.core": "0.1.0",
+        "com.uee03.pretzel.ui": "0.1.0"
+      }
+    },
+    "com.uee03.pretzel.tween": {
+      "version": "file:../../Packages/com.uee03.pretzel.tween",
+      "depth": 0,
+      "source": "local",
+      "dependencies": {
+        "com.uee03.pretzel.core": "0.1.0"
+      }
+    },
+    "com.uee03.pretzel.ui": {
+      "version": "file:../../Packages/com.uee03.pretzel.ui",
+      "depth": 0,
+      "source": "local",
+      "dependencies": {
+        "com.uee03.pretzel.core": "0.1.0",
+        "com.uee03.pretzel.tween": "0.1.0",
+        "com.unity.modules.uielements": "1.0.0"
+      }
+    },
+    "com.uee03.pretzel.ui.ugui": {
+      "version": "file:../../Packages/com.uee03.pretzel.ui.ugui",
+      "depth": 0,
+      "source": "local",
+      "dependencies": {
+        "com.uee03.pretzel.core": "0.1.0",
+        "com.uee03.pretzel.ui": "0.1.0",
+        "com.uee03.pretzel.tween": "0.1.0",
+        "com.unity.ugui": "2.0.0"
+      }
     },
     "com.unity.2d.animation": {
       "version": "16.0.1",

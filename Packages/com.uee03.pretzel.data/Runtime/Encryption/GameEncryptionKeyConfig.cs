@@ -1,12 +1,11 @@
 using System;
-using System.Security.Cryptography;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using UnityEngine;
 
 namespace Pretzel.Data
 {
-    /// <summary>Optional game-readable keys bundled as a JSON TextAsset. Never contains an RSA private key.</summary>
+    /// <summary>Optional game-readable AES key bundled as a JSON TextAsset.</summary>
     public static class GameEncryptionKeyConfig
     {
         public const string ResourcePath = "Pretzel/GameEncryptionKeys";
@@ -18,8 +17,8 @@ namespace Pretzel.Data
             return config ? FromJson(config.text) : null;
         }
 
-        /// <summary>Exports only the selected mode's AES key or RSA public key.</summary>
-        public static string ToJson(EncryptionKeys keys, EncryptionMode mode)
+        /// <summary>Exports the AES key, its fingerprint and optional previous keys.</summary>
+        public static string ToJson(EncryptionKeys keys, EncryptionMode mode = EncryptionMode.Aes)
         {
             if (keys == null)
             {
@@ -49,14 +48,6 @@ namespace Pretzel.Data
                     }
 
                     break;
-                case EncryptionMode.Rsa:
-                    if (!keys.HasPublicKey)
-                    {
-                        throw new InvalidOperationException("Generate an RSA public key on the Encryption tab first.");
-                    }
-
-                    config["rsaPublicKey"] = EncryptionKeys.EncodeXml(PublicKeyOnly(keys.RsaPublicKey));
-                    break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(mode), mode, "Unsupported encryption mode.");
             }
@@ -67,11 +58,6 @@ namespace Pretzel.Data
         public static EncryptionKeys FromJson(string json)
         {
             JObject config = JObject.Parse(json);
-            if (config["rsaPrivateKey"] != null)
-            {
-                throw new FormatException("A game key config must not contain an RSA private key.");
-            }
-
             EncryptionKeys keys = new();
             string aes = ReadString(config, "aesKey");
             if (aes != null)
@@ -113,21 +99,9 @@ namespace Pretzel.Data
                 }
             }
 
-            string publicKey = ReadString(config, "rsaPublicKey");
-            if (publicKey != null)
-            {
-                string xml = EncryptionKeys.DecodeXml(publicKey);
-                if (string.IsNullOrWhiteSpace(xml))
-                {
-                    throw new FormatException("The game key config RSA public key must be XML or Base64-encoded XML.");
-                }
-
-                keys.RsaPublicKey = PublicKeyOnly(xml);
-            }
-
             if (keys.IsEmpty)
             {
-                throw new FormatException("The game key config must contain an AES key or an RSA public key.");
+                throw new FormatException("The game key config must contain a Base64-encoded 32 byte AES key.");
             }
 
             return keys;
@@ -149,11 +123,5 @@ namespace Pretzel.Data
             return (string)value;
         }
 
-        private static string PublicKeyOnly(string xml)
-        {
-            using RSA rsa = RSA.Create();
-            rsa.FromXmlString(xml);
-            return rsa.ToXmlString(false);
-        }
     }
 }

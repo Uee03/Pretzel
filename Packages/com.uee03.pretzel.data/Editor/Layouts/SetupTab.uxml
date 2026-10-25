@@ -3,7 +3,7 @@
         <engine:VisualElement class="pretzel-section">
             <engine:Label text="Set up DataIO in your project" class="pretzel-section__title" />
             <engine:Label class="pretzel-section__hint"
-                          text="Each button below generates ProjectDataIO.cs: a small static class you call once at startup. It reads the settings asset (Format, Encryption and Keys tabs), and you can override any setting in code. Use one setup; generating the other replaces it after you confirm." />
+                          text="Plain JSON works without generated code. For a project-owned startup wrapper, choose plain / binary or optional AES below to generate ProjectDataIO.cs. It reads the settings asset and accepts code overrides. Use one wrapper; generating another replaces it only after confirmation." />
             <engine:TextField name="setup-panel__folder" label="Output folder" />
             <engine:Label name="setup-panel__current" class="pretzel-chip" />
             <engine:Label name="setup-panel__current-detail" class="pretzel-section__hint" />
@@ -11,26 +11,46 @@
         </engine:VisualElement>
 
         <engine:VisualElement class="pretzel-section">
-            <engine:Label text="1. Plain JSON, GZip or BSON" class="pretzel-section__title" />
+            <engine:Label text="1. Plain JSON or binary" class="pretzel-section__title" />
             <engine:Label class="pretzel-section__hint"
-                          text="Readable or compact files and no key to manage. Choose this for settings, caches and saves that players may edit." />
+                          text="Plain JSON is the zero-setup default: DataIO.Save and DataIO.Load already work without generated code. Choose binary for a non-text representation, not encryption. Generate this optional startup wrapper when your project needs overrides." />
             <engine:DropdownField name="setup-panel__plain-format" label="Format" />
             <engine:VisualElement class="pretzel-button-row">
-                <engine:Button name="setup-panel__plain-generate" text="Generate plain / GZip / BSON setup"
+                <engine:Button name="setup-panel__plain-generate" text="Generate plain / binary setup"
                                class="pretzel-section__action pretzel-section__action--primary" />
             </engine:VisualElement>
         </engine:VisualElement>
 
         <engine:VisualElement class="pretzel-section">
-            <engine:Label text="2. Encryption (AES or RSA)" class="pretzel-section__title" />
+            <engine:Label text="Use-case examples" class="pretzel-section__title" />
             <engine:Label class="pretzel-section__hint"
-                          text="One step: it switches the settings to Encrypted, creates an AES key if there is none, exports the key the game will read, sets the key source to match, and generates ProjectDataIO.cs. For RSA, generate the key pair on the Encryption tab first." />
-            <engine:DropdownField name="setup-panel__mode" label="Encryption" />
+                          text="Generate independent examples: editable settings (JSON), inventory (binary), or protected profile (AES). Each uses its own folder and strategy without changing your setup. The AES example uses the configured key source; export the matching key first. Existing files are never replaced." />
+            <engine:VisualElement class="pretzel-button-row">
+                <engine:Button name="setup-panel__plain-example" text="Generate plain text example" class="pretzel-section__action" />
+                <engine:Button name="setup-panel__binary-example" text="Generate binary example" class="pretzel-section__action" />
+                <engine:Button name="setup-panel__aes-example" text="Generate AES example" class="pretzel-section__action" />
+            </engine:VisualElement>
+        </engine:VisualElement>
+
+        <engine:VisualElement class="pretzel-section">
+            <engine:Label text="2. Optional AES encryption" class="pretzel-section__title" />
+            <engine:Label class="pretzel-section__hint"
+                          text="Only if you want encryption: this switches settings to AES, creates a key only if none exists, stores and exports it, selects the matching key source, and generates ProjectDataIO.cs. Back up your key. Rotation is optional under Advanced on the Encryption and Keys tabs." />
             <engine:DropdownField name="setup-panel__delivery" label="Key delivery" />
             <engine:HelpBox name="setup-panel__encryption-note" message-type="Info" />
             <engine:VisualElement class="pretzel-button-row">
-                <engine:Button name="setup-panel__encrypted-generate" text="Generate AES / RSA encryption setup"
+                <engine:Button name="setup-panel__encrypted-generate" text="Generate AES encryption setup"
                                class="pretzel-section__action pretzel-section__action--primary" />
+            </engine:VisualElement>
+        </engine:VisualElement>
+
+        <engine:VisualElement class="pretzel-section">
+            <engine:Label text="3. Review and test the configured store" class="pretzel-section__title" />
+            <engine:Label name="setup-panel__summary" class="pretzel-section__hint" />
+            <engine:Label text="Testing uses a separate diagnostic folder and key, never a player profile. AES uses the configured key source only: no key is generated and unsaved working keys are not substituted." class="pretzel-section__hint" />
+            <engine:VisualElement class="pretzel-button-row">
+                <engine:Button name="setup-panel__test" text="Test save and load" class="pretzel-section__action" />
+                <engine:Button name="setup-panel__open-store" text="Open this store's folder" class="pretzel-section__action" />
             </engine:VisualElement>
         </engine:VisualElement>
 
@@ -39,7 +59,7 @@
             <engine:Label class="pretzel-section__hint"
                           text="Examples add a save service and a demo component that use ProjectDataIO, plus a short guide (and a text encrypt / decrypt demo when the setup is encrypted). Existing files are never replaced. Check build setup runs the same validation as a build." />
             <engine:VisualElement class="pretzel-button-row">
-                <engine:Button name="setup-panel__examples" text="Add examples" class="pretzel-section__action" />
+                <engine:Button name="setup-panel__examples" text="Add profile service example" class="pretzel-section__action" />
                 <engine:Button name="setup-panel__validate" text="Check build setup" class="pretzel-section__action" />
             </engine:VisualElement>
         </engine:VisualElement>

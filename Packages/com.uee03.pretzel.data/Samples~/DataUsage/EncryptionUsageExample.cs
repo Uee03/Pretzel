@@ -1,63 +1,47 @@
 using System;
+using System.IO;
+using System.Security.Cryptography;
 using System.Threading;
+using Newtonsoft.Json;
 using Pretzel.Data;
 using UnityEngine;
 
 namespace Pretzel.Samples.Data
 {
-    /// <summary>Add to a GameObject and use its component context menu in Play mode.</summary>
+    /// <summary>
+    /// AES-encrypted saves. Add to a GameObject and use its component context menu in Play mode.
+    /// The static methods are the patterns to copy into your own startup and sign-in code.
+    /// </summary>
     public sealed class EncryptionUsageExample : MonoBehaviour
     {
+        private static readonly DataKey ExampleKey = new("encryption-example-profile", slot: 1, folder: "PretzelSamples");
+
         [ContextMenu("Encryption/Save and load configured AES profile")]
         public void SaveAndLoadConfiguredAes()
         {
-            RequireConfig(EncryptionMode.Aes);
-
-            // JSON, environment variables and generated embedded setup all use the same DataIO API.
-            // Recreate the default after configuration changes; otherwise an existing store keeps its keys.
-            DataIO.Default = DataIOConfig.Load().CreateStore();
-            DataKey key = new("encryption-example-profile", slot: 1, folder: "Examples");
-            DataIO.Save(key, new PlayerProfile { displayName = "Encrypted player", level = 7 });
-            Report(DataIO.Load<PlayerProfile>(key));
-        }
-
-        [ContextMenu("Encryption/Write RSA report for server")]
-        public void WriteRsaReport()
-        {
-            DataIOConfig config = RequireConfig(EncryptionMode.Rsa);
-            EncryptionKeys resolved = EncryptionKeys.Resolve(config.environmentPrefix);
-            if (resolved == null || !resolved.HasPublicKey)
+            if (!Application.isPlaying)
             {
-                throw new InvalidOperationException("Generate and export an RSA public key on the Keys tab first.");
+                Debug.LogWarning("Enter Play mode before running the example.", this);
+                return;
             }
 
-            // Deliberately give the client only the public key, even when the Editor has the private key.
-            DataStore client = DataStoreFactory.Create(DataRoots.PersistentData("EncryptionExamples/RsaOutbox"),
-                DataFormat.Encrypted, new EncryptionKeys { RsaPublicKey = resolved.RsaPublicKey }, EncryptionMode.Rsa);
-            client.Save("report", new PlayerProfile { displayName = "Report from game", level = 12 });
-            Debug.Log("Wrote report.pretzel under persistentDataPath/EncryptionExamples/RsaOutbox. "
-                      + "Send it over HTTPS to your server. The public key cannot read this file.");
-        }
-
-        /// <summary>Call on a trusted server/tool with its private key and the received file's folder.</summary>
-        public static LoadResult<PlayerProfile> ReadRsaReportOnServer(string receivedFolder, EncryptionKeys serverKeys)
-        {
-            if (serverKeys == null || !serverKeys.HasPrivateKey)
+            try
             {
-                throw new InvalidOperationException("Only the trusted server/tool should have the RSA private key.");
+                // A local store built from the DataIOConfig asset and its key source. DataIO.Default is left alone.
+                DataStore store = RequireAesConfig().CreateStore();
+                store.Save(ExampleKey, new PlayerProfile { displayName = "Encrypted player", level = 7 });
+                Report(store.Load<PlayerProfile>(ExampleKey), this);
             }
-
-            DataStore server = DataStoreFactory.Create(DataRoots.Absolute(receivedFolder), DataFormat.Encrypted,
-                new EncryptionKeys { RsaPrivateKey = serverKeys.RsaPrivateKey }, EncryptionMode.Rsa);
-            LoadResult<PlayerProfile> result = server.Load<PlayerProfile>("report");
-            Report(result);
-            return result;
+            catch (Exception ex) when (IsExpectedFailure(ex))
+            {
+                Debug.LogError("Encrypted example failed: " + ex.Message, this);
+            }
         }
 
-        /// <summary>Explicit AES store, independent of DataIOConfig and DataIO.Default.</summary>
+        /// <summary>Explicit AES store, independent of DataIOConfig and DataIO.Default. Create it once and keep it.</summary>
         public static DataStore CreateAesStore(EncryptionKeys keys)
         {
-            return DataStoreFactory.Create(DataRoots.PersistentData("EncryptionExamples/Aes"),
+            return DataStoreFactory.Create(DataRoots.PersistentData("PretzelSamples/Aes"),
                 DataFormat.Encrypted, keys, EncryptionMode.Aes);
         }
 
@@ -68,8 +52,11 @@ namespace Pretzel.Samples.Data
         // CreateAesStore(GameEncryptionKeyConfig.FromJson(downloadedJson)); // JSON supplied by your own code.
         // Do not GenerateAesKey() on each launch: a different key cannot open yesterday's saves.
 
-        /// <summary>After sign-in, fetch a Base64 AES key with your HTTPS client, then enable encrypted saves.</summary>
-        public static async Awaitable LoadAesKeyAfterSignInAsync(
+        /// <summary>
+        /// After sign-in, fetches a Base64 AES key with your HTTPS client and makes DataIO use it.
+        /// Returns false when the service returned no valid key. Cancellation and request failures propagate to the caller.
+        /// </summary>
+        public static async Awaitable<bool> EnableEncryptedSavesAfterSignInAsync(
             string accessToken,
             Func<string, CancellationToken, Awaitable<string>> requestKeyAsync,
             CancellationToken cancellationToken = default)
@@ -84,50 +71,57 @@ namespace Pretzel.Samples.Data
                 throw new ArgumentNullException(nameof(requestKeyAsync));
             }
 
-            DataIOConfig config = RequireConfig(EncryptionMode.Aes);
+            DataIOConfig config = RequireAesConfig();
             string encoded = await requestKeyAsync(accessToken, cancellationToken);
             cancellationToken.ThrowIfCancellationRequested();
-            EncryptionKeys keys = new()
+            byte[] key = EncryptionKeys.DecodeAesKey(encoded);
+            if (key == null || key.Length != EncryptionKeys.AesKeySize)
             {
-                AesKey = string.IsNullOrWhiteSpace(encoded) ? null : EncryptionKeys.DecodeAesKey(encoded)
-            };
-            if (!keys.HasAesKey)
-            {
-                throw new InvalidOperationException("The key service must return a Base64-encoded 32 byte AES key.");
+                return false;
             }
 
-            // Keep the key in memory. Never log the token/key or put it in PlayerPrefs.
-            DataStore store = config.CreateStore(keys: keys);
-            EncryptionKeys.Provider = () => keys;
-            DataIO.Default = store;
-            await DataIO.SaveAsync("authenticated-example-profile",
-                new PlayerProfile { displayName = "Signed-in player" }, cancellationToken);
-            Report(await DataIO.LoadAsync<PlayerProfile>("authenticated-example-profile", cancellationToken));
+            // Keep the key in memory only. Never log the token or the key, or put them in PlayerPrefs.
+            DataIO.Default = config.CreateStore(keys: new EncryptionKeys { AesKey = key });
+            return true;
         }
 
-        private static DataIOConfig RequireConfig(EncryptionMode mode)
+        /// <summary>On sign-out: forget the store and any provided key, so the next user cannot read this user's saves.</summary>
+        public static void SignOut()
+        {
+            DataIO.Reset();
+            EncryptionKeys.Provider = null;
+        }
+
+        private static DataIOConfig RequireAesConfig()
         {
             DataIOConfig config = DataIOConfig.Load();
-            if (!config || config.format != DataFormat.Encrypted || config.encryptionMode != mode)
+            if (!config || config.format != DataFormat.Encrypted || config.encryptionMode != EncryptionMode.Aes)
             {
-                throw new InvalidOperationException($"Choose Encrypted and {mode} in Pretzel > Data Format first.");
+                throw new InvalidOperationException("Choose Encrypted and AES in Pretzel > Data Format first.");
             }
 
             return config;
         }
 
-        private static void Report(LoadResult<PlayerProfile> result)
+        private static bool IsExpectedFailure(Exception ex)
+        {
+            return ex is IOException or UnauthorizedAccessException or InvalidOperationException or ArgumentException
+                or NotSupportedException or CryptographicException or JsonException;
+        }
+
+        private static void Report(LoadResult<PlayerProfile> result, UnityEngine.Object context)
         {
             switch (result.Status)
             {
                 case DataStatus.Ok:
-                    Debug.Log($"Loaded {result.Value.displayName}, level {result.Value.level}. Backup: {result.RecoveredFromBackup}");
+                    Debug.Log($"Loaded {result.Value.displayName}, level {result.Value.level}. From backup: {result.RecoveredFromBackup}.", context);
                     break;
                 case DataStatus.NotFound:
-                    Debug.Log("No example save yet. Start a new profile.");
+                    Debug.Log("No example save yet. Start a new profile.", context);
                     break;
-                case DataStatus.Corrupt:
-                    Debug.LogError($"Could not decrypt the example save (wrong key or damaged data): {result.Error}");
+                default:
+                    // MissingKey or AuthenticationFailed: restore the right key; never overwrite the file with a new profile.
+                    Debug.LogError($"Could not read the encrypted save ({result.ErrorCode}): {result.Error}", context);
                     break;
             }
         }

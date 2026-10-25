@@ -1,0 +1,48 @@
+using System;
+using System.IO;
+using Pretzel.Data;
+using UnityEngine;
+using UnityEngine.Scripting;
+
+// Editable settings: no keys, readable JSON, and an explicit corrupt-file check.
+public sealed class PretzelPlainTextExample : MonoBehaviour
+{
+    // Preserve keeps the type and constructor Newtonsoft needs when IL2CPP strips code.
+    [Serializable, Preserve]
+    private sealed class Settings
+    {
+        public float musicVolume = 0.75f;
+        public string language = "en";
+    }
+
+    [ContextMenu("Pretzel/Run example")]
+    public void RunExample()
+    {
+        if (!Application.isPlaying)
+        {
+            Debug.LogWarning("Enter Play mode before running the example.", this);
+            return;
+        }
+
+        try
+        {
+            IDataStore store = DataStoreFactory.CreateWithStrategy(
+                DataRoots.PersistentData("PretzelExamples/Settings"), new PlainTextStrategy(), prettyPrint: true);
+            LoadResult<Settings> loaded = store.Load<Settings>("settings");
+            if (loaded.Status == DataStatus.Corrupt)
+            {
+                Debug.LogError("Settings are corrupt; preserve them and offer recovery: " + loaded.Error, this);
+                return;
+            }
+
+            Settings settings = loaded.Ok ? loaded.Value : new Settings();
+            store.Save("settings", settings);
+            Debug.Log($"Saved readable settings.json. Music: {settings.musicVolume}, language: {settings.language}.", this);
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or ArgumentException
+            or InvalidOperationException or Newtonsoft.Json.JsonException)
+        {
+            Debug.LogError("Settings example failed: " + ex.Message, this);
+        }
+    }
+}

@@ -22,26 +22,56 @@ namespace Pretzel.Data.Editor
 
         public static string RenderPlain(DataFormat format)
         {
-            if (format == DataFormat.Encrypted)
+            if (format != DataFormat.PlainText && format != DataFormat.Binary)
             {
-                throw new ArgumentException("Use RenderEncrypted for the Encrypted format.", nameof(format));
+                throw new ArgumentException("Choose PlainText or Binary. Use RenderEncrypted for encryption.", nameof(format));
             }
 
             return ReadTemplate("ProjectDataIO.Plain.cs.txt").Replace("@@FORMAT@@", format.ToString());
         }
 
+        /// <summary>Creates an independent, use-case-specific example without changing the active setup or overwriting edits.</summary>
+        public static string CreateUseCaseExample(string folder, DataFormat format, EncryptionMode mode = EncryptionMode.Aes)
+        {
+            ShippingGenerator.ValidateFolder(folder);
+            string name = ExampleName(format, mode);
+            string destination = folder + "/" + name + ".cs";
+            if (File.Exists(destination))
+            {
+                throw new IOException($"The example already exists at {destination}. It was preserved; choose another folder or back up and remove it explicitly.");
+            }
+            ShippingGenerator.EnsureNoOtherScriptCopy(name + ".cs", destination);
+            Copy("Examples/" + name + ".cs.txt", destination);
+            AssetDatabase.ImportAsset(destination);
+            return destination;
+        }
+
+        public static string RenderUseCaseExample(DataFormat format, EncryptionMode mode = EncryptionMode.Aes)
+        {
+            return ReadTemplate("Examples/" + ExampleName(format, mode) + ".cs.txt");
+        }
+
+        private static string ExampleName(DataFormat format, EncryptionMode mode)
+        {
+            return format switch
+            {
+                DataFormat.PlainText => "PretzelPlainTextExample",
+                DataFormat.Binary => "PretzelBinaryExample",
+                DataFormat.Encrypted when mode == EncryptionMode.Aes => "PretzelAesExample",
+                _ => throw new ArgumentOutOfRangeException(nameof(format), "Choose plain text, binary or AES.")
+            };
+        }
+
         public static string RenderEncrypted(EncryptionMode mode, KeySource keySource)
         {
-            bool rsa = mode == EncryptionMode.Rsa;
-            string usage = rsa
-                ? "DataIO.Save encrypts with the public key, but this game cannot read the files back: only the private key on your server can.\n"
-                  + "// Send the files to your server and read them there with CreateServerStore."
-                : "DataIO.Save(\"profile\", profile) and DataIO.Load<Profile>(\"profile\") encrypt and decrypt with the same key.";
+            if (mode != EncryptionMode.Aes)
+            {
+                throw new ArgumentOutOfRangeException(nameof(mode), "Only AES encryption is supported.");
+            }
 
-            string text = KeepRegion(ReadTemplate("ProjectDataIO.Encrypted.cs.txt"), rsa);
-            return text
-                .Replace("@@MODE_TEXT@@", rsa ? "RSA: the game writes, a server reads" : "AES")
-                .Replace("@@USAGE@@", usage)
+            return ReadTemplate("ProjectDataIO.Encrypted.cs.txt")
+                .Replace("@@MODE_TEXT@@", "AES")
+                .Replace("@@USAGE@@", "DataIO.Save(\"profile\", profile) and DataIO.Load<Profile>(\"profile\") encrypt and decrypt with the same key.")
                 .Replace("@@MODE@@", mode.ToString())
                 .Replace("@@KEY_SOURCE@@", keySource.ToString());
         }
@@ -155,34 +185,5 @@ namespace Pretzel.Data.Editor
             return File.ReadAllText(path);
         }
 
-        /// <summary>Drops the //@@IF_RSA ... //@@END_IF lines unless <paramref name="keep"/> is set, and removes the marker lines.</summary>
-        private static string KeepRegion(string template, bool keep)
-        {
-            StringBuilder result = new();
-            bool inside = false;
-            foreach (string line in template.Split('\n'))
-            {
-                string marker = line.Trim();
-                if (marker == "//@@IF_RSA")
-                {
-                    inside = true;
-                    continue;
-                }
-
-                if (marker == "//@@END_IF")
-                {
-                    inside = false;
-                    continue;
-                }
-
-                if (!inside || keep)
-                {
-                    result.Append(line).Append('\n');
-                }
-            }
-
-            // Split adds one extra empty segment after the final newline.
-            return result.ToString(0, result.Length - 1);
-        }
     }
 }

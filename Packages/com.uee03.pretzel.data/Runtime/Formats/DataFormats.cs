@@ -1,16 +1,18 @@
+using System;
+
 namespace Pretzel.Data
 {
     public static class DataFormats
     {
-        /// <summary>Extension without the dot: json, json.gz, bin, pretzel.</summary>
+        /// <summary>Extension without the dot: json, bin, pretzel.</summary>
         public static string DefaultExtension(DataFormat format)
         {
             return format switch
             {
-                DataFormat.Compressed => "json.gz",
+                DataFormat.PlainText => "json",
                 DataFormat.Binary => "bin",
                 DataFormat.Encrypted => "pretzel",
-                _ => "json"
+                _ => throw new NotSupportedException($"Data format {format} is not supported.")
             };
         }
     }

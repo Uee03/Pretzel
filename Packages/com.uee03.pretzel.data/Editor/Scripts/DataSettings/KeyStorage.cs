@@ -8,8 +8,7 @@ namespace Pretzel.Data.Editor
 {
     internal enum KeyScope
     {
-        All,
-        PublicOnly
+        All
     }
 
     internal enum EnvironmentStatus
@@ -40,16 +39,6 @@ namespace Pretzel.Data.Editor
             if (scope == KeyScope.All && keys.HasAesKey)
             {
                 variables.Add((EncryptionKeys.AesVariable(prefix), EncryptionKeys.EncodeAesKey(keys.AesKey)));
-            }
-
-            if (keys.HasPublicKey)
-            {
-                variables.Add((EncryptionKeys.PublicVariable(prefix), EncryptionKeys.EncodeXml(keys.RsaPublicKey)));
-            }
-
-            if (scope == KeyScope.All && keys.HasPrivateKey)
-            {
-                variables.Add((EncryptionKeys.PrivateVariable(prefix), EncryptionKeys.EncodeXml(keys.RsaPrivateKey)));
             }
 
             return variables;
@@ -107,30 +96,21 @@ namespace Pretzel.Data.Editor
         private static IEnumerable<string> AllNames(string prefix)
         {
             yield return EncryptionKeys.AesVariable(prefix);
-            yield return EncryptionKeys.PublicVariable(prefix);
-            yield return EncryptionKeys.PrivateVariable(prefix);
         }
 
         #endregion
 
         #region KEY FILE
 
-        /// <summary>The keys of <paramref name="mode"/> as Editor storage should hold them: AES with its history, or the RSA pair.</summary>
+        /// <summary>The AES key and its read history for Editor storage.</summary>
         public static EncryptionKeys ForMode(EncryptionKeys keys, EncryptionMode mode)
         {
-            EncryptionKeys copy = new();
-            if (mode == EncryptionMode.Aes)
+            if (mode != EncryptionMode.Aes)
             {
-                copy.AesKey = keys.AesKey;
-                copy.PreviousAesKeys.AddRange(keys.PreviousAesKeys);
-            }
-            else
-            {
-                copy.RsaPublicKey = keys.RsaPublicKey;
-                copy.RsaPrivateKey = keys.RsaPrivateKey;
+                throw new ArgumentOutOfRangeException(nameof(mode), "Only AES encryption is supported.");
             }
 
-            return copy;
+            return keys.Clone();
         }
 
         /// <summary>Writes the keys into the project key file. Keys that are not part of <paramref name="scope"/> are left as they were.</summary>
@@ -147,12 +127,6 @@ namespace Pretzel.Data.Editor
                     merged.PreviousAesKeys.AddRange(keys.PreviousAesKeys);
                 }
 
-                merged.RsaPrivateKey = keys.HasPrivateKey ? keys.RsaPrivateKey : merged.RsaPrivateKey;
-            }
-
-            if (keys.HasPublicKey)
-            {
-                merged.RsaPublicKey = keys.RsaPublicKey;
             }
 
             EncryptionKeyFile.Save(merged);

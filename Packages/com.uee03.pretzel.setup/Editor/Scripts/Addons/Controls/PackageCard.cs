@@ -1,64 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using UnityEngine.UIElements;
+﻿using UnityEngine.UIElements;
 
 namespace Pretzel.Setup.Addons.Controls
 {
-    public enum ChipKind
-    {
-        Ok,
-        Warn,
-        Missing,
-        Neutral
-    }
-
-    public readonly struct CardChip
-    {
-        public readonly string Text;
-        public readonly ChipKind Kind;
-
-        public CardChip(string text, ChipKind kind)
-        {
-            Text = text;
-            Kind = kind;
-        }
-    }
-
-    public readonly struct CardAction
-    {
-        public readonly string Label;
-        public readonly Action Invoke;
-        public readonly bool Enabled;
-        public readonly bool Primary;
-        public readonly bool Danger;
-        public readonly string Tooltip;
-
-        public CardAction(string label, Action invoke, bool enabled = true, bool primary = false, bool danger = false, string tooltip = null)
-        {
-            Label = label;
-            Invoke = invoke;
-            Enabled = enabled;
-            Primary = primary;
-            Danger = danger;
-            Tooltip = tooltip;
-        }
-    }
-
-    public sealed class CardModel
-    {
-        public string Title;
-        public string Subtitle;
-        public string Description;
-        public string Detail;
-        public string Note;
-        public HelpBoxMessageType NoteType = HelpBoxMessageType.Info;
-        public List<CardChip> Chips = new();
-        public List<CardAction> Actions = new();
-
-        /// <summary>Extra elements shown under the description, for example a version field.</summary>
-        public List<VisualElement> Extras = new();
-    }
-
     /// <summary>A card with a title, status chips, a description and action buttons. Built once from a <see cref="CardModel"/>.</summary>
     public sealed class PackageCard : VisualElement
     {

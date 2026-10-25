@@ -12,9 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2a59f10af9c7d924694c135ef595d3b2, type: 3}
   m_Name: DataIOConfig
   m_EditorClassIdentifier: Pretzel.Data::Pretzel.Data.DataIOConfig
-  format: 2
+  format: 0
   serializer: 0
-  fileExtension: bin
+  fileExtension: json
   saveFolder: SaveData
   prettyPrint: 1
   keepBackup: 1
@@ -22,3 +22,4 @@ MonoBehaviour:
   encryptionMode: 0
   rsaKeySize: 4096
   environmentPrefix: PRETZEL_TESTPRETZEL
+  keySource: 0

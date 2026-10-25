@@ -1,10 +1,17 @@
 {
   "dependencies": {
     "com.github-glitchenzo.nugetforunity": "https://github.com/GlitchEnzo/NuGetForUnity.git?path=/src/NuGetForUnity#v4.5.0",
-    "com.uee03.pretzel.core": "https://github.com/Uee03/Pretzel.git?path=Packages/com.uee03.pretzel.core",
-    "com.uee03.pretzel.data": "https://github.com/Uee03/Pretzel.git?path=Packages/com.uee03.pretzel.data",
-    "com.uee03.pretzel.extensions": "https://github.com/Uee03/Pretzel.git?path=Packages/com.uee03.pretzel.extensions",
-    "com.uee03.pretzel.setup": "https://github.com/Uee03/Pretzel.git?path=Packages/com.uee03.pretzel.setup",
+    "com.uee03.pretzel.api": "file:../../Packages/com.uee03.pretzel.api",
+    "com.uee03.pretzel.core": "file:../../Packages/com.uee03.pretzel.core",
+    "com.uee03.pretzel.data": "file:../../Packages/com.uee03.pretzel.data",
+    "com.uee03.pretzel.editor": "file:../../Packages/com.uee03.pretzel.editor",
+    "com.uee03.pretzel.extensions": "file:../../Packages/com.uee03.pretzel.extensions",
+    "com.uee03.pretzel.integrations": "file:../../Packages/com.uee03.pretzel.integrations",
+    "com.uee03.pretzel.setup": "file:../../Packages/com.uee03.pretzel.setup",
+    "com.uee03.pretzel.templates": "file:../../Packages/com.uee03.pretzel.templates",
+    "com.uee03.pretzel.tween": "file:../../Packages/com.uee03.pretzel.tween",
+    "com.uee03.pretzel.ui": "file:../../Packages/com.uee03.pretzel.ui",
+    "com.uee03.pretzel.ui.ugui": "file:../../Packages/com.uee03.pretzel.ui.ugui",
     "com.unity.2d.animation": "16.0.1",
     "com.unity.2d.aseprite": "6.0.0",
     "com.unity.2d.psdimporter": "15.0.1",
@@ -59,5 +66,8 @@
     "com.unity.modules.video": "1.0.0",
     "com.unity.modules.wind": "1.0.0",
     "com.unity.modules.xr": "1.0.0"
-  }
+  },
+  "testables": [
+    "com.uee03.pretzel.data"
+  ]
 }

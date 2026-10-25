@@ -48,14 +48,9 @@ public sealed class ProjectSaveService
             throw new ArgumentNullException(nameof(profile));
         }
 
-        // Snapshot before background serialization; gameplay can keep changing the live profile.
-        ProjectSaveData snapshot = new()
-        {
-            playerName = profile.playerName,
-            level = profile.level,
-            coins = profile.coins
-        };
-        return _store.SaveAsync(ProfileKey(slot), snapshot, cancellationToken);
+        // The store serializes on the calling (main) thread before writing in the background,
+        // so later gameplay changes to the live profile cannot leak into this save.
+        return _store.SaveAsync(ProfileKey(slot), profile, cancellationToken);
     }
 
     public async Awaitable<IReadOnlyList<int>> ListSlotsAsync(CancellationToken cancellationToken = default)

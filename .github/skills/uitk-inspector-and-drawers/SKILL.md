@@ -13,7 +13,7 @@ public class MyComponentEditor : Editor
 {
     public override VisualElement CreateInspectorGUI()
     {
-        var root = new VisualElement();
+        VisualElement root = new VisualElement();
         root.AddToClassList("pretzel-my-component");
         root.Add(new PropertyField(serializedObject.FindProperty("m_Speed")));
         return root;
@@ -33,8 +33,8 @@ public class SerializableGuidDrawer : PropertyDrawer
 {
     public override VisualElement CreatePropertyGUI(SerializedProperty property)
     {
-        var root = new VisualElement();
-        var field = new PropertyField(property.FindPropertyRelative("m_Value"), property.displayName);
+        VisualElement root = new VisualElement();
+        PropertyField field = new PropertyField(property.FindPropertyRelative("m_Value"), property.displayName);
         root.Add(field);
         return root;
     }

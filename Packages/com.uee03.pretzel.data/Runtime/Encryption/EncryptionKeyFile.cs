@@ -1,3 +1,4 @@
+#if UNITY_EDITOR
 using System.IO;
 using Newtonsoft.Json;
 using UnityEngine;
@@ -24,7 +25,8 @@ namespace Pretzel.Data
                     return null;
                 }
 
-                FileDto dto = JsonConvert.DeserializeObject<FileDto>(File.ReadAllText(Path));
+                string json = File.ReadAllText(Path);
+                FileDto dto = JsonConvert.DeserializeObject<FileDto>(json);
                 if (dto == null)
                 {
                     return null;
@@ -32,10 +34,12 @@ namespace Pretzel.Data
 
                 EncryptionKeys keys = new()
                 {
-                    AesKey = string.IsNullOrWhiteSpace(dto.aesKey) ? null : EncryptionKeys.DecodeAesKey(dto.aesKey),
-                    RsaPublicKey = EncryptionKeys.DecodeXml(dto.rsaPublicKey),
-                    RsaPrivateKey = EncryptionKeys.DecodeXml(dto.rsaPrivateKey)
+                    AesKey = string.IsNullOrWhiteSpace(dto.aesKey) ? null : EncryptionKeys.DecodeAesKey(dto.aesKey)
                 };
+                if (!keys.HasAesKey && !string.IsNullOrWhiteSpace(dto.aesKey))
+                {
+                    Debug.LogWarning("[Pretzel.Data] The Editor key file contains an invalid AES key; it must be 32 bytes encoded as Base64.");
+                }
                 if (dto.previousAesKeys != null)
                 {
                     foreach (string old in dto.previousAesKeys)
@@ -58,13 +62,22 @@ namespace Pretzel.Data
             FileDto dto = new()
             {
                 aesKey = keys.HasAesKey ? EncryptionKeys.EncodeAesKey(keys.AesKey) : null,
-                rsaPublicKey = EncryptionKeys.EncodeXml(keys.RsaPublicKey),
-                rsaPrivateKey = EncryptionKeys.EncodeXml(keys.RsaPrivateKey),
                 previousAesKeys = keys.PreviousAesKeys.Count == 0 ? null : keys.PreviousAesKeys.ConvertAll(EncryptionKeys.EncodeAesKey).ToArray()
             };
 
-            Directory.CreateDirectory(System.IO.Path.GetDirectoryName(Path));
-            File.WriteAllText(Path, JsonConvert.SerializeObject(dto, Formatting.Indented, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore }));
+            string path = Path;
+            string temp = path + ".tmp";
+            Directory.CreateDirectory(System.IO.Path.GetDirectoryName(path));
+            File.WriteAllText(temp, JsonConvert.SerializeObject(dto, Formatting.Indented, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore }));
+            // Replace in one step, so a crash mid-write never destroys the only copy of a key.
+            if (File.Exists(path))
+            {
+                File.Replace(temp, path, null);
+            }
+            else
+            {
+                File.Move(temp, path);
+            }
         }
 
         public static void Delete()
@@ -75,9 +88,8 @@ namespace Pretzel.Data
         private sealed class FileDto
         {
             public string aesKey;
-            public string rsaPublicKey;
-            public string rsaPrivateKey;
             public string[] previousAesKeys;
         }
     }
 }
+#endif

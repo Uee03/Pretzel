@@ -18,13 +18,11 @@ namespace Pretzel.Data
         public bool prettyPrint = true;
         public bool keepBackup = true;
 
-        [Tooltip("Writes Compressed, Binary and Encrypted files as Base64 text.")]
+        [Tooltip("Writes Binary and Encrypted files as Base64 text.")]
         public bool storeAsBase64;
 
         public EncryptionMode encryptionMode = EncryptionMode.Aes;
-        public int rsaKeySize = EncryptionKeys.RecommendedRsaKeySize;
-
-        [Tooltip("Names the environment variables that hold the keys: <prefix>_AES_KEY, <prefix>_RSA_PUBLIC and <prefix>_RSA_PRIVATE.")]
+        [Tooltip("Names the environment variable that holds the AES key: <prefix>_AES_KEY.")]
         public string environmentPrefix = "PRETZEL_GAME";
 
         [Tooltip("Where encrypted formats look for keys. Choose the one your build ships: Provider (embedded setup or token) or BundledJson. Automatic is for development.")]
@@ -35,26 +33,29 @@ namespace Pretzel.Data
 
         /// <param name="root">Defaults to persistent data under <see cref="saveFolder"/>.</param>
         /// <param name="keys">Defaults to <see cref="EncryptionKeys.Resolve(string, KeySource, out string)"/> with <see cref="keySource"/>.</param>
-        public DataStore CreateStore(IDataRoot root = null, EncryptionKeys keys = null)
+        public DataStore CreateStore(IDataRoot root = null, EncryptionKeys keys = null, Action<DataStoreOptions> configure = null)
         {
             root ??= DataRoots.PersistentData(string.IsNullOrWhiteSpace(saveFolder) ? null : saveFolder.Trim('/', '\\'));
 
             if (format == DataFormat.Encrypted)
             {
+                if (encryptionMode != EncryptionMode.Aes)
+                {
+                    throw new NotSupportedException("This config selects an unsupported encryption mode. Only AES is supported.");
+                }
                 keys ??= EncryptionKeys.Resolve(environmentPrefix, keySource, out _);
                 if (keys == null)
                 {
                     throw new InvalidOperationException(
                         $"DataIO is set to Encrypted, but no keys were found (key source: {keySource}). Export a game key config or the embedded setup on the Keys tab, " +
-                        $"set the environment variables {EncryptionKeys.AesVariable(environmentPrefix)} " +
-                        $"(or {EncryptionKeys.PublicVariable(environmentPrefix)} / {EncryptionKeys.PrivateVariable(environmentPrefix)}), " +
+                        $"set the environment variable {EncryptionKeys.AesVariable(environmentPrefix)}, " +
                         "assign EncryptionKeys.Provider before the first save, " +
                         "or create the store yourself with DataStoreFactory.");
                 }
             }
 
             ISerializer chosen = serializer == SerializerChoice.JsonUtility ? new JsonUtilitySerializer() : new NewtonsoftSerializer();
-            return DataStoreFactory.Create(root, format, keys, encryptionMode, chosen, fileExtension, storeAsBase64, prettyPrint, keepBackup);
+            return DataStoreFactory.Create(root, format, keys, encryptionMode, chosen, fileExtension, storeAsBase64, prettyPrint, keepBackup, configure);
         }
     }
 }

@@ -18,7 +18,6 @@ namespace Pretzel.Data.Editor
         {
             return format switch
             {
-                DataFormat.Compressed => Compressed,
                 DataFormat.Binary => Binary,
                 DataFormat.Encrypted => Encrypted,
                 _ => PlainText
@@ -46,44 +45,22 @@ namespace Pretzel.Data.Editor
             BestFor = "Settings, development builds, single-player games where cheating does not matter, and data you want to diff."
         };
 
-        private static readonly FormatInfo Compressed = new()
-        {
-            Title = "Compressed",
-            Summary = "JSON compressed with GZip.",
-            Extensions = new[] { "json.gz", "gz" },
-            Pros = new[]
-            {
-                "Large or repetitive saves often shrink several times over.",
-                "Smaller cloud uploads and faster sync.",
-                "Still plain JSON inside, so any gzip tool can open it.",
-                "Built into .NET, no extra dependency."
-            },
-            Cons = new[]
-            {
-                "Not secure: unzipping the file shows everything.",
-                "Not readable or diffable as it is.",
-                "Little or no gain for tiny files.",
-                "One damaged byte can make the whole file unreadable (the .bak recovery helps)."
-            },
-            BestFor = "Big saves, world or level data, cloud saves."
-        };
-
         private static readonly FormatInfo Binary = new()
         {
             Title = "Binary",
-            Summary = "BSON, a binary encoding of the JSON data model.",
+            Summary = "Versioned binary values using .NET BinaryWriter and BinaryReader. Never BinaryFormatter.",
             Extensions = new[] { "bin", "dat" },
             Pros = new[]
             {
                 "Not readable or editable in a text editor.",
                 "Keeps value types (int, long, double, bool) exactly.",
-                "BSON is a standard, so other tools can read it.",
+                "No per-type read/write implementation needed for ordinary serializable game data.",
                 "Works with schema versions and migrations."
             },
             Cons = new[]
             {
                 "Only discourages casual editing: field names and strings are still visible in a hex editor.",
-                "Often not smaller than JSON, because type tags, lengths and field names are kept. Use Compressed for size.",
+                "Not guaranteed smaller than JSON: type tags, lengths and field names are kept.",
                 "Cannot be diffed or edited by hand.",
                 "Not a security feature. Use Encrypted if the data must stay private."
             },
@@ -93,23 +70,21 @@ namespace Pretzel.Data.Editor
         private static readonly FormatInfo Encrypted = new()
         {
             Title = "Encrypted",
-            Summary = "JSON encrypted with AES-256, tamper-checked with HMAC-SHA256. Optionally with an RSA public key.",
+            Summary = "JSON encrypted with AES-256, tamper-checked with HMAC-SHA256.",
             Extensions = new[] { "pretzel", "enc" },
             Pros = new[]
             {
                 "Contents are unreadable without the key.",
                 "Edited or damaged files are rejected instead of loaded as garbage (the HMAC check).",
-                "A random IV for every file, so equal data never gives equal files.",
-                "RSA mode lets your server or tools decrypt what the game wrote, without the game holding the secret."
+                "A random IV for every file, so equal data never gives equal files."
             },
             Cons = new[]
             {
                 "You must manage and protect keys. A lost key means lost data.",
                 "A key that ships inside the game can be extracted. It slows cheaters down, it does not stop them.",
-                "Cannot be diffed or merged.",
-                "In RSA mode the game cannot read its own files back."
+                "Cannot be diffed or merged."
             },
-            BestFor = "Saves where tampering matters, private user data, and data sent to a server."
+            BestFor = "Local saves where casual tampering matters. Not for secrets or anything a server must trust: a key in the game can be extracted."
         };
 
         public static readonly string[] AesModeNotes =
@@ -118,43 +93,16 @@ namespace Pretzel.Data.Editor
             "The game needs the key to read its own saves, so the key has to reach the player's machine. Treat it as obfuscation against casual editing."
         };
 
-        public static readonly string[] RsaModeNotes =
-        {
-            "Each file gets a random AES key, wrapped with your RSA public key.",
-            "The game only needs the public key to write. The public key can be public.",
-            "Reading needs the private key. Keep it on your server, in a secret manager or on your own machine, never in the game.",
-            "Use it for data going from the game to you, such as leaderboards, bug reports and telemetry."
-        };
-
-        public static string RsaSizeNote(int bits)
-        {
-            return bits switch
-            {
-                4096 => "4096 bits (recommended). The largest margin. Generating takes longest, but happens once. Adds 512 bytes to every file.",
-                3072 => "3072 bits. Matches the 128-bit security level NIST gives AES-128. A good balance.",
-                _ => "2048 bits. The minimum that is still acceptable. Fast, but with the smallest safety margin."
-            };
-        }
-
         public static readonly string[] EncryptedChecklist =
         {
-            "Pick a mode: AES for single-player saves, RSA for data you send to a server.",
-            "Generate the keys on the Encryption tab.",
+            "Use plain JSON (the zero-setup default) or binary when you do not need encryption.",
+            "For AES, generate the setup on the Setup tab or generate a key on the Encryption tab.",
             "Store them on the Keys tab, as environment variables or in this project's key file. Both stay out of version control. Also back them up in a password manager.",
-            "Never commit the AES key or the RSA private key. Check that UserSettings is in your .gitignore.",
-            "Test a round trip on the Decrypt tab.",
-            "Decide how the game gets the key. Development: environment variables. Release: the Shipping tab.",
-            "Keep old keys until every old save has been re-saved, or those saves cannot be opened.",
+            "Never commit the AES key. Check that UserSettings is in your .gitignore.",
+            "Use Test save and load on the Setup tab to check the configured store in an isolated diagnostic folder.",
+            "Decide how the game gets the key. Release: embedded C# or bundled JSON on the Setup tab, or a token flow on the Shipping tab.",
+            "Optional rotation is under Advanced. Keep previous keys until every old save has been re-saved.",
             "Remember that a key in the game can be extracted. For data that really must stay secret, keep the key and the decryption on a server."
-        };
-
-        public static readonly string[] PrivateKeyAdvice =
-        {
-            "Never ship it, commit it or paste it into chat or tickets.",
-            "Keep it in a secret manager (Azure Key Vault, AWS Secrets Manager, HashiCorp Vault), a password manager, or an encrypted backup.",
-            "Give your server access through its secret store or environment, not through a file in the repository.",
-            "On a build server, use the CI system's secret variables.",
-            "If it leaks, generate a new pair, ship the new public key, and re-encrypt what you still need."
         };
 
         public static readonly string[] TokenSteps =
@@ -164,7 +112,7 @@ namespace Pretzel.Data.Editor
             "The service validates the token on the server and returns a key made for that player, so one leaked key opens one player's saves.",
             "The game keeps the key in memory only. It never writes it to disk or PlayerPrefs, and creates its store after the key arrives.",
             "Rotate keys with a version number on the server, rate limit requests, and keep old keys until saves are re-saved.",
-            "The generated script has a stub, RequestKeyAsync, for your own request. The guide has the full flow and a server example."
+            "The generated script has a stub, RequestKeyAsync, for your own request. The build check fails until it is implemented. On sign-out, call ProjectDataIO.Shutdown() and PretzelDataSetup.ClearKeys()."
         };
 
         public static readonly string[] Base64Pros =

@@ -37,8 +37,9 @@ namespace Pretzel.Data.Editor
                 }
             }
 
-            error = null;
-            return true;
+            // The same rules the store applies at runtime, such as reserved device names.
+            error = DataNames.ValidateFolder(normalized);
+            return error == null;
         }
     }
 }

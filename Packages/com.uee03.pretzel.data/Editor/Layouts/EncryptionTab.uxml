@@ -1,13 +1,8 @@
 <engine:UXML xmlns:engine="UnityEngine.UIElements" xmlns:editor="UnityEditor.UIElements">
     <engine:ScrollView class="pretzel-tab">
         <engine:VisualElement class="pretzel-section">
-            <engine:Label text="Encryption mode" class="pretzel-section__title" />
-            <engine:DropdownField name="encryption-panel__mode" label="Mode" />
+            <engine:Label text="AES-256 encryption" class="pretzel-section__title" />
             <engine:VisualElement name="encryption-panel__mode-notes" class="pretzel-bullets" />
-            <engine:VisualElement name="encryption-panel__rsa-size-row">
-                <engine:DropdownField name="encryption-panel__rsa-size" label="RSA key size" />
-                <engine:Label name="encryption-panel__rsa-size-note" class="pretzel-section__hint" />
-            </engine:VisualElement>
         </engine:VisualElement>
 
         <engine:VisualElement class="pretzel-section">
@@ -16,21 +11,19 @@
             <engine:Label name="encryption-panel__unstored" class="pretzel-section__hint pretzel-section__hint--warning" />
             <engine:Label name="encryption-panel__status" class="pretzel-section__hint" />
             <engine:VisualElement class="pretzel-button-row">
-                <engine:Button name="encryption-panel__generate" text="Generate keys"
+                <engine:Button name="encryption-panel__generate" text="Generate AES key"
                                class="pretzel-section__action pretzel-section__action--primary" />
                 <engine:Button name="encryption-panel__copy-aes" text="Copy AES key" class="pretzel-section__action" />
-                <engine:Button name="encryption-panel__copy-public" text="Copy public key" class="pretzel-section__action" />
-                <engine:Button name="encryption-panel__copy-private" text="Copy private key" class="pretzel-section__action pretzel-section__action--danger" />
             </engine:VisualElement>
             <engine:Label class="pretzel-section__hint"
                           text="Store the keys on the Keys tab. The IV is generated randomly for every file and written into the file, so there is no IV to store." />
             <engine:Button name="encryption-panel__best-practices" text="Open best practices guide" class="pretzel-section__action" />
         </engine:VisualElement>
 
-        <engine:VisualElement name="encryption-panel__private-section" class="pretzel-section">
-            <engine:Label text="Protecting the private key" class="pretzel-section__title" />
-            <engine:VisualElement name="encryption-panel__private-advice" class="pretzel-bullets" />
-        </engine:VisualElement>
+        <engine:Foldout name="encryption-panel__advanced" text="Advanced (optional): key rotation" value="false" class="pretzel-section">
+            <engine:Label text="Rotation is not required for normal setup. Previous keys keep existing saves readable; back up and export the new key ring after rotating." class="pretzel-section__hint" />
+            <engine:Button name="encryption-panel__rotate" text="Rotate AES key" class="pretzel-section__action" />
+        </engine:Foldout>
 
         <engine:VisualElement class="pretzel-section">
             <engine:Label text="If you create an encrypted JSON" class="pretzel-section__title" />

@@ -4,7 +4,7 @@
             <engine:Label text="Where the keys are stored" class="pretzel-section__title" />
             <engine:Label class="pretzel-section__hint"
                           text="The key file belongs to this project only: it lives in this project's UserSettings folder. Environment variables belong to your user account on this computer and are shared by every project, so their names start with a prefix. Give each project its own prefix." />
-            <engine:TextField name="keys-panel__prefix" label="Variable prefix" />
+            <engine:TextField name="keys-panel__prefix" label="Variable prefix" is-delayed="true" />
             <engine:Label name="keys-panel__prefix-hint" class="pretzel-section__hint" />
             <engine:VisualElement name="keys-panel__rows" />
             <engine:Label name="keys-panel__result" class="pretzel-section__hint" />
@@ -20,10 +20,6 @@
             <engine:EnumField name="keys-panel__source" label="Key source" />
             <engine:Label name="keys-panel__active" class="pretzel-chip" />
             <engine:Label name="keys-panel__active-detail" class="pretzel-section__hint" />
-            <engine:VisualElement class="pretzel-button-row">
-                <engine:Button name="keys-panel__previous-clear" text="Clear previous AES keys"
-                               class="pretzel-section__action pretzel-section__action--danger" />
-            </engine:VisualElement>
         </engine:VisualElement>
 
         <engine:VisualElement class="pretzel-section">
@@ -32,7 +28,6 @@
             <engine:VisualElement class="pretzel-button-row">
                 <engine:Button name="keys-panel__env-store" text="Store keys as environment variables"
                                class="pretzel-section__action pretzel-section__action--primary" />
-                <engine:Button name="keys-panel__env-store-public" text="Store public key only" class="pretzel-section__action" />
                 <engine:Button name="keys-panel__env-copy" text="Copy commands" class="pretzel-section__action" />
                 <engine:Button name="keys-panel__env-remove" text="Remove variables"
                                class="pretzel-section__action pretzel-section__action--danger" />
@@ -48,7 +43,6 @@
             <engine:VisualElement class="pretzel-button-row">
                 <engine:Button name="keys-panel__file-store" text="Save keys to project key file"
                                class="pretzel-section__action pretzel-section__action--primary" />
-                <engine:Button name="keys-panel__file-store-public" text="Save public key only" class="pretzel-section__action" />
                 <engine:Button name="keys-panel__file-reveal" text="Show in folder" class="pretzel-section__action" />
                 <engine:Button name="keys-panel__file-delete" text="Delete key file"
                                class="pretzel-section__action pretzel-section__action--danger" />
@@ -59,7 +53,7 @@
             <engine:Label text="Game-specific keys (included in builds)" class="pretzel-section__title" />
             <engine:Label name="keys-panel__game-hint" class="pretzel-section__hint" />
             <engine:HelpBox message-type="Warning"
-                            text="A shipped AES key can be extracted from JSON or compiled code. IL2CPP and the generated script's XOR masking only raise the effort; they do not keep it secret. Keep generated AES files out of version control. RSA private keys are never exported." />
+                            text="A shipped AES key can be extracted from JSON or compiled code. IL2CPP and the generated script's XOR masking only raise the effort; they do not keep it secret. Keep generated AES files out of version control." />
             <engine:Label class="pretzel-section__hint"
                           text="Saving the JSON sets the key source to Bundled Json. Generating the embedded C# setup sets it to Provider. Both keep older AES keys so existing saves still open. Choose one delivery; the other file is not read, but a stale JSON would still ship, so remove it." />
             <engine:VisualElement class="pretzel-button-row">
@@ -71,11 +65,11 @@
             <engine:Label name="keys-panel__game-result" class="pretzel-section__hint" />
         </engine:VisualElement>
 
-        <engine:VisualElement name="keys-panel__public-section" class="pretzel-section">
-            <engine:Label text="About the public key" class="pretzel-section__title" />
-            <engine:Label class="pretzel-section__hint"
-                          text="The RSA public key may be public. It can be stored in the project key file or an environment variable, or shipped inside the game, because it can only encrypt. Only the private key has to stay secret." />
-        </engine:VisualElement>
+        <engine:Foldout name="keys-panel__advanced" text="Advanced (optional): previous AES keys" value="false" class="pretzel-section">
+            <engine:Label text="Rotation is optional. Keep previous keys until all old saves have been loaded and saved with the current key. Back up the complete key ring before clearing it, then export again." class="pretzel-section__hint" />
+            <engine:Button name="keys-panel__previous-clear" text="Clear previous AES keys"
+                           class="pretzel-section__action pretzel-section__action--danger" />
+        </engine:Foldout>
 
         <engine:VisualElement class="pretzel-section">
             <engine:Label text="About the IV" class="pretzel-section__title" />

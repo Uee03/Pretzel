@@ -30,7 +30,7 @@ public sealed class ProjectSaveExample : MonoBehaviour
             ProjectDataIO.Initialize();
             LoadProfile();
         }
-        catch (Exception ex) when (ex is InvalidOperationException or ArgumentException or FormatException or IOException
+        catch (Exception ex) when (ex is InvalidOperationException or ArgumentException or FormatException or IOException or InvalidDataException or NotSupportedException
             or UnauthorizedAccessException or System.Security.Cryptography.CryptographicException
             or Newtonsoft.Json.JsonException or System.Xml.XmlException)
         {
@@ -61,7 +61,7 @@ public sealed class ProjectSaveExample : MonoBehaviour
         {
             // Scene teardown cancelled the operation; no new save is started.
         }
-        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+        catch (Exception ex) when (ex is IOException or InvalidDataException or UnauthorizedAccessException)
         {
             Debug.LogError($"Profile load failed: {ex.Message}", this);
         }
@@ -115,7 +115,8 @@ public sealed class ProjectSaveExample : MonoBehaviour
         {
             // Do not report success for a cancelled save.
         }
-        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+        catch (Exception ex) when (ex is IOException or InvalidDataException or UnauthorizedAccessException
+            or System.Security.Cryptography.CryptographicException or Newtonsoft.Json.JsonException)
         {
             Debug.LogError($"Save failed; keep progress in memory and offer retry: {ex.Message}", this);
         }

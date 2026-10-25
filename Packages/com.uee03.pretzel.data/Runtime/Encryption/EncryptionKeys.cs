@@ -6,22 +6,22 @@ using UnityEngine;
 
 namespace Pretzel.Data
 {
-    /// <summary>
-    /// The secrets behind <see cref="DataFormat.Encrypted"/>. The AES key is a secret. The RSA public key can be public,
-    /// the RSA private key must never ship with a game.
-    /// </summary>
+    /// <summary>The AES key used by encrypted saves. Keep a backup; replacing it is optional, not a startup step.</summary>
     public sealed class EncryptionKeys
     {
         public const int AesKeySize = 32;
         public const int SaltSize = 16;
         public const int DefaultPbkdf2Iterations = 600000;
         public const int MinPbkdf2Iterations = 100000;
-        public const int RecommendedRsaKeySize = 4096;
-
-        public static readonly int[] RsaKeySizes = { 2048, 3072, 4096 };
-
-        /// <summary>Set this at startup to supply keys from code, for example keys fetched from a server with a token. It wins over every other source.</summary>
+        /// <summary>
+        /// Set this at startup to supply keys from code, for example keys fetched from a server with a token. It wins over every other source.
+        /// Cleared when Play mode starts. Set it to null on sign-out so the next user cannot read the previous user's saves.
+        /// </summary>
         public static Func<EncryptionKeys> Provider { get; set; }
+
+        // Static state survives play sessions when domain reload is disabled. Generated setups register again at BeforeSceneLoad.
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+        private static void ResetProvider() => Provider = null;
 
         /// <summary>32 random bytes.</summary>
         public byte[] AesKey { get; set; }
@@ -32,25 +32,11 @@ namespace Pretzel.Data
         /// </summary>
         public List<byte[]> PreviousAesKeys { get; } = new();
 
-        /// <summary>RSA key in XML form. Safe to publish.</summary>
-        public string RsaPublicKey { get; set; }
-
-        /// <summary>RSA key in XML form. Keep it secret.</summary>
-        public string RsaPrivateKey { get; set; }
-
         public bool HasAesKey => AesKey != null && AesKey.Length == AesKeySize;
 
-        public bool HasPublicKey => !string.IsNullOrWhiteSpace(RsaPublicKey);
-
-        public bool HasPrivateKey => !string.IsNullOrWhiteSpace(RsaPrivateKey);
-
-        public bool IsEmpty => !HasAesKey && !HasPublicKey && !HasPrivateKey;
+        public bool IsEmpty => !HasAesKey;
 
         public static string AesVariable(string prefix) => prefix + "_AES_KEY";
-
-        public static string PublicVariable(string prefix) => prefix + "_RSA_PUBLIC";
-
-        public static string PrivateVariable(string prefix) => prefix + "_RSA_PRIVATE";
 
         public static byte[] GenerateAesKey()
         {
@@ -94,23 +80,7 @@ namespace Pretzel.Data
             return derive.GetBytes(AesKeySize);
         }
 
-        /// <summary>Generates an RSA pair. 4096 bits can take many seconds, so call it off the main thread.</summary>
-        public static EncryptionKeys GenerateRsa(int keySize)
-        {
-            if (Array.IndexOf(RsaKeySizes, keySize) < 0)
-            {
-                throw new ArgumentOutOfRangeException(nameof(keySize), keySize, "Use 2048, 3072 or 4096.");
-            }
-
-            using RSA rsa = RSA.Create(keySize);
-            return new EncryptionKeys
-            {
-                RsaPublicKey = rsa.ToXmlString(false),
-                RsaPrivateKey = rsa.ToXmlString(true)
-            };
-        }
-
-        /// <summary>Reads the three variables named from <paramref name="prefix"/>. Returns null when none is set.</summary>
+        /// <summary>Reads the AES variable named from <paramref name="prefix"/>. Returns null when absent; invalid keys throw.</summary>
         public static EncryptionKeys FromEnvironment(string prefix)
         {
             if (string.IsNullOrWhiteSpace(prefix))
@@ -123,10 +93,12 @@ namespace Pretzel.Data
             if (!string.IsNullOrWhiteSpace(aes))
             {
                 keys.AesKey = DecodeAesKey(aes);
+                if (!keys.HasAesKey)
+                {
+                    throw new FormatException($"Environment variable {AesVariable(prefix)} must contain a Base64-encoded 32 byte AES key.");
+                }
             }
 
-            keys.RsaPublicKey = DecodeXml(Environment.GetEnvironmentVariable(PublicVariable(prefix)));
-            keys.RsaPrivateKey = DecodeXml(Environment.GetEnvironmentVariable(PrivateVariable(prefix)));
             return keys.IsEmpty ? null : keys;
         }
 
@@ -143,6 +115,10 @@ namespace Pretzel.Data
         /// </summary>
         public static EncryptionKeys Resolve(string environmentPrefix, KeySource source, out string origin)
         {
+            if (!Enum.IsDefined(typeof(KeySource), source))
+            {
+                throw new ArgumentOutOfRangeException(nameof(source));
+            }
             EncryptionKeys result = new();
             List<string> used = new();
 
@@ -164,10 +140,12 @@ namespace Pretzel.Data
                 Take(FromEnvironment(environmentPrefix), "environment variables");
             }
 
-            if (source == KeySource.Automatic && Application.isEditor)
+#if UNITY_EDITOR
+            if (source == KeySource.Automatic)
             {
                 Take(EncryptionKeyFile.Load(), "Editor key file");
             }
+#endif
 
             if (source is KeySource.Automatic or KeySource.BundledJson)
             {
@@ -198,33 +176,27 @@ namespace Pretzel.Data
 
         public EncryptionKeys Clone()
         {
-            EncryptionKeys copy = new() { AesKey = AesKey, RsaPublicKey = RsaPublicKey, RsaPrivateKey = RsaPrivateKey };
-            copy.PreviousAesKeys.AddRange(PreviousAesKeys);
+            EncryptionKeys copy = new() { AesKey = AesKey == null ? null : (byte[])AesKey.Clone() };
+            foreach (byte[] previous in PreviousAesKeys)
+            {
+                copy.AddPreviousAesKey(previous == null ? null : (byte[])previous.Clone());
+            }
             return copy;
         }
 
-        /// <summary>
-        /// The keys a game client should hold for <paramref name="mode"/>: the AES key and its previous keys, or only the RSA public key.
-        /// The RSA private key is never included.
-        /// </summary>
-        public EncryptionKeys ForClient(EncryptionMode mode)
+        /// <summary>An independent copy of the AES key and optional history for a store.</summary>
+        public EncryptionKeys ForClient(EncryptionMode mode = EncryptionMode.Aes)
         {
-            EncryptionKeys copy = new();
-            if (mode == EncryptionMode.Aes)
+            if (mode != EncryptionMode.Aes)
             {
-                copy.AesKey = AesKey;
-                copy.PreviousAesKeys.AddRange(PreviousAesKeys);
-            }
-            else
-            {
-                copy.RsaPublicKey = RsaPublicKey;
+                throw new NotSupportedException("Only AES encryption is supported.");
             }
 
-            return copy;
+            return Clone();
         }
 
         /// <summary>True when this holds what a client needs to write in <paramref name="mode"/>.</summary>
-        public bool CanWrite(EncryptionMode mode) => mode == EncryptionMode.Aes ? HasAesKey : HasPublicKey;
+        public bool CanWrite(EncryptionMode mode = EncryptionMode.Aes) => mode == EncryptionMode.Aes && HasAesKey;
 
         /// <summary>Adds an earlier key that old saves may still use. Ignores duplicates, the current key and wrong sizes.</summary>
         public void AddPreviousAesKey(byte[] key)
@@ -254,44 +226,20 @@ namespace Pretzel.Data
                 return PreviousAesKeys.Count > 0 ? $"{text}, {PreviousAesKeys.Count} previous key(s) for older saves" : text;
             }
 
-            string rsa = HasPublicKey ? $"RSA public key {Fingerprint(Encoding.UTF8.GetBytes(RsaPublicKey))} from {origin} (writes only)" : $"no RSA public key (looked in: {origin})";
-            return HasPrivateKey ? rsa + ". WARNING: a private key is loaded here and must never ship" : rsa;
+            throw new NotSupportedException("Only AES encryption is supported.");
         }
 
         public static string EncodeAesKey(byte[] key) => Convert.ToBase64String(key);
 
         public static byte[] DecodeAesKey(string value)
         {
-            try
-            {
-                return Convert.FromBase64String(value.Trim());
-            }
-            catch (FormatException)
-            {
-                return null;
-            }
-        }
-
-        /// <summary>Keys travel as Base64 of the XML, so they survive shells, JSON and environment variables.</summary>
-        public static string EncodeXml(string xml) => string.IsNullOrWhiteSpace(xml) ? null : Convert.ToBase64String(Encoding.UTF8.GetBytes(xml));
-
-        /// <summary>Accepts the Base64 form, or raw XML.</summary>
-        public static string DecodeXml(string value)
-        {
             if (string.IsNullOrWhiteSpace(value))
             {
                 return null;
             }
-
-            value = value.Trim();
-            if (value[0] == '<')
-            {
-                return value;
-            }
-
             try
             {
-                return Encoding.UTF8.GetString(Convert.FromBase64String(value));
+                return Convert.FromBase64String(value.Trim());
             }
             catch (FormatException)
             {
@@ -309,19 +257,7 @@ namespace Pretzel.Data
             bool used = false;
             if (!HasAesKey && other.HasAesKey)
             {
-                AesKey = other.AesKey;
-                used = true;
-            }
-
-            if (!HasPublicKey && other.HasPublicKey)
-            {
-                RsaPublicKey = other.RsaPublicKey;
-                used = true;
-            }
-
-            if (!HasPrivateKey && other.HasPrivateKey)
-            {
-                RsaPrivateKey = other.RsaPrivateKey;
+                AesKey = (byte[])other.AesKey.Clone();
                 used = true;
             }
 

@@ -8,13 +8,12 @@ using UnityEngine.UIElements;
 
 namespace Pretzel.Data.Editor
 {
-    /// <summary>Two buttons that generate ProjectDataIO.cs: one for plain, GZip and BSON, one for AES or RSA encryption.</summary>
+    /// <summary>Generates project setup and independent examples for each supported use case.</summary>
     internal sealed class SetupPanel : IDataFormatPanel
     {
-        private static readonly DataFormat[] PlainFormats = { DataFormat.PlainText, DataFormat.Compressed, DataFormat.Binary };
-        private static readonly string[] PlainChoices = { "Plain JSON (.json)", "GZip (.json.gz)", "BSON (.bin)" };
-        private static readonly string[] ModeChoices = { "AES: the game reads and writes", "RSA: the game writes, a server reads" };
-        private static readonly string[] DeliveryChoices = { "Embedded C# (obfuscated, recommended)", "Bundled JSON (Resources)" };
+        private static readonly DataFormat[] PlainFormats = { DataFormat.PlainText, DataFormat.Binary };
+        private static readonly string[] PlainChoices = { "Plain JSON (.json)", "BinaryWriter / BinaryReader (.bin)" };
+        private static readonly string[] DeliveryChoices = { "Embedded C# (obfuscated)", "Bundled JSON (Resources)" };
 
         private DataFormatState _state;
         private TextField _folder;
@@ -22,9 +21,16 @@ namespace Pretzel.Data.Editor
         private Label _currentDetail;
         private Label _result;
         private DropdownField _plainFormat;
-        private DropdownField _mode;
         private DropdownField _delivery;
         private HelpBox _note;
+        private Label _summary;
+
+        [Serializable]
+        private sealed class DiagnosticData
+        {
+            public string token;
+            public int number;
+        }
 
         public string Title => "Setup";
 
@@ -39,28 +45,30 @@ namespace Pretzel.Data.Editor
             _currentDetail = view.Q<Label>("setup-panel__current-detail");
             _result = view.Q<Label>("setup-panel__result");
             _plainFormat = view.Q<DropdownField>("setup-panel__plain-format");
-            _mode = view.Q<DropdownField>("setup-panel__mode");
             _delivery = view.Q<DropdownField>("setup-panel__delivery");
             _note = view.Q<HelpBox>("setup-panel__encryption-note");
+            _summary = view.Q<Label>("setup-panel__summary");
 
             _folder.SetValueWithoutNotify(DataIOSetupGenerator.DefaultFolder);
             _plainFormat.choices = new List<string>(PlainChoices);
-            _mode.choices = new List<string>(ModeChoices);
             _delivery.choices = new List<string>(DeliveryChoices);
 
             // Start from what the project already uses, then leave the choices to the user.
             DataIOConfig config = _state.Config;
             int plain = Array.IndexOf(PlainFormats, config.format);
             _plainFormat.index = Mathf.Max(0, plain);
-            _mode.index = config.encryptionMode == EncryptionMode.Rsa ? 1 : 0;
             _delivery.index = config.keySource == KeySource.BundledJson ? 1 : 0;
 
             _folder.RegisterValueChangedCallback(_ => Refresh());
-            _mode.RegisterValueChangedCallback(_ => Refresh());
             view.Q<Button>("setup-panel__plain-generate").clicked += OnGeneratePlain;
             view.Q<Button>("setup-panel__encrypted-generate").clicked += OnGenerateEncrypted;
             view.Q<Button>("setup-panel__examples").clicked += OnAddExamples;
             view.Q<Button>("setup-panel__validate").clicked += OnValidate;
+            view.Q<Button>("setup-panel__plain-example").clicked += () => OnUseCaseExample(DataFormat.PlainText);
+            view.Q<Button>("setup-panel__binary-example").clicked += () => OnUseCaseExample(DataFormat.Binary);
+            view.Q<Button>("setup-panel__aes-example").clicked += () => OnUseCaseExample(DataFormat.Encrypted, EncryptionMode.Aes);
+            view.Q<Button>("setup-panel__test").clicked += OnTestSaveAndLoad;
+            view.Q<Button>("setup-panel__open-store").clicked += OnOpenStore;
 
             _state.Changed += Refresh;
             Refresh();
@@ -70,8 +78,6 @@ namespace Pretzel.Data.Editor
         public void OnSelected() => Refresh();
 
         private string Folder => _folder.value.Trim().Replace('\\', '/').TrimEnd('/');
-
-        private EncryptionMode SelectedMode => _mode.index == 1 ? EncryptionMode.Rsa : EncryptionMode.Aes;
 
         private void Refresh()
         {
@@ -91,19 +97,34 @@ namespace Pretzel.Data.Editor
             {
                 bool encryptedScript = File.ReadAllText(path).Contains("InitializeWithKeys");
                 bool matches = encryptedScript == (config.format == DataFormat.Encrypted);
-                PanelUi.SetChip(_current, matches ? "ProjectDataIO.cs matches the settings" : "ProjectDataIO.cs does not match the settings",
-                    matches ? PanelUi.Ok : PanelUi.Missing);
-                _currentDetail.text = $"{path} is the {(encryptedScript ? "encryption" : "plain / GZip / BSON")} setup. "
+                PanelUi.SetChip(_current, matches ? "Setup family detected (not validated)" : "Setup family differs from settings",
+                    matches ? PanelUi.Warn : PanelUi.Missing);
+                _currentDetail.text = $"{path} is the {(encryptedScript ? "encryption" : "plain / binary")} setup. "
                     + $"The settings asset says: {config.format}"
                     + (config.format == DataFormat.Encrypted ? $" ({config.encryptionMode}, key source {config.keySource})" : string.Empty)
-                    + (matches ? "." : ". Generate the matching setup, or change the format on the Format tab.");
+                    + (matches ? ". Source inspection does not validate overrides, folder, keys or runtime startup." : ". Generate the matching setup, or change the format on the Format tab.");
             }
 
-            bool rsa = SelectedMode == EncryptionMode.Rsa;
-            _note.messageType = rsa ? HelpBoxMessageType.Info : HelpBoxMessageType.Warning;
-            _note.text = rsa
-                ? "RSA: the game only gets the public key and cannot read its own files. Use it to send data to a server. The private key stays in the Editor-only key file and is never exported."
-                : "A key that ships with the game can be recovered by a determined player, with or without IL2CPP. This stops casual save editing, not a cheater. Keep real secrets on a server.";
+            bool supported = config.encryptionMode == EncryptionMode.Aes;
+            _note.messageType = supported ? HelpBoxMessageType.Warning : HelpBoxMessageType.Error;
+            _note.text = supported
+                ? "AES is the only encryption choice. A shipped key can be recovered by a determined player. This stops casual save editing, not cheating. Keep real secrets on a server."
+                : "Unsupported saved encryption mode. It has not been changed. Generate an AES setup to replace it.";
+            string storeFolder;
+            try
+            {
+                storeFolder = StoreFolder(config);
+            }
+            catch (ArgumentException ex)
+            {
+                storeFolder = "Invalid folder: " + ex.Message;
+            }
+
+            _summary.text = $"Store folder: {storeFolder}\nFormat: {config.format} (.{config.fileExtension})"
+                + $"\nKey source: {(config.format == DataFormat.Encrypted ? config.keySource.ToString() : "None — no key needed")}"
+                + "\nReadiness: not verified by source inspection. Test save and load checks this Editor's settings and configured keys only; player delivery and startup still need a player test."
+                + (supported || config.format != DataFormat.Encrypted ? string.Empty : "\nBlocked: unsupported saved encryption mode.")
+                + (_state.KeyLoadError == null ? string.Empty : "\n" + _state.KeyLoadError);
         }
 
         private void OnGeneratePlain()
@@ -125,7 +146,7 @@ namespace Pretzel.Data.Editor
                 });
                 Succeed($"Created {path} for {format}. Call ProjectDataIO.Initialize() once at startup, then use DataIO.Save and DataIO.Load.", path);
             }
-            catch (Exception ex) when (IsExpected(ex))
+            catch (Exception ex) when (PanelUi.IsExpectedFailure(ex))
             {
                 PanelUi.SetText(_result, "Could not generate the setup: " + PanelUi.ErrorText(ex), "error");
             }
@@ -133,17 +154,13 @@ namespace Pretzel.Data.Editor
 
         private void OnGenerateEncrypted()
         {
-            EncryptionMode mode = SelectedMode;
+            const EncryptionMode mode = EncryptionMode.Aes;
             bool embedded = _delivery.index == 0;
             KeySource source = embedded ? KeySource.Provider : KeySource.BundledJson;
+            DataIOConfig before = null;
+            bool completed = false;
             try
             {
-                if (mode == EncryptionMode.Rsa && !_state.Keys.HasPublicKey)
-                {
-                    PanelUi.SetText(_result, "Generate an RSA key pair on the Encryption tab first. It can take a while, so it is not done here.", "error");
-                    return;
-                }
-
                 // Fail before changing anything: a bad folder or a duplicate script must not leave a half-done setup.
                 ShippingGenerator.ValidateFolder(Folder);
                 ShippingGenerator.EnsureNoOtherScriptCopy(DataIOSetupGenerator.ScriptName, DataIOSetupGenerator.ScriptPath(Folder));
@@ -153,11 +170,17 @@ namespace Pretzel.Data.Editor
                 }
 
                 string code = DataIOSetupGenerator.RenderEncrypted(mode, source);
+                if (embedded && !ShippingGenerator.ConfirmReplace(Folder))
+                {
+                    return;
+                }
+
                 if (!ConfirmEncrypted(mode, embedded, DataIOSetupGenerator.WouldReplace(Folder, code)))
                 {
                     return;
                 }
 
+                before = UnityEngine.Object.Instantiate(_state.Config);
                 _state.Edit("Set up encrypted DataIO", c =>
                 {
                     c.format = DataFormat.Encrypted;
@@ -172,13 +195,12 @@ namespace Pretzel.Data.Editor
                     _state.SetKeys(created, true);
                 }
 
-                // The Editor-only key file is the project's own copy of the keys, including an RSA private key.
                 if (_state.KeysUnstored)
                 {
                     _state.SaveKeysToFile();
                 }
 
-                string error = GameKeyExport.Export(_state, embedded, Folder, out string keyPath);
+                string error = GameKeyExport.Export(_state, embedded, Folder, out string keyPath, replaceConfirmed: true);
                 if (error != null)
                 {
                     PanelUi.SetText(_result, error, "error");
@@ -186,13 +208,38 @@ namespace Pretzel.Data.Editor
                 }
 
                 string path = DataIOSetupGenerator.Write(Folder, code);
+                completed = true;
                 Succeed($"Created {path} and exported the key to {keyPath}. Key source: {_state.Config.keySource}. "
                     + "Call ProjectDataIO.Initialize() once at startup, then use DataIO.Save and DataIO.Load. Back up the key.", path);
             }
-            catch (Exception ex) when (IsExpected(ex))
+            catch (Exception ex) when (PanelUi.IsExpectedFailure(ex))
             {
                 PanelUi.SetText(_result, "Could not generate the setup: " + PanelUi.ErrorText(ex), "error");
             }
+            finally
+            {
+                if (before)
+                {
+                    // A failed setup must not leave the settings switched to Encrypted. Stored keys are kept.
+                    if (!completed)
+                    {
+                        RestoreConfig(before);
+                    }
+
+                    UnityEngine.Object.DestroyImmediate(before);
+                }
+            }
+        }
+
+        private void RestoreConfig(DataIOConfig before)
+        {
+            _state.Edit("Revert encrypted DataIO setup", c =>
+            {
+                c.format = before.format;
+                c.fileExtension = before.fileExtension;
+                c.encryptionMode = before.encryptionMode;
+                c.keySource = before.keySource;
+            });
         }
 
         private void OnAddExamples()
@@ -205,9 +252,23 @@ namespace Pretzel.Data.Editor
                     : $"Added {created.Count} file(s) to {Folder}: {string.Join(", ", created.ConvertAll(file => Path.GetFileName(file)))}. "
                       + $"Read {DataIOSetupGenerator.GuideName} next. Add ProjectSaveExample to a GameObject to try it in Play mode.");
             }
-            catch (Exception ex) when (IsExpected(ex))
+            catch (Exception ex) when (PanelUi.IsExpectedFailure(ex))
             {
                 PanelUi.SetText(_result, "Could not add the examples: " + PanelUi.ErrorText(ex), "error");
+            }
+        }
+
+        private void OnUseCaseExample(DataFormat format, EncryptionMode mode = EncryptionMode.Aes)
+        {
+            try
+            {
+                string path = DataIOSetupGenerator.CreateUseCaseExample(Folder, format, mode);
+                Succeed($"Created {path}. Add the component to a GameObject, enter Play mode and use its Run example context menu. "
+                    + "It uses its own example folder and does not change the active DataIO setup.", path);
+            }
+            catch (Exception ex) when (PanelUi.IsExpectedFailure(ex))
+            {
+                PanelUi.SetText(_result, "Could not generate the example: " + PanelUi.ErrorText(ex), "error");
             }
         }
 
@@ -216,7 +277,7 @@ namespace Pretzel.Data.Editor
             List<BuildIssue> issues = DataIOBuildValidator.Validate();
             if (issues.Count == 0)
             {
-                PanelUi.SetText(_result, "Build setup looks good: nothing to fix.");
+                PanelUi.SetText(_result, "No issues found by the limited build-delivery checks. This does not prove startup code, keys or player save/load work.");
                 return;
             }
 
@@ -251,10 +312,8 @@ namespace Pretzel.Data.Editor
         private bool ConfirmEncrypted(EncryptionMode mode, bool embedded, bool replacing)
         {
             string target = embedded ? Folder + "/" + ShippingGenerator.ScriptName : GameKeyExport.JsonPath;
-            string key = mode == EncryptionMode.Aes
-                ? (_state.Keys.HasAesKey ? "use the current AES key" : "create a new AES key")
-                : "use the current RSA key pair";
-            string shipped = mode == EncryptionMode.Aes ? "the AES key (anyone with the game can recover it)" : "only the RSA public key";
+            string key = _state.Keys.HasAesKey ? "use the current AES key" : "create a new AES key";
+            const string shipped = "the AES key (anyone with the game can recover it)";
             return PanelUi.Confirm("Set up encrypted DataIO?",
                 "This will:\n"
                 + $"- switch the settings asset to Encrypted ({mode})\n"
@@ -262,14 +321,82 @@ namespace Pretzel.Data.Editor
                 + $"- write {shipped} to {target}, which ships with the game\n"
                 + $"- set the key source to {(embedded ? KeySource.Provider : KeySource.BundledJson)}\n"
                 + $"- write ProjectDataIO.cs{(replacing ? " (replacing the existing, different file)" : string.Empty)}\n\n"
-                + "Keep a separate backup of the key. Files encrypted with it cannot be opened without it.",
+                + "Keep a separate backup of the key. Files encrypted with it cannot be opened without it."
+                + (_state.Config.encryptionMode == EncryptionMode.Aes ? string.Empty
+                    : "\n\nThis explicitly replaces an unsupported saved mode with AES."),
                 "Set up", "Cancel");
         }
 
-        private static bool IsExpected(Exception ex)
+        internal static string StoreFolder(DataIOConfig config)
         {
-            return ex is IOException or UnauthorizedAccessException or ArgumentException or InvalidOperationException
-                or System.Security.Cryptography.CryptographicException or System.Xml.XmlException;
+            return DataRoots.PersistentData(string.IsNullOrWhiteSpace(config.saveFolder) ? null : config.saveFolder.Trim('/', '\\')).FullPath;
         }
+
+        internal static string TestSaveAndLoad(DataIOConfig config)
+        {
+            if (config == null)
+            {
+                throw new ArgumentNullException(nameof(config));
+            }
+
+            // Never resolve the configured player root or touch DataIO.Default.
+            string folder = Path.Combine(Directory.GetParent(Application.dataPath).FullName,
+                "Library", "Pretzel", "DataIODiagnostics", Guid.NewGuid().ToString("N"));
+            try
+            {
+                DataStore store = config.CreateStore(DataRoots.Absolute(folder));
+                DiagnosticData expected = new() { token = Guid.NewGuid().ToString("N"), number = 173 };
+                const string key = "pretzel-diagnostic";
+                store.Save(key, expected);
+                LoadResult<DiagnosticData> loaded = store.Load<DiagnosticData>(key);
+                if (!loaded.Ok || loaded.Value == null || loaded.Value.token != expected.token || loaded.Value.number != expected.number)
+                {
+                    throw new InvalidDataException($"Diagnostic round trip failed ({loaded.Status}): {loaded.Error ?? "payload mismatch"}");
+                }
+
+                return "Test save and load passed in an isolated diagnostic store using the current Editor settings and configured key source. "
+                    + "Diagnostic files were removed. Player profiles were untouched. This does not verify player key delivery or startup code.";
+            }
+            finally
+            {
+                if (Directory.Exists(folder))
+                {
+                    Directory.Delete(folder, true);
+                }
+            }
+        }
+
+        private void OnTestSaveAndLoad()
+        {
+            try
+            {
+                PanelUi.SetText(_result, TestSaveAndLoad(_state.Config));
+            }
+            catch (Exception ex) when (PanelUi.IsExpectedFailure(ex))
+            {
+                PanelUi.SetText(_result, "Test save and load failed: " + PanelUi.ErrorText(ex)
+                    + ". No key was generated. Configure the existing key source first.", "error");
+            }
+        }
+
+        private void OnOpenStore()
+        {
+            try
+            {
+                string folder = StoreFolder(_state.Config);
+                if (!Directory.Exists(folder))
+                {
+                    PanelUi.SetText(_result, $"Store folder has not been created: {folder}. The diagnostic test intentionally does not create it.", "warning");
+                    return;
+                }
+
+                EditorUtility.RevealInFinder(folder);
+            }
+            catch (Exception ex) when (PanelUi.IsExpectedFailure(ex))
+            {
+                PanelUi.SetText(_result, "Could not open the configured store folder: " + PanelUi.ErrorText(ex), "error");
+            }
+        }
+
     }
 }

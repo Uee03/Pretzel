@@ -9,7 +9,6 @@ namespace Pretzel.Data.Tests
     public sealed class BuildValidatorTests
     {
         private const string EmbeddedAes = "private static readonly byte[] PartA = new byte[] { 0x01 };";
-        private const string EmbeddedRsa = "private const string PublicKey = \"abc\";";
         private const string TokenScript = "public static async Awaitable<bool> LoadKeysAsync()";
         private const string EnvironmentScript = "private const string EnvironmentPrefix = \"X\";";
 
@@ -35,8 +34,6 @@ namespace Pretzel.Data.Tests
         }
 
         private static string AesJson() => GameEncryptionKeyConfig.ToJson(new EncryptionKeys { AesKey = EncryptionKeys.GenerateAesKey() }, EncryptionMode.Aes);
-
-        private static string RsaJson() => GameEncryptionKeyConfig.ToJson(EncryptionKeys.GenerateRsa(2048), EncryptionMode.Rsa);
 
         private static IEnumerable<string> Errors(List<BuildIssue> issues) =>
             issues.Where(i => i.Severity == IssueSeverity.Error).Select(i => i.Message);
@@ -113,26 +110,20 @@ namespace Pretzel.Data.Tests
         {
             DataIOConfig aes = Config(DataFormat.Encrypted, EncryptionMode.Aes, KeySource.BundledJson);
             Assert.That(Errors(DataIOBuildValidator.Validate(aes, null, null)).Single(), Does.Contain("missing"));
-            Assert.That(Errors(DataIOBuildValidator.Validate(aes, null, RsaJson())).Single(), Does.Contain("no Aes key"));
+            Assert.That(Errors(DataIOBuildValidator.Validate(aes, null, "{}")).Single(), Does.Contain("invalid"));
             Assert.That(Errors(DataIOBuildValidator.Validate(aes, null, "{ not json")).Single(), Does.Contain("invalid"));
-            Assert.That(Errors(DataIOBuildValidator.Validate(aes, null, "{\"rsaPrivateKey\":\"secret\"}")).Single(), Does.Contain("private key"));
 
             List<BuildIssue> good = DataIOBuildValidator.Validate(aes, null, AesJson());
             Assert.That(Errors(good), Is.Empty);
             Assert.That(Warnings(good).Single(), Does.Contain("ships the AES key"));
-
-            DataIOConfig rsa = Config(DataFormat.Encrypted, EncryptionMode.Rsa, KeySource.BundledJson);
-            Assert.That(Errors(DataIOBuildValidator.Validate(rsa, null, RsaJson())), Is.Empty);
-            Assert.That(Warnings(DataIOBuildValidator.Validate(rsa, null, RsaJson())), Is.Empty, "A public key is safe to ship.");
         }
 
         [Test]
-        public void ASetupForTheOtherModeFails()
+        public void UnsupportedSavedModeFailsWithoutCoercion()
         {
-            Assert.That(Errors(DataIOBuildValidator.Validate(Config(DataFormat.Encrypted, EncryptionMode.Rsa, KeySource.Provider), EmbeddedAes, null)).Single(),
-                Does.Contain("holds an AES key"));
-            Assert.That(Errors(DataIOBuildValidator.Validate(Config(DataFormat.Encrypted, EncryptionMode.Aes, KeySource.Provider), EmbeddedRsa, null)).Single(),
-                Does.Contain("holds an RSA public key"));
+            DataIOConfig unsupported = Config(DataFormat.Encrypted, (EncryptionMode)1, KeySource.Provider);
+            Assert.That(Errors(DataIOBuildValidator.Validate(unsupported, EmbeddedAes, null)).Single(), Does.Contain("unsupported"));
+            Assert.That(unsupported.encryptionMode, Is.EqualTo((EncryptionMode)1));
         }
 
         [Test]

@@ -4,7 +4,8 @@ A modular set of Unity packages, the successor to LazyJedi. Every package is `co
 
 Start with [setup](Packages/com.uee03.pretzel.setup/README.md). It is the only package you install by hand: it needs no other Pretzel module, and its Addons tab installs the rest.
 
-Requires Unity 6000.0 or newer. Tested on 6000.6.
+Requires Unity 6000.0 or newer. Local Editor validation uses 6000.6.5f1; see
+[compatibility and release gates](COMPATIBILITY.md) for the exact tested scope and unverified targets.
 
 ## Modules
 
@@ -24,7 +25,6 @@ graph TD
 
     extensions --> core
     data --> core
-    data --> extensions
     api --> core
     api --> data
     tween --> core
@@ -99,3 +99,23 @@ LazyJedi stays as it is and is deprecated once Pretzel ships. The renames are li
 ## Samples
 
 Each module has a code sample under its `Samples~` folder. Import it from the Package Manager window.
+
+## DataIO quick start
+
+[Pretzel Data](Packages/com.uee03.pretzel.data/README.md) defaults to plain JSON with no key setup.
+For binary or encrypted saves, open **Pretzel > Data Format > Setup** and generate the matching
+startup. AES is the only encryption option. Use one backed-up AES key across
+releases; rotation is an optional advanced feature. The independent examples cover editable JSON
+settings, binary inventory and an AES profile.
+
+Load results distinguish missing data from unreadable data. Handle both explicitly rather than
+silently starting a new profile. The Setup tab includes isolated save/load diagnostics, a store-folder
+action and limited build-delivery checks. A real player save/quit/relaunch test is still required.
+
+## Validation
+
+The [Unity validation workflow](.github/workflows/unity-validation.yml) creates clean consumer hosts
+from the checkout, runs EditMode tests and compiles generated examples. It requires repository Unity
+license secrets. The [host preparation script](.github/scripts/New-UnityValidationHost.ps1) also
+supports local runs without changing the open `TestPretzel` project.
+See [COMPATIBILITY.md](COMPATIBILITY.md) for commands, license prerequisites and the release policy.

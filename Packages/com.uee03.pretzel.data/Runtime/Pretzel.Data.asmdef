@@ -2,8 +2,7 @@
   "name": "Pretzel.Data",
   "rootNamespace": "Pretzel.Data",
   "references": [
-    "Pretzel.Core",
-    "Pretzel.Extensions"
+    "Pretzel.Core"
   ],
   "includePlatforms": [],
   "excludePlatforms": [],

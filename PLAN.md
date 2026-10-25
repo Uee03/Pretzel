@@ -10,7 +10,7 @@ Status key: `[x]` done, `[ ]` not started, `[~]` partly done.
 - Packages are named `com.uee03.pretzel.*`, assemblies `Pretzel.<Module>`, root namespace `Pretzel.<Module>`.
 - Asmdefs reference each other by name, not GUID. `Pretzel.Core` is the only base dependency.
 - Runtime asmdefs are `autoReferenced: true` so user scripts and samples can use them. Editor asmdefs are not.
-- No tests. Each package ships code usage examples in `Samples~`, registered in its `package.json`.
+- DataIO has an EditMode regression suite; each package also ships usage examples in `Samples~`.
 - Unity 6000.6.5f1 at `D:\Program Files\Unity\Hub\Editor\6000.6.5f1`. Packages target `unity: 6000.0`.
 - LazyJedi stays as it is and is deprecated once Pretzel ships.
 - Verify by compiling headless, then check the log for `error CS`:
@@ -54,14 +54,14 @@ Dependency direction: `ui.ugui` depends on core, ui, tween and `com.unity.ugui`.
     - `DataKey` value type (readonly struct): name, optional slot, optional sub-folder. One `Save`, `Load`, `TryLoad`, `Exists`, `Delete` and `List` for every key. No slot-specific method pairs. Default name is explicit, not `typeof(T).Name`.
     - `IDataRoot` (path provider) replaces the `PathType` enum and its switch. Built-ins: persistent data, temporary cache, `ProjectSettings` (editor only), `UserSettings` (editor only), absolute path. Roots resolve lazily, so `Application.persistentDataPath` is never read in a static initializer.
     - `ISerializer` strategy: Newtonsoft default, `JsonUtility` for ScriptableObjects and for projects without Newtonsoft. Serializer-aware `LoadInto(target)` replaces `LoadAndOverwrite`.
-    - Pipeline of optional `IDataTransform` steps (compress, encrypt) applied between serializer and disk. `EncodingType` is not used here, UTF-8 only.
+    - Pipeline of encoding strategies (plain, binary, AES) between serializer and disk. UTF-8 only.
     - Static `DataIO` facade over a replaceable default store, for the simple case. Thin: no logic of its own.
   - API shape:
     - `Result<T>` or `TryLoad` for missing and corrupt files. No `default` return, no `Debug.unityLogger` error as flow control. Exceptions only for programmer errors, through `Guard`.
     - `Awaitable` variants of every I/O method with `CancellationToken`. The sync variants stay for small data.
     - Key and filename validation: reject separators, `..`, invalid characters and reserved names so a key can never escape the root.
   - Reliability:
-    - Atomic writes: write a temp file, flush, then replace, with an optional `.bak`. Recover from `.bak` when the main file is corrupt.
+    - Flushed temp writes, replacement and a recoverable rollback fallback, with optional `.bak` recovery. Not a universal atomicity/power-loss guarantee.
     - `schemaVersion` in an envelope, with an `IMigration` chain per type.
     - Thread-safe: no static caches, paths resolved on the main thread and cached in the store.
   - Serialization extras:
@@ -147,7 +147,7 @@ A missing or corrupt file falls back to defaults. One `PretzelSettings` accessor
 | Area | Changes |
 |---|---|
 | `WebRequestUtility` / `Response` | Rewrite on `Awaitable`, see step 6. |
-| `DataIO` | Full redesign, not a port: instance `DataStore`, `DataKey`, `IDataRoot`, `ISerializer`, atomic writes, async, no static mutable state. See step 5. |
+| `DataIO` | Full redesign, not a port: instance `DataStore`, `DataKey`, `IDataRoot`, `ISerializer`, recoverable writes and async. Thin static facade over the replaceable default store. See step 5. |
 | `ProjectWindow` / `CreditsWindow` / `Project` / `StringGlobals` | Rewrite, see the Setup window section. |
 | `EaseUtility` | See step 7. |
 | `SerializableGuid` | `GetHashCode` ignores case but `Equals` does not. String constructor accepts malformed input. |
@@ -199,17 +199,19 @@ A missing or corrupt file falls back to defaults. One `PretzelSettings` accessor
 
 ## Phase 6: Data formats and the Data Format window
 
-- [x] 16. `pretzel.data` formats: `DataFormat` (PlainText `.json`, Compressed `.json.gz`, Binary `.bin`/`.dat`, Encrypted `.pretzel`), `BinaryTransform` (BSON), `EncryptionTransform` (AES-256-CBC + HMAC-SHA256, optional RSA-wrapped key), `Base64Transform`, `EncryptionKeys`, `EncryptionKeyFile`, `DataStoreFactory`, and `DataIOConfig` (asset in `Assets/Resources/Pretzel`, read by `DataIO.Default`).
+- [x] 16. `pretzel.data` formats: `DataFormat` (PlainText `.json`, Binary `.bin`/`.dat`, Encrypted `.pretzel`), `BinaryTransform` (versioned BinaryWriter/BinaryReader), `EncryptionTransform` (AES-256-CBC + HMAC-SHA256), `Base64Transform`, `EncryptionKeys`, `EncryptionKeyFile`, `DataStoreFactory`, and `DataIOConfig`.
 - [x] 17. `pretzel.editor` Data Format window (`Pretzel/Data Format`): Format, Encryption, Keys, Shipping and Decrypt tabs. Guide: `pretzel.data/Documentation~/EncryptionKeyDelivery.md`.
 
 ### Phase 6 notes
 
-- Plain text JSON stays the default. Binary and Encrypted are transforms after the serializer, so schema versions, migrations, `LoadInto` and both serializers keep working. `BinaryTransform` wraps any JSON root in `{"v": ...}` because BSON roots must be objects.
-- The bundled Newtonsoft (3.2.2) only has the obsolete `BsonReader` and `BsonWriter` (no `BsonDataWriter`). They work, and the warning is suppressed in one file. Mono's RSA supports only OAEP with SHA-1 (`OaepSHA256` throws), which is fine for wrapping a random key.
+- Plain JSON stays the default; AES is the only encryption option. `IDataFormatStrategy` selects plain, binary or AES encoding, preserving schemas, migrations, `LoadInto` and both serializers. The settings asset and enum factory select the same strategies. Setup generates distinct JSON settings, binary inventory and AES profile examples.
+- Binary uses a `PZBN` header and versioned BinaryWriter/BinaryReader values, never BinaryFormatter or Newtonsoft BSON APIs.
 - The IV is random per file and stored in the file, so the window stores no IV. A fixed IV is not offered on purpose.
-- Key storage: user environment variables `<PREFIX>_AES_KEY`, `_RSA_PUBLIC`, `_RSA_PRIVATE` (Base64, saved at user level on Windows only), and `UserSettings/Pretzel/pretzel-keys.json` (per project, plain text, Editor only). The key file is in `UserSettings` and not `ProjectSettings`, because `ProjectSettings` is committed.
+- Key storage: `<PREFIX>_AES_KEY` (Base64, persisted at user level on Windows only) and `UserSettings/Pretzel/pretzel-keys.json` (per project, plaintext, Editor-only). Keep one backed-up key for a normal game's lifetime. Rotation/history is optional advanced functionality.
 - Moved out of `PretzelProjectSettings` into `DataIOConfig`: `serializer`, `saveFolder`, `fileExtension`. Old files that still contain them load fine, the members are ignored. `SerializerChoice` now lives in `Pretzel.Data`.
-- Best practices review (2026-10-19, 14 links, 3 unreachable): added `EncryptionKeys.DeriveAesKey` (PBKDF2-HMAC-SHA256, 600,000 iterations, about 2 s in the Editor) and `GenerateSalt`, switched the tag comparison to `CryptographicOperations.FixedTimeEquals`, and wrote `pretzel.data/Documentation~/EncryptionBestPractices.md` (practice table, patterns not to copy, passphrase keys, rotation recipe, server-side reader, release checklist, limits). The reader sample and the rotation recipe were run in the scratch project.\n- Verified in a scratch project: 24 runtime checks (every format, Base64, RSA and AES round trips, versioned types, wrong key, tampering, public-only cannot read) and window checks (tabs, codec, key file, environment variables, `DataIO` following the config, generated scripts). Look of the window in the Editor was checked by screenshot where noted below.
+- AES uses separate derived encryption/MAC keys, random IVs and fixed-time tag comparison. Optional passphrase derivation uses PBKDF2-HMAC-SHA256 (600,000 default iterations); measure on target devices rather than assuming Editor timing.
+- Setup now provides isolated save/load diagnostics, folder access, cautious build-check status and pre-construction migration callbacks. Load results categorize schema, authentication, format and I/O failures.
+- Clean-host CI, generated-example compilation and release/compatibility gates are documented in [COMPATIBILITY.md](COMPATIBILITY.md). Player, minimum-Editor and IL2CPP checks must not be inferred from local EditMode success.
 
 ## Phase 5 notes
 

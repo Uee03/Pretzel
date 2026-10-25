@@ -11,10 +11,6 @@ namespace Pretzel.Core.Singletons
     public abstract class RegulatorSingleton<T> : MonoBehaviour where T : RegulatorSingleton<T>
     {
         private static T _instance;
-        private static int _nextOrder;
-
-        // Creation order breaks ties that Time.time cannot, such as two instances awake in the same frame.
-        private int _order;
 
         public static bool HasInstance => _instance;
 
@@ -59,16 +55,12 @@ namespace Pretzel.Core.Singletons
             }
 
             InitializationTime = Time.time;
-            _order = ++_nextOrder;
             DontDestroyOnLoad(gameObject);
 
-            foreach (T found in FindObjectsByType<T>())
+            // Every awake instance registers itself, so the only older live instance is the current one.
+            if (_instance && _instance != this)
             {
-                RegulatorSingleton<T> other = found;
-                if (other != this && other._order < _order)
-                {
-                    Destroy(other.gameObject);
-                }
+                Destroy(_instance.gameObject);
             }
 
             _instance = (T)this;

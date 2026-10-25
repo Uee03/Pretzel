@@ -1,0 +1,56 @@
+using System;
+using System.IO;
+using Pretzel.Data;
+using UnityEngine;
+using UnityEngine.Scripting;
+
+// Inventory values use a versioned BinaryWriter/BinaryReader format, not BSON or BinaryFormatter.
+public sealed class PretzelBinaryExample : MonoBehaviour
+{
+    // Preserve keeps the type and constructor Newtonsoft needs when IL2CPP strips code.
+    [Serializable, Preserve]
+    private sealed class Inventory
+    {
+        public int[] itemIds = { 101, 205, 309 };
+        public int[] quantities = { 2, 1, 12 };
+        public long coins = 100;
+    }
+
+    [ContextMenu("Pretzel/Run example")]
+    public void RunExample()
+    {
+        if (!Application.isPlaying)
+        {
+            Debug.LogWarning("Enter Play mode before running the example.", this);
+            return;
+        }
+
+        try
+        {
+            IDataStore store = DataStoreFactory.CreateWithStrategy(
+                DataRoots.PersistentData("PretzelExamples/Inventory"), new BinaryDataStrategy());
+            LoadResult<Inventory> loaded = store.Load<Inventory>("inventory");
+            if (loaded.Status == DataStatus.Corrupt)
+            {
+                Debug.LogError("Inventory is corrupt; do not replace it: " + loaded.Error, this);
+                return;
+            }
+
+            Inventory inventory = loaded.Ok ? loaded.Value : new Inventory();
+            store.Save("inventory", inventory);
+            LoadResult<Inventory> verified = store.Load<Inventory>("inventory");
+            if (!verified.Ok)
+            {
+                Debug.LogError("Binary inventory verification failed: " + verified.Error, this);
+                return;
+            }
+            Debug.Log($"inventory.bin round trip: {verified.Value.itemIds.Length} item types, {verified.Value.coins} coins. "
+                + "Binary is an encoding, not encryption or a size guarantee.", this);
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or ArgumentException
+            or InvalidOperationException or Newtonsoft.Json.JsonException)
+        {
+            Debug.LogError("Inventory example failed: " + ex.Message, this);
+        }
+    }
+}

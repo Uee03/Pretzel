@@ -1,21 +1,26 @@
 namespace Pretzel.Data
 {
-    /// <summary>String helpers that route through the serializer of <see cref="DataIO.Default"/>, or one you pass in.</summary>
+    /// <summary>
+    /// String helpers that use a shared <see cref="NewtonsoftSerializer"/>, or the serializer you pass in.
+    /// They never build the <see cref="DataIO"/> store, so they work before keys exist.
+    /// </summary>
     public static class JsonExtensions
     {
+        private static readonly ISerializer DefaultSerializer = new NewtonsoftSerializer();
+
         public static string ToJson<T>(this T value, bool prettyPrint = false, ISerializer serializer = null)
         {
-            return (serializer ?? DataIO.Default.Serializer).Serialize(value, prettyPrint);
+            return (serializer ?? DefaultSerializer).Serialize(value, prettyPrint);
         }
 
         public static T FromJson<T>(this string json, ISerializer serializer = null)
         {
-            return (serializer ?? DataIO.Default.Serializer).Deserialize<T>(json);
+            return (serializer ?? DefaultSerializer).Deserialize<T>(json);
         }
 
         public static void FromJsonOverwrite<T>(this string json, T target, ISerializer serializer = null) where T : class
         {
-            (serializer ?? DataIO.Default.Serializer).Populate(json, target);
+            (serializer ?? DefaultSerializer).Populate(json, target);
         }
     }
 }
