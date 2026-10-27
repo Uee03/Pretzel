@@ -13,7 +13,7 @@ namespace Pretzel.Scenes
     /// </summary>
     [RequireComponent(typeof(UIDocument))]
     [AddComponentMenu("Pretzel/Scenes/UI Document Scene Transition")]
-    public sealed class UIDocumentSceneTransition : MonoBehaviour, ISceneTransition
+    public sealed class UIDocumentSceneTransition : MonoBehaviour, ISceneTransition, ISceneStatusDisplay
     {
         [SerializeField] private UIDocument _document;
         [SerializeField, Min(0f)] private float _fadeDuration = 0.35f;
@@ -22,10 +22,17 @@ namespace Pretzel.Scenes
         [Tooltip("Name of a ProgressBar in the document. Leave empty for none.")]
         [SerializeField] private string _progressBarName = "progress";
 
+        [Tooltip("Writes the percentage into the progress bar's title.")]
+        [SerializeField] private bool _showPercentage = true;
+
+        [Tooltip("Name of a Label for status lines such as 'Spawning enemies'. Leave empty for none.")]
+        [SerializeField] private string _statusLabelName = "status";
+
         [Tooltip("Moves this object to DontDestroyOnLoad, so the screen stays up while a single-mode load replaces the scene.")]
         [SerializeField] private bool _persistAcrossLoads = true;
 
         private ProgressBar _progressBar;
+        private Label _statusLabel;
 
         private VisualElement Root => _document ? _document.rootVisualElement : null;
 
@@ -73,7 +80,27 @@ namespace Pretzel.Scenes
             _progressBar ??= root.Q<ProgressBar>(_progressBarName);
             if (_progressBar != null)
             {
-                _progressBar.value = Mathf.Lerp(_progressBar.lowValue, _progressBar.highValue, Mathf.Clamp01(progress));
+                float clamped = Mathf.Clamp01(progress);
+                _progressBar.value = Mathf.Lerp(_progressBar.lowValue, _progressBar.highValue, clamped);
+                if (_showPercentage)
+                {
+                    _progressBar.title = Mathf.RoundToInt(clamped * 100f) + " %";
+                }
+            }
+        }
+
+        public void ReportStatus(string status)
+        {
+            VisualElement root = Root;
+            if (root == null || string.IsNullOrEmpty(_statusLabelName))
+            {
+                return;
+            }
+
+            _statusLabel ??= root.Q<Label>(_statusLabelName);
+            if (_statusLabel != null)
+            {
+                _statusLabel.text = status ?? string.Empty;
             }
         }
 

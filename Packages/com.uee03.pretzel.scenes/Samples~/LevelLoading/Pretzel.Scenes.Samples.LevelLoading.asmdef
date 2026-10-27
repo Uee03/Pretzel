@@ -1,0 +1,26 @@
+{
+  "name": "Pretzel.Scenes.Samples.LevelLoading",
+  "rootNamespace": "Pretzel.Samples.LevelLoading",
+  "references": [
+    "Pretzel.Core",
+    "Pretzel.Scenes",
+    "Pretzel.Pooling"
+  ],
+  "includePlatforms": [],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": true,
+  "defineConstraints": [
+    "PRETZEL_POOLING"
+  ],
+  "versionDefines": [
+    {
+      "name": "com.uee03.pretzel.pooling",
+      "expression": "",
+      "define": "PRETZEL_POOLING"
+    }
+  ],
+  "noEngineReferences": false
+}

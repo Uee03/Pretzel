@@ -29,6 +29,7 @@ time, and the timers are easy to test.
 | `Cooldown` | `TryUse()` succeeds when ready and starts the cooldown. `RemainingNormalized` drives a radial fill. |
 | `IntervalTimer` | Raises `Elapsed` every interval and catches up when one tick spans several intervals. |
 | `AwaitableDelay` | `SecondsAsync(seconds, unscaled, token)` and `FramesAsync(frames, token)` on `Awaitable`. |
+| `FrameBudget` | `await budget.YieldIfExceededAsync(token)` between work items waits a frame once this frame's milliseconds are used, so spawning or loading never freezes the game. |
 
 ```csharp
 Cooldown dash = new(0.75f);

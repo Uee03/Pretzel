@@ -8,7 +8,7 @@ dependencies. Do not run a second Editor against an open or locked project.
 
 | Gate | Scope | Evidence / required follow-up |
 |---|---|---|
-| Unity 6000.6.5f1, Windows Editor | Seventeen first-party packages, EditMode suites of twelve packages, DataIO samples | Local validation; results below |
+| Unity 6000.6.5f1, Windows Editor | Seventeen first-party packages, EditMode suites of thirteen packages, DataIO samples | Local validation; results below |
 | Package samples | Every `Samples~` folder imported into one host | Compiled with zero C# errors and warnings (integration samples are skipped by their define constraints) |
 | Generated examples | Plain, binary and AES use cases and the profile service and startup | Separate compile gate; generation tests also inspect source |
 | UI Toolkit theme template | `PretzelTheme.tss` imported as a theme | Imported without errors |
@@ -16,7 +16,7 @@ dependencies. Do not run a second Editor against an open or locked project.
 | Player persistence | Save, quit, relaunch, load; previous-release saves | Required per shipping platform; not proven by EditMode |
 | IL2CPP / stripping, Windows x64 | Generated AES startup and profile service; plain, binary (async) and encrypted round trips | One local smoke player, 6000.6.5f1, Managed Stripping High, passed (2026-10-24). Audio, scenes, pooling and the console were not part of it |
 | IL2CPP on other platforms, consoles, mobile | Actual player and backend | Not certified |
-| Runtime behaviour in a player | Scene transitions, audio mixing, safe area on notched devices, world-space panels, console input | Manual checks; not covered by EditMode tests |
+| Runtime behaviour in a player | Scene transitions and setup phases, audio mixing, safe area on notched devices, world-space panels, console input | Manual checks; not covered by EditMode tests |
 | R3, UniTask, LitMotion adapters | Third-party packages present | Optional assemblies are absent from clean hosts unless those packages are installed |
 | Performance and size | Representative target-player payloads | No speed, size or allocation claim |
 
@@ -100,8 +100,8 @@ validation. They do not replace a shipped-player upgrade exercise.
 
 ### Local results for v0.2.0
 
-- Unity 6000.6.5f1 / Windows, clean host with seventeen embedded packages: **263 of 263 EditMode tests passed, zero
-  skipped**, across core, extensions, tween, api, data, events, pooling, ui, audio, preferences, devconsole and
+- Unity 6000.6.5f1 / Windows, clean host with seventeen embedded packages: **269 of 269 EditMode tests passed, zero
+  skipped**, across core, extensions, tween, api, data, events, pooling, scenes, ui, audio, preferences, devconsole and
   setup.
 - Every package sample compiled in one host with zero C# errors and warnings; the theme template imported cleanly.
 - The generated DataIO examples (AES startup) compiled with zero C# errors and warnings.

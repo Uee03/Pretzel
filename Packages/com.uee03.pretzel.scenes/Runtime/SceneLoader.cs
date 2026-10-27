@@ -8,8 +8,9 @@ namespace Pretzel.Scenes
 {
     /// <summary>
     /// Loads and unloads scenes one at a time. Loading is gated at 90 %, so the transition, the minimum duration and the progress
-    /// report finish before the scene activates. Unity cannot abort a scene load, so cancellation after loading started
-    /// unloads an additive scene again, and lets a single-mode load finish.
+    /// report finish before the scene activates. After activation, <see cref="SceneLoadOptions.SetupAsync"/> runs behind the
+    /// transition and fills the rest of the progress bar. Unity cannot abort a scene load, so cancellation after loading
+    /// started unloads an additive scene again, and lets a single-mode load finish.
     /// </summary>
     public sealed class SceneLoader
     {
@@ -65,6 +66,10 @@ namespace Pretzel.Scenes
 
             options ??= new SceneLoadOptions();
             ISceneTransition transition = options.Transition;
+            ISceneStatusDisplay status = transition as ISceneStatusDisplay;
+            OverallProgress overall = new(options.Progress, transition);
+            bool hasSetup = options.SetupAsync != null;
+            float sceneShare = hasSetup ? Mathf.Clamp01(options.SceneProgressWeight) : 1f;
             bool shown = false;
             IsBusy = true;
             try
@@ -73,11 +78,16 @@ namespace Pretzel.Scenes
                 if (transition != null)
                 {
                     shown = true;
+                    if (options.LoadingStatus != null)
+                    {
+                        status?.ReportStatus(options.LoadingStatus);
+                    }
+
                     await transition.ShowAsync(cancellationToken);
                 }
 
                 cancellationToken.ThrowIfCancellationRequested();
-                Scene loaded = await LoadGatedAsync(begin, label, options, transition, cancellationToken);
+                Scene loaded = await LoadGatedAsync(begin, label, options, new SubProgress(overall, 0f, sceneShare), cancellationToken);
                 bool additive = options.Mode == LoadSceneMode.Additive;
                 if (cancellationToken.IsCancellationRequested && additive)
                 {
@@ -90,6 +100,12 @@ namespace Pretzel.Scenes
                     SceneManager.SetActiveScene(loaded);
                 }
 
+                if (hasSetup)
+                {
+                    await RunSetupAsync(loaded, options, new SubProgress(overall, sceneShare, 1f), status, additive, cancellationToken);
+                }
+
+                overall.Report(1f);
                 if (options.UnloadUnusedAssets)
                 {
                     AsyncOperation unload = Resources.UnloadUnusedAssets();
@@ -97,6 +113,11 @@ namespace Pretzel.Scenes
                     {
                         await Awaitable.NextFrameAsync();
                     }
+                }
+
+                for (int i = 0; i < options.SettleFrames; i++)
+                {
+                    await Awaitable.NextFrameAsync();
                 }
 
                 SceneLoaded?.Invoke(loaded);
@@ -114,7 +135,7 @@ namespace Pretzel.Scenes
         }
 
         private static async Awaitable<Scene> LoadGatedAsync(Func<LoadSceneMode, AsyncOperation> begin, string label, SceneLoadOptions options,
-            ISceneTransition transition, CancellationToken cancellationToken)
+            IProgress<float> progress, CancellationToken cancellationToken)
         {
             Scene loaded = default;
             void OnLoaded(Scene scene, LoadSceneMode mode) => loaded = scene;
@@ -132,11 +153,11 @@ namespace Pretzel.Scenes
                 operation.allowSceneActivation = false;
                 while (operation.progress < 0.9f)
                 {
-                    Report(options, transition, operation.progress / 0.9f);
+                    progress.Report(operation.progress / 0.9f);
                     await Awaitable.NextFrameAsync();
                 }
 
-                Report(options, transition, 1f);
+                progress.Report(1f);
                 while (Time.realtimeSinceStartup - start < options.MinimumDuration && !cancellationToken.IsCancellationRequested)
                 {
                     await Awaitable.NextFrameAsync();
@@ -156,10 +177,21 @@ namespace Pretzel.Scenes
             return loaded;
         }
 
-        private static void Report(SceneLoadOptions options, ISceneTransition transition, float progress)
+        // Cancelling or failing during setup unloads an additive scene, so it is never left half prepared.
+        private async Awaitable RunSetupAsync(Scene scene, SceneLoadOptions options, IProgress<float> progress, ISceneStatusDisplay status,
+            bool additive, CancellationToken cancellationToken)
         {
-            options.Progress?.Report(progress);
-            transition?.ReportProgress(progress);
+            try
+            {
+                await options.SetupAsync(new SceneSetupContext(scene, progress, status, cancellationToken));
+                cancellationToken.ThrowIfCancellationRequested();
+                progress.Report(1f);
+            }
+            catch when (additive && scene.isLoaded)
+            {
+                await UnloadAsync(scene, CancellationToken.None);
+                throw;
+            }
         }
 
         private static async Awaitable HideAsync(ISceneTransition transition)
@@ -171,6 +203,33 @@ namespace Pretzel.Scenes
             catch (Exception ex)
             {
                 Debug.LogException(ex);
+            }
+        }
+
+        // Forwards to the caller and the transition, and never moves backwards.
+        private sealed class OverallProgress : IProgress<float>
+        {
+            private readonly IProgress<float> _target;
+            private readonly ISceneTransition _transition;
+            private float _value = -1f;
+
+            public OverallProgress(IProgress<float> target, ISceneTransition transition)
+            {
+                _target = target;
+                _transition = transition;
+            }
+
+            public void Report(float value)
+            {
+                value = Mathf.Clamp01(value);
+                if (value <= _value)
+                {
+                    return;
+                }
+
+                _value = value;
+                _target?.Report(value);
+                _transition?.ReportProgress(value);
             }
         }
     }

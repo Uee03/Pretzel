@@ -3,7 +3,7 @@
   "displayName": "Pretzel Scenes",
   "version": "0.2.0",
   "unity": "6000.0",
-  "description": "An Awaitable scene loader with additive loading, activation gating, progress, minimum duration, cancellation and fade transitions.",
+  "description": "An Awaitable scene loader with additive loading, activation gating, a setup phase behind the loading screen, weighted progress, status text, minimum duration, cancellation and fade transitions.",
   "author": { "name": "Uee03" },
   "license": "MIT",
   "dependencies": {
@@ -16,6 +16,11 @@
       "displayName": "Scenes Usage",
       "description": "A loading screen with UIDocumentSceneTransition and a menu that loads scenes additively or as a single scene.",
       "path": "Samples~/ScenesUsage"
+    },
+    {
+      "displayName": "Level Loading",
+      "description": "Additive levels loaded behind a loading screen whose progress bar also covers spawning pooled enemies from placed markers. Needs Pretzel Pooling.",
+      "path": "Samples~/LevelLoading"
     }
   ]
 }

@@ -83,6 +83,7 @@
     "com.uee03.pretzel.extensions",
     "com.uee03.pretzel.pooling",
     "com.uee03.pretzel.preferences",
+    "com.uee03.pretzel.scenes",
     "com.uee03.pretzel.setup",
     "com.uee03.pretzel.tween",
     "com.uee03.pretzel.ui"

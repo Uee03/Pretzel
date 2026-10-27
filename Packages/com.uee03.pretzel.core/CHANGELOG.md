@@ -10,5 +10,6 @@ First published release. Version 0.1.0 was internal and never tagged.
 
 - `Guard` argument checks and the `Singleton`, `PersistentSingleton` and `RegulatorSingleton` bases.
 - Timers: `CountdownTimer`, `StopwatchTimer`, `Cooldown` and `IntervalTimer`, ticked by the owner, and `AwaitableDelay` for scaled or unscaled waits.
+- `FrameBudget`: spreads heavy main-thread work over frames.
 - `DisposableAction` for subscriptions that unregister on dispose.
 - EditMode tests for guards, timers and disposables.
