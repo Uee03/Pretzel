@@ -1,0 +1,10 @@
+<engine:UXML xmlns:engine="UnityEngine.UIElements">
+    <Style src="UIUsage.uss" />
+    <engine:VisualElement name="overlay" class="sample-overlay">
+        <engine:VisualElement class="sample-card">
+            <engine:Label text="Overlay" class="sample-title" />
+            <engine:Label text="A second UIControllerBase. SwitchTo showed this screen and hid the main one, and UIDocumentFader faded it in." class="sample-hint" />
+            <engine:Button name="back-button" text="Back" />
+        </engine:VisualElement>
+    </engine:VisualElement>
+</engine:UXML>

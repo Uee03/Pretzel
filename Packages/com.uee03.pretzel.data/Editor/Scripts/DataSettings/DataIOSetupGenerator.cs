@@ -16,7 +16,10 @@ namespace Pretzel.Data.Editor
         public const string EncryptionDemoName = "PretzelEncryptionExample.cs";
         public const string EncryptionDemoEditorName = "PretzelEncryptionExampleEditor.cs";
 
-        private static readonly string[] SaveExampleFiles = { "ProjectSaveData.cs", "ProjectSaveService.cs", "ProjectSaveExample.cs" };
+        private static readonly string[] SaveExampleFiles =
+        {
+            "ISaveService.cs", "SaveService.cs", "SaveController.cs", "ProjectSaveData.cs", "ProjectSaveManager.cs"
+        };
 
         public static string ScriptPath(string folder) => folder + "/" + ScriptName;
 

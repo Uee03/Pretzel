@@ -1,0 +1,6 @@
+<engine:UXML xmlns:engine="UnityEngine.UIElements">
+    <engine:VisualElement name="score-hud" style="position: absolute; top: 16px; left: 16px; padding: 8px 12px; background-color: rgba(0, 0, 0, 0.6); border-radius: 4px;">
+        <engine:Label name="score-label" text="Score: 0" style="color: rgb(255, 255, 255); font-size: 18px;" />
+        <engine:Button name="add-button" text="Add point" />
+    </engine:VisualElement>
+</engine:UXML>

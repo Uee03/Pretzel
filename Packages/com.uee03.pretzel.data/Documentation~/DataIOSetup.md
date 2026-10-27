@@ -7,7 +7,8 @@
    protected saves. Plain JSON remains the zero-setup default; AES is the only encryption option.
 3. For AES, retain and back up the generated key. Embedded C# and bundled JSON both put the key
    in the game; neither makes it inaccessible to a determined player.
-4. Call `ProjectDataIO.Initialize()` once from `Start` or later, before the first `DataIO` call.
+4. `ProjectDataIO` initializes itself before the first scene loads. Settings (and the AES key) are
+   read once and stay fixed until the game stops; stop Play mode to change them.
 5. Run **Test save and load**, then build a player and verify save/quit/relaunch/load.
 
 The test uses an isolated temporary store with configured Editor keys. It does not modify profiles
@@ -17,65 +18,63 @@ root, not any custom root or runtime override.
 ## Which piece owns what?
 
 ```text
-Gameplay
-  -> ProjectSaveService (optional example: your slots and application rules)
-    -> DataIO / ProjectDataIO.Store
-      -> serializer -> plain / binary / AES strategy -> files
+ProjectSaveManager (component: lifetime, load on start, save on pause/quit)
+  -> SaveController<T> (serializable: one kind of data in memory, key, slot, busy guard)
+    -> ISaveService / SaveService (load-or-create, save, delete, list slots)
+      -> IDataStore = ProjectDataIO.Store
+        -> serializer -> plain / binary / AES strategy -> files
 ```
 
-`ProjectDataIO` reads a copy of `DataIOConfig`, wires keys and creates one store. You do not need
-another factory or initializer for this route. The settings asset contains no secrets.
-The generated file belongs to you; regenerating is not an automatic upgrade of existing scripts.
+The format is a strategy inside the store, so one service and controller work with JSON, binary
+and AES unchanged. `ProjectDataIO` reads a copy of `DataIOConfig`, loads keys and creates one store.
+The settings asset contains no secrets. The generated files belong to you; regenerating is not an
+automatic upgrade of existing scripts.
 
 ```csharp
-ProjectDataIO.Initialize(config => config.saveFolder = "MyGameSaves");
-LoadResult<Profile> result = DataIO.Load<Profile>("profile");
-switch (result.Status)
-{
-    case DataStatus.Ok:
-        profile = result.Value;
-        break;
-    case DataStatus.NotFound:
-        profile = new Profile();
-        break;
-    case DataStatus.Corrupt:
-        Debug.LogError($"Load failed ({result.ErrorCode}): {result.Error}");
-        // Offer recovery/retry. Never overwrite the existing save silently.
-        break;
-}
+[SerializeField] private ProjectSaveManager _saves;
+
+_saves.Profile.Data.coins += 10;
+await _saves.Profile.SaveAsync(destroyCancellationToken);
 ```
 
-Parameterless `Initialize()` is idempotent; supplying new settings/keys after initialization is
-an error. Finish outstanding saves, call `Shutdown()`, then initialize to change settings.
-Shutdown also resets the static facade and runs at Play session startup for disabled domain reload.
+Add more data types by adding a field to `ProjectSaveManager` and injecting the same service in `Start`:
 
-For keys fetched after sign-in, use `InitializeWithKeys(keys)` after they arrive. Otherwise the
-configured `Provider` or `BundledJson` supplies them. Do not call the lazy `DataIO` default before
-your initializer: it would miss your overrides.
+```csharp
+[SerializeField] private SaveController<GameSettings> _settings = new("settings");
+_settings.Inject(Service);
+```
+
+For large data (worlds, inventories), split it into several keys, for example one controller per
+region, so a save serializes only what changed. Binary keeps such files compact. Serialization runs
+on the main thread before the write moves to the background.
+
+`Initialize()` is idempotent and takes no overrides. For keys fetched after sign-in, keep the key
+source on `Provider` with no provider registered at startup, then call `InitializeWithKeys(keys)`
+once. `ProjectDataIO.WhenReadyAsync` completes when the store exists. Keys cannot be swapped during
+a run; restart to sign in with a different key.
 
 ## Schema migrations
 
-Use `Initialize(configureStore: options => options.AddMigration<Profile>(...))`.
-The callback runs before the store snapshots options. Register every step, including schema 0
+Implement the partial `ConfigureStore` in a separate file so regenerating `ProjectDataIO.cs` keeps it:
+
+```csharp
+public static partial class ProjectDataIO
+{
+    static partial void ConfigureStore(DataStoreOptions options) => options.AddMigration<Profile>(new ProfileV1ToV2());
+}
+```
+
+It runs before the store snapshots options. Register every step, including schema 0
 for unversioned files. See the package [README](../README.md#schema-upgrades-without-replacing-generated-startup)
 for a complete version 1-to-2 field migration. Successfully loading a migration does not rewrite the
 file; save it after verifying the loaded value.
 
-The same callback is exposed by generated `CreateStore`, `DataIOConfig.CreateStore`, and factories.
+The same callback is exposed by `DataIOConfig.CreateStore` and factories.
 
 ## Additional stores (advanced)
 
-Create once and retain; use distinct folders for different formats:
-
-```csharp
-DataStore settings = ProjectDataIO.CreateStore("Settings", config =>
-{
-    config.format = DataFormat.PlainText;
-    config.fileExtension = "json";
-});
-```
-
-For a store independent of project settings:
+Prefer folders in keys (`SaveController` folder field) over extra stores. For a store independent
+of project settings, create it once and retain it:
 
 ```csharp
 IDataStore inventory = DataStoreFactory.CreateWithStrategy(
@@ -110,9 +109,10 @@ The independent buttons generate three components with different payloads and fo
 They do not need `ProjectDataIO` and do not replace `DataIO.Default`. Use their context menu in Play
 mode. The AES component uses the configured key source.
 
-**Add profile service example** additionally generates a profile model, slot service, demo component,
-this guide, and (for encryption) a text encryption demo/Inspector. Use the service as a starting
-point, not a required package layer. Existing example files are never replaced.
+**Add save manager** additionally generates `ISaveService`, `SaveService`, `SaveController<T>`,
+`ProjectSaveManager`, the `ProjectSaveData` profile model, this guide, and (for encryption) a text
+encryption demo/Inspector. Add `ProjectSaveManager` to a GameObject in your first scene. Existing
+files are never replaced.
 
 ## Before shipping
 

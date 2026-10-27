@@ -21,6 +21,7 @@ namespace Pretzel.Setup.Windows
         private SettingsSaver _saver;
         private PretzelTabContext _context;
         private TabView _tabView;
+        private SetupProgressFooter _progress;
         private readonly List<IPretzelTab> _tabs = new();
         private readonly Dictionary<Tab, IPretzelTab> _tabByElement = new();
 
@@ -43,6 +44,7 @@ namespace Pretzel.Setup.Windows
             _context = new PretzelTabContext(root, _saver);
 
             _tabView = root.Q<TabView>("setup-window__tabs");
+            _progress = new SetupProgressFooter(root);
             BuildTabs();
         }
 

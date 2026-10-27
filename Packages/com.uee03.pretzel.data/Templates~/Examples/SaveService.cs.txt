@@ -1,0 +1,81 @@
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Threading;
+using Pretzel.Data;
+using UnityEngine;
+
+/// <summary>
+/// The one class that touches the store. Construct it with ProjectDataIO.Store, or any other IDataStore
+/// (DataStoreFactory, a test double), and inject it into every SaveController.
+/// </summary>
+public sealed class SaveService : ISaveService
+{
+    private readonly IDataStore _store;
+
+    public SaveService(IDataStore store)
+    {
+        _store = store ?? throw new ArgumentNullException(nameof(store));
+    }
+
+    public async Awaitable<T> LoadOrCreateAsync<T>(DataKey key, CancellationToken cancellationToken = default) where T : class, new()
+    {
+        LoadResult<T> result = await _store.LoadAsync<T>(key, cancellationToken);
+        switch (result.Status)
+        {
+            case DataStatus.Ok:
+                if (result.Value == null)
+                {
+                    throw new InvalidDataException($"{key} contains null data. The file was kept; offer recovery or an explicit reset.");
+                }
+
+                if (result.RecoveredFromBackup)
+                {
+                    Debug.LogWarning($"[SaveService] {key} was unreadable; loaded its backup instead.");
+                }
+
+                return result.Value;
+            case DataStatus.NotFound:
+                return new T();
+            default:
+                throw new InvalidDataException($"Cannot load {key} ({result.ErrorCode}): {result.Error} "
+                    + "The file was kept. Offer retry, backup recovery or an explicit reset; do not overwrite it with new data.");
+        }
+    }
+
+    public Awaitable SaveAsync<T>(DataKey key, T data, CancellationToken cancellationToken = default) where T : class
+    {
+        return _store.SaveAsync(key, data ?? throw new ArgumentNullException(nameof(data)), cancellationToken);
+    }
+
+    public void Save<T>(DataKey key, T data) where T : class
+    {
+        _store.Save(key, data ?? throw new ArgumentNullException(nameof(data)));
+    }
+
+    public Awaitable<bool> ExistsAsync(DataKey key, CancellationToken cancellationToken = default)
+    {
+        return _store.ExistsAsync(key, cancellationToken);
+    }
+
+    public Awaitable<bool> DeleteAsync(DataKey key, CancellationToken cancellationToken = default)
+    {
+        return _store.DeleteAsync(key, cancellationToken);
+    }
+
+    public async Awaitable<IReadOnlyList<int>> ListSlotsAsync(DataKey key, CancellationToken cancellationToken = default)
+    {
+        IReadOnlyList<int> folders = await _store.ListSlotsAsync(key.Folder, cancellationToken);
+        List<int> slots = new();
+        foreach (int slot in folders)
+        {
+            // A slot folder can outlive its files, so only count slots that still hold this key.
+            if (await _store.ExistsAsync(key.WithSlot(slot), cancellationToken))
+            {
+                slots.Add(slot);
+            }
+        }
+
+        return slots;
+    }
+}

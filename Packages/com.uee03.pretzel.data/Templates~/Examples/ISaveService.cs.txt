@@ -1,0 +1,24 @@
+using System.Collections.Generic;
+using System.Threading;
+using Pretzel.Data;
+using UnityEngine;
+
+/// <summary>Saves and loads any serializable type. The store behind it decides the format: JSON, binary or AES.</summary>
+public interface ISaveService
+{
+    /// <summary>Returns the saved value, or a new one when nothing is saved yet. Throws instead of hiding a corrupt file.</summary>
+    Awaitable<T> LoadOrCreateAsync<T>(DataKey key, CancellationToken cancellationToken = default) where T : class, new();
+
+    /// <summary>Serializes on the calling thread, then writes in the background.</summary>
+    Awaitable SaveAsync<T>(DataKey key, T data, CancellationToken cancellationToken = default) where T : class;
+
+    /// <summary>Blocking save for pause and quit, when an async save may not get to finish.</summary>
+    void Save<T>(DataKey key, T data) where T : class;
+
+    Awaitable<bool> ExistsAsync(DataKey key, CancellationToken cancellationToken = default);
+
+    Awaitable<bool> DeleteAsync(DataKey key, CancellationToken cancellationToken = default);
+
+    /// <summary>The slots in the key's folder that hold a file with the key's name.</summary>
+    Awaitable<IReadOnlyList<int>> ListSlotsAsync(DataKey key, CancellationToken cancellationToken = default);
+}

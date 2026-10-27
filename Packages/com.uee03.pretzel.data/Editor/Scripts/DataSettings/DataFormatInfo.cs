@@ -112,7 +112,7 @@ namespace Pretzel.Data.Editor
             "The service validates the token on the server and returns a key made for that player, so one leaked key opens one player's saves.",
             "The game keeps the key in memory only. It never writes it to disk or PlayerPrefs, and creates its store after the key arrives.",
             "Rotate keys with a version number on the server, rate limit requests, and keep old keys until saves are re-saved.",
-            "The generated script has a stub, RequestKeyAsync, for your own request. The build check fails until it is implemented. On sign-out, call ProjectDataIO.Shutdown() and PretzelDataSetup.ClearKeys()."
+            "The generated script has a stub, RequestKeyAsync, for your own request. The build check fails until it is implemented. Keys stay fixed for the run, so signing in as another player needs a restart."
         };
 
         public static readonly string[] Base64Pros =

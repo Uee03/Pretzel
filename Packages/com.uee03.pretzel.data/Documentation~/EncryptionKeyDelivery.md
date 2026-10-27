@@ -37,8 +37,9 @@ fingerprint is rejected. Unity includes the TextAsset in the player.
 ### Embedded C#
 
 Setup or Shipping generates `PretzelDataSetup.cs` and selects `Provider`.
-It reconstructs XOR-masked key arrays and registers a provider before scene startup.
-Call `ProjectDataIO.Initialize()` from `Start` or later.
+It reconstructs XOR-masked key arrays and registers a provider at `AfterAssembliesLoaded`, before
+`ProjectDataIO` initializes at `BeforeSceneLoad`. Re-export older scripts that register at
+`BeforeSceneLoad`; **Check build setup** reports them.
 
 Both options put the same usable AES secret on the player's machine. Keep key-bearing exports and
 their `.meta` files out of public version control: ignore `PretzelDataSetup.cs` (or the JSON file)
@@ -46,7 +47,7 @@ by name, not the whole output folder, because `ProjectDataIO.cs` lives there too
 Regenerating never silently replaces a `PretzelDataSetup.cs` that contains your own code.
 Store a protected copy for reproducible builds.
 Remove unused exports: an unselected JSON file still ships if left in Resources.
-Restart Play mode/recreate the store after re-exporting; an existing store keeps its own keys.
+Restart Play mode after re-exporting; the running store keeps the keys it started with.
 
 ## Custom in-memory delivery (advanced)
 
@@ -57,16 +58,17 @@ EncryptionKeys keys = new() { AesKey = receivedKey };
 ProjectDataIO.InitializeWithKeys(keys);
 ```
 
-Or set `EncryptionKeys.Provider = () => keys` and select `Provider` before normal initialization.
-Do not save the key in PlayerPrefs or print it in logs.
+Or set `EncryptionKeys.Provider = () => keys` at `AfterAssembliesLoaded` and select `Provider`.
+With `Provider` selected and no provider registered at startup, `ProjectDataIO` waits for one of
+these calls. Do not save the key in PlayerPrefs or print it in logs.
 
 The Shipping token scaffold is optional. Implement `RequestKeyAsync`; the placeholder throws and
 **Check build setup** fails the build until it is replaced. `LoadKeysAsync` returns `false` (and logs
 why) on a failed request or an invalid key, and rethrows cancellation.
 A service must authenticate and authorize requests, use HTTPS, and keep per-player keys stable
 across sessions. Handle failure/cancellation before initializing or touching existing saves.
-On sign-out call `ProjectDataIO.Shutdown()` and then `PretzelDataSetup.ClearKeys()` (or set
-`EncryptionKeys.Provider = null`), so the next user never reads with the previous user's key.
+Settings and keys stay fixed for the run: signing in as a different player requires a restart, so
+the next user never reads with the previous user's key in the same session.
 `EncryptionKeys.Provider` is also cleared whenever Play mode starts.
 Server delivery is not a promise of offline availability or protection against client memory access.
 

@@ -50,10 +50,9 @@ rather than relying on an unfinished save in `OnDestroy` or `OnApplicationQuit`.
 | Binary inventory/save data | Select Binary, then **Generate plain / binary setup** | No |
 | Discourage casual save editing | **Generate AES encryption setup** | One persistent AES key |
 
-Open **Pretzel > Data Format > Setup**. Generate the setup for your route, then call
-`ProjectDataIO.Initialize()` once from startup (`Start` or later), before using `DataIO`.
-The asset `Assets/Resources/Pretzel/DataIOConfig.asset` holds settings, not secrets. The generated
-setup reads it and applies optional code overrides to a copy.
+Open **Pretzel > Data Format > Setup** and generate the setup for your route. The generated
+`ProjectDataIO` initializes itself before the first scene loads; settings and keys stay fixed until
+the game stops. The asset `Assets/Resources/Pretzel/DataIOConfig.asset` holds settings, not secrets.
 
 For AES, choose embedded C# or bundled JSON delivery. The setup creates a key only when needed,
 stores it in the Editor key file, exports it for the game, and sets the matching key source.
@@ -70,8 +69,9 @@ binary inventory, and an AES-protected profile. Each uses its own store/strategy
 changing `DataIO.Default`. Add the generated component to a GameObject, enter Play mode and use its
 context menu. The AES example needs the configured key source.
 
-**Add profile service example** supplies an optional slot-oriented save service, profile class,
-demo component and [setup guide](Documentation~/DataIOSetup.md). Generated files belong to you;
+**Add save manager** supplies a format-agnostic `SaveService`, a serializable `SaveController<T>`
+for any data type, a `ProjectSaveManager` component, a profile class and the
+[setup guide](Documentation~/DataIOSetup.md). Generated files belong to you;
 regeneration asks before replacing a different setup and does not overwrite existing example files.
 Previously generated scripts are not upgraded automatically.
 
@@ -118,7 +118,7 @@ never build the default store.
 
 ### Schema upgrades without replacing generated startup
 
-The `configureStore` callback runs before the store snapshots its options. For a profile whose
+The partial `ConfigureStore` method runs before the store snapshots its options. For a profile whose
 version 1 payload used `gold`, version 2 can migrate it to `coins`:
 
 ```csharp
@@ -132,23 +132,26 @@ public sealed class Profile
     public int coins;
 }
 
-// At startup, before the first DataIO call:
-ProjectDataIO.Initialize(configureStore: options =>
+// In its own file, so regenerating ProjectDataIO.cs keeps it:
+public static partial class ProjectDataIO
 {
-    options.AddMigration<Profile>(new DelegateMigration(1, 2, json =>
+    static partial void ConfigureStore(DataStoreOptions options)
     {
-        JObject payload = JObject.Parse(json);
-        payload["coins"] = payload.Value<int?>("gold") ?? 0;
-        payload.Remove("gold");
-        return payload.ToString(Formatting.None);
-    }));
-});
+        options.AddMigration<Profile>(new DelegateMigration(1, 2, json =>
+        {
+            JObject payload = JObject.Parse(json);
+            payload["coins"] = payload.Value<int?>("gold") ?? 0;
+            payload.Remove("gold");
+            return payload.ToString(Formatting.None);
+        }));
+    }
+}
 ```
 
 The previous release must have saved `[SchemaVersion(1)]` data. Unversioned files start at schema
 0 and need a 0-to-1 step too. Register every required step; newer unsupported schemas fail rather
 than being downgraded. Save after a successful migrated load to persist the current schema.
-The same callback is available on generated `CreateStore`, `DataIOConfig.CreateStore` and factories.
+The same callback is available on `DataIOConfig.CreateStore` and factories.
 
 ### Load failures and write guarantees
 

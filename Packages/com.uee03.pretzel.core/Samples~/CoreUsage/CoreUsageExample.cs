@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Generic;
 using Pretzel.Core;
 using UnityEngine;
 
@@ -11,6 +13,8 @@ namespace Pretzel.Samples.Core
     {
         [SerializeField, Range(0f, 1f)] private float _volume = 0.5f;
         [SerializeField] private string _playerName = "Ada";
+        [SerializeField] private List<string> _levels = new() { "Tutorial", "Forest", "Castle" };
+        [SerializeField] private int _startLevel;
 
         private void Start()
         {
@@ -40,7 +44,24 @@ namespace Pretzel.Samples.Core
             float volume = Guard.InRange(_volume, 0f, 1f, nameof(_volume));
             string playerName = Guard.NotNullOrEmpty(_playerName, nameof(_playerName));
             Transform self = Guard.NotDestroyed(transform, nameof(transform));
-            Debug.Log($"{playerName} at volume {volume} on {self.name}.");
+            IReadOnlyCollection<string> levels = Guard.NotNullOrEmpty(_levels, nameof(_levels));
+            int startLevel = Guard.InRange(_startLevel, 0, levels.Count - 1, nameof(_startLevel));
+            Debug.Log($"{playerName} at volume {volume} on {self.name}, starting on {_levels[startLevel]}.", this);
+
+            // Validate input at the boundary, where you can report it, rather than deep inside your systems.
+            try
+            {
+                ApplyProfile(null);
+            }
+            catch (ArgumentNullException ex)
+            {
+                Debug.LogWarning($"Rejected profile: {ex.ParamName} was null.", this);
+            }
+        }
+
+        private static void ApplyProfile(string profileJson)
+        {
+            Guard.NotNull(profileJson, nameof(profileJson));
         }
     }
 }

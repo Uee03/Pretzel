@@ -19,7 +19,7 @@ namespace Pretzel.Data
         /// </summary>
         public static Func<EncryptionKeys> Provider { get; set; }
 
-        // Static state survives play sessions when domain reload is disabled. Generated setups register again at BeforeSceneLoad.
+        // Static state survives play sessions when domain reload is disabled. Generated setups register again at AfterAssembliesLoaded.
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
         private static void ResetProvider() => Provider = null;
 

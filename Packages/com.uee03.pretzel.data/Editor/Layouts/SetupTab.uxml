@@ -3,7 +3,7 @@
         <engine:VisualElement class="pretzel-section">
             <engine:Label text="Set up DataIO in your project" class="pretzel-section__title" />
             <engine:Label class="pretzel-section__hint"
-                          text="Plain JSON works without generated code. For a project-owned startup wrapper, choose plain / binary or optional AES below to generate ProjectDataIO.cs. It reads the settings asset and accepts code overrides. Use one wrapper; generating another replaces it only after confirmation." />
+                          text="Plain JSON works without generated code. For a project-owned startup wrapper, choose plain / binary or optional AES below to generate ProjectDataIO.cs. It reads the settings asset (and for AES, the key) once before the first scene loads; they stay fixed until the game stops. Use one wrapper; generating another replaces it only after confirmation." />
             <engine:TextField name="setup-panel__folder" label="Output folder" />
             <engine:Label name="setup-panel__current" class="pretzel-chip" />
             <engine:Label name="setup-panel__current-detail" class="pretzel-section__hint" />
@@ -13,7 +13,7 @@
         <engine:VisualElement class="pretzel-section">
             <engine:Label text="1. Plain JSON or binary" class="pretzel-section__title" />
             <engine:Label class="pretzel-section__hint"
-                          text="Plain JSON is the zero-setup default: DataIO.Save and DataIO.Load already work without generated code. Choose binary for a non-text representation, not encryption. Generate this optional startup wrapper when your project needs overrides." />
+                          text="Plain JSON is the zero-setup default: DataIO.Save and DataIO.Load already work without generated code. Choose binary for a non-text representation, not encryption. Generate this optional startup wrapper for a fixed, project-owned setup." />
             <engine:DropdownField name="setup-panel__plain-format" label="Format" />
             <engine:VisualElement class="pretzel-button-row">
                 <engine:Button name="setup-panel__plain-generate" text="Generate plain / binary setup"
@@ -57,9 +57,9 @@
         <engine:VisualElement class="pretzel-section">
             <engine:Label text="Optional" class="pretzel-section__title" />
             <engine:Label class="pretzel-section__hint"
-                          text="Examples add a save service and a demo component that use ProjectDataIO, plus a short guide (and a text encrypt / decrypt demo when the setup is encrypted). Existing files are never replaced. Check build setup runs the same validation as a build." />
+                          text="Adds a format-agnostic SaveService, a serializable SaveController&lt;T&gt; for any data type, a ProjectSaveManager component and a profile model, plus a short guide (and a text encrypt / decrypt demo when the setup is encrypted). Existing files are never replaced. Check build setup runs the same validation as a build." />
             <engine:VisualElement class="pretzel-button-row">
-                <engine:Button name="setup-panel__examples" text="Add profile service example" class="pretzel-section__action" />
+                <engine:Button name="setup-panel__examples" text="Add save manager" class="pretzel-section__action" />
                 <engine:Button name="setup-panel__validate" text="Check build setup" class="pretzel-section__action" />
             </engine:VisualElement>
         </engine:VisualElement>

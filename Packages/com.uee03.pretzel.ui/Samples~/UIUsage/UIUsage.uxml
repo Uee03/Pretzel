@@ -1,0 +1,23 @@
+<engine:UXML xmlns:engine="UnityEngine.UIElements">
+    <Style src="UIUsage.uss" />
+    <engine:VisualElement name="screen" class="sample-screen">
+        <engine:VisualElement name="card" class="sample-card">
+            <engine:Label text="Pretzel UI" class="sample-title" />
+            <engine:Label name="hover-hint" text="UIHoverFade shows this line while the pointer is over the card." class="sample-hint" />
+            <engine:VisualElement name="panel" class="sample-panel">
+                <engine:Label name="panel-label" text="This panel fades with the extension methods." />
+            </engine:VisualElement>
+            <engine:VisualElement class="sample-row">
+                <engine:Button name="fade-button" text="Fade panel" />
+                <engine:Button name="cancel-button" text="Cancel fade" />
+                <engine:Button name="instant-button" text="Toggle instantly" />
+                <engine:Button name="pulse-button" text="Pulse progress" />
+            </engine:VisualElement>
+            <engine:VisualElement class="sample-row">
+                <engine:Button name="overlay-button" text="Open overlay" />
+                <engine:Button name="blink-button" text="Hide, then show after a delay" />
+            </engine:VisualElement>
+            <engine:VisualElement name="fields" />
+        </engine:VisualElement>
+    </engine:VisualElement>
+</engine:UXML>

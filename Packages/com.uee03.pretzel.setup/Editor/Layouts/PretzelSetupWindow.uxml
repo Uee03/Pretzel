@@ -8,5 +8,11 @@
             </engine:VisualElement>
         </engine:VisualElement>
         <engine:TabView name="setup-window__tabs" class="pretzel-setup__tabs" />
+        <engine:VisualElement name="setup-window__progress" class="pretzel-progress pretzel-progress--hidden">
+            <engine:Label name="setup-window__progress-label" class="pretzel-progress__label" />
+            <engine:VisualElement class="pretzel-progress__track">
+                <engine:VisualElement name="setup-window__progress-fill" class="pretzel-progress__fill" />
+            </engine:VisualElement>
+        </engine:VisualElement>
     </engine:VisualElement>
 </engine:UXML>

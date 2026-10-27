@@ -1,0 +1,54 @@
+.sample-screen {
+    flex-grow: 1;
+    align-items: center;
+    justify-content: center;
+}
+
+.sample-card {
+    width: 520px;
+    max-height: 90%;
+    padding: 16px 20px;
+    background-color: rgba(24, 24, 30, 0.92);
+    border-radius: 8px;
+    color: rgb(235, 235, 235);
+}
+
+.sample-title {
+    font-size: 22px;
+    -unity-font-style: bold;
+    margin-bottom: 4px;
+}
+
+.sample-hint {
+    opacity: 0.8;
+    white-space: normal;
+    margin-bottom: 8px;
+}
+
+.sample-panel {
+    padding: 8px;
+    margin-bottom: 8px;
+    background-color: rgba(255, 225, 0, 0.15);
+    border-radius: 4px;
+}
+
+.sample-row {
+    flex-direction: row;
+    flex-wrap: wrap;
+    margin-top: 6px;
+}
+
+.sample-list {
+    height: 96px;
+}
+
+.sample-overlay {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(0, 0, 0, 0.6);
+}

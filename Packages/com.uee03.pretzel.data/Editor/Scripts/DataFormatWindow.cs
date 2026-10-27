@@ -11,8 +11,10 @@ namespace Pretzel.Data.Editor
         private const string TabKey = "Pretzel.DataFormat.Tab";
 
         private readonly List<IDataFormatPanel> _panels = new();
+        private readonly List<VisualElement> _settingsViews = new();
         private DataFormatState _state;
         private TabView _tabView;
+        private HelpBox _playModeNote;
 
         [MenuItem("Pretzel/Data Format", priority = 101)]
         public static void Open()
@@ -46,12 +48,25 @@ namespace Pretzel.Data.Editor
             _panels.Add(new DecryptPanel());
 
             _tabView = root.Q<TabView>("data-window__tabs");
+            _settingsViews.Clear();
             foreach (IDataFormatPanel panel in _panels)
             {
                 Tab tab = new(panel.Title);
-                tab.Add(panel.CreateView(_state));
+                VisualElement view = panel.CreateView(_state);
+                tab.Add(view);
                 _tabView.Add(tab);
+                if (panel is not DecryptPanel)
+                {
+                    _settingsViews.Add(view);
+                }
             }
+
+            _playModeNote = new HelpBox("Settings are read once when the game starts and stay fixed while it runs. Stop Play mode to change them.",
+                HelpBoxMessageType.Info);
+            _tabView.parent.Insert(_tabView.parent.IndexOf(_tabView), _playModeNote);
+            EditorApplication.playModeStateChanged -= OnPlayModeChanged;
+            EditorApplication.playModeStateChanged += OnPlayModeChanged;
+            UpdatePlayModeLock();
 
             _tabView.selectedTabIndex = Mathf.Clamp(SessionState.GetInt(TabKey, 0), 0, _panels.Count - 1);
             _tabView.activeTabChanged += (_, _) =>
@@ -67,7 +82,22 @@ namespace Pretzel.Data.Editor
 
         private void OnDisable()
         {
+            EditorApplication.playModeStateChanged -= OnPlayModeChanged;
             _state?.Flush();
+        }
+
+        private void OnPlayModeChanged(PlayModeStateChange _) => UpdatePlayModeLock();
+
+        // The decrypt tool stays usable; everything that changes settings or keys is locked.
+        private void UpdatePlayModeLock()
+        {
+            bool playing = EditorApplication.isPlayingOrWillChangePlaymode;
+            foreach (VisualElement view in _settingsViews)
+            {
+                view.SetEnabled(!playing);
+            }
+
+            _playModeNote.style.display = playing ? DisplayStyle.Flex : DisplayStyle.None;
         }
 
         private void UpdateUnsaved()

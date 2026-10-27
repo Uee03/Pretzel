@@ -22,6 +22,12 @@ namespace Pretzel.Setup.Addons.Tabs
         {
             Button updateAll = new(UpdateAll) { text = "Update all", tooltip = "Pull the latest version of every installed Pretzel module that came from git." };
             toolbar.Add(updateAll);
+
+            // Setup has no card of its own, so its samples open from the toolbar, which is built once.
+            CardAction setupSamples = SampleService.CreateAction(PackageInfo.FindForAssembly(typeof(AddonsTab).Assembly), busy: false);
+            Button samples = new(setupSamples.Invoke) { text = "Setup samples", tooltip = setupSamples.Tooltip };
+            samples.SetEnabled(setupSamples.Enabled);
+            toolbar.Add(samples);
         }
 
         private void UpdateAll()
@@ -105,6 +111,8 @@ namespace Pretzel.Setup.Addons.Tabs
                     tooltip: identifier == null ? "Set the repository URL on the Settings tab." : null));
                 return model;
             }
+
+            model.Actions.Add(SampleService.CreateAction(info, busy));
 
             if (!local && info.source == UpmSource.Git && identifier != null)
             {

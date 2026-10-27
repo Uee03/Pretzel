@@ -16,7 +16,7 @@
   "samples": [
     {
       "displayName": "API Usage",
-      "description": "GET, JSON POST, downloads, retries and cancellation.",
+      "description": "Every request type (JSON, text, bytes, HEAD, file, texture and audio downloads), options, retries, errors and cancellation.",
       "path": "Samples~/ApiUsage"
     }
   ]

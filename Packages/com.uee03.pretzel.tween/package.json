@@ -12,7 +12,7 @@
   "samples": [
     {
       "displayName": "Tween Usage",
-      "description": "Ease types and AnimationCurve lerps.",
+      "description": "Ease types and AnimationCurve lerps for float, Vector2, Vector3 and Color, plus Evaluate.",
       "path": "Samples~/TweenUsage"
     }
   ]

@@ -27,15 +27,15 @@ foreach ($package in Get-ChildItem (Join-Path $repository "Packages") -Directory
 }
 
 $dependencies = [ordered]@{
-    "com.unity.nuget.newtonsoft-json" = "3.2.2"
-    "com.unity.test-framework" = "1.4.5"
-    "com.unity.ugui" = "2.0.0"
-    "com.unity.modules.audio" = "1.0.0"
-    "com.unity.modules.imgui" = "1.0.0"
-    "com.unity.modules.jsonserialize" = "1.0.0"
-    "com.unity.modules.physics" = "1.0.0"
-    "com.unity.modules.ui" = "1.0.0"
-    "com.unity.modules.uielements" = "1.0.0"
+    "com.unity.nuget.newtonsoft-json"   = "3.2.2"
+    "com.unity.test-framework"          = "1.4.5"
+    "com.unity.ugui"                    = "2.0.0"
+    "com.unity.modules.audio"           = "1.0.0"
+    "com.unity.modules.imgui"           = "1.0.0"
+    "com.unity.modules.jsonserialize"   = "1.0.0"
+    "com.unity.modules.physics"         = "1.0.0"
+    "com.unity.modules.ui"              = "1.0.0"
+    "com.unity.modules.uielements"      = "1.0.0"
     "com.unity.modules.unitywebrequest" = "1.0.0"
     "com.unity.modules.imageconversion" = "1.0.0"
 }
@@ -53,7 +53,7 @@ if ($UseInstalledPackages) {
 
 $manifest = [ordered]@{
     dependencies = $dependencies
-    testables = $packageNames
+    testables    = $packageNames
 }
 $utf8 = New-Object System.Text.UTF8Encoding($false)
 [System.IO.File]::WriteAllText((Join-Path $packagesPath "manifest.json"), ($manifest | ConvertTo-Json -Depth 5), $utf8)
@@ -65,7 +65,7 @@ Copy-Item -LiteralPath (Join-Path $dataPackage "Samples~\DataUsage") -Destinatio
 if ($IncludeGeneratedExamples) {
     $examplesPath = Join-Path $assetsPath "GeneratedExamples"
     New-Item -ItemType Directory -Path $examplesPath | Out-Null
-    foreach ($name in @("PretzelPlainTextExample", "PretzelBinaryExample", "PretzelAesExample", "ProjectSaveData", "ProjectSaveService", "ProjectSaveExample", "PretzelEncryptionExample")) {
+    foreach ($name in @("PretzelPlainTextExample", "PretzelBinaryExample", "PretzelAesExample", "ProjectSaveData", "ISaveService", "SaveService", "SaveController", "ProjectSaveManager", "PretzelEncryptionExample")) {
         Copy-Item -LiteralPath (Join-Path $dataPackage "Templates~\Examples\$name.cs.txt") -Destination (Join-Path $examplesPath "$name.cs")
     }
     $editorPath = Join-Path $examplesPath "Editor"

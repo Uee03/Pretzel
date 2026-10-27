@@ -36,7 +36,7 @@ namespace Pretzel.Data.Tests
         {
             foreach (string name in new[]
                      {
-                         "ProjectDataIO", "PretzelDataSetup", "ProjectSaveData", "ProjectSaveService", "ProjectSaveExample",
+                         "ProjectDataIO", "PretzelDataSetup", "ProjectSaveData", "ISaveService", "SaveService", "SaveController", "ProjectSaveManager",
                          "PretzelEncryptionExample", "PretzelEncryptionExampleEditor"
                      })
             {
@@ -56,8 +56,9 @@ namespace Pretzel.Data.Tests
         {
             string code = DataIOSetupGenerator.RenderPlain(format);
             Assert.That(code, Does.Contain("DataFormat." + format + ";"));
-            Assert.That(code, Does.Contain("public static class ProjectDataIO"));
-            Assert.That(code, Does.Contain("Initialize(Action<DataIOConfig> configure = null, Action<DataStoreOptions> configureStore = null)"));
+            Assert.That(code, Does.Contain("public static partial class ProjectDataIO"));
+            Assert.That(code, Does.Contain("public static void Initialize()"));
+            Assert.That(code, Does.Contain("RuntimeInitializeLoadType.BeforeSceneLoad"));
             Assert.That(code, Does.Not.Contain("@@"));
             Assert.That(code, Does.Not.Contain("EncryptionKeys"));
         }
@@ -159,26 +160,26 @@ namespace Pretzel.Data.Tests
         [TestCase(DataFormat.PlainText)]
         [TestCase(DataFormat.Binary)]
         [TestCase(DataFormat.Encrypted)]
-        public void GeneratedSetupPassesStoreOptionsBeforeConstructingEveryStore(DataFormat format)
+        public void GeneratedSetupIsFixedAtStartupAndPassesStoreOptionsBeforeConstruction(DataFormat format)
         {
             string code = format == DataFormat.Encrypted
                 ? DataIOSetupGenerator.RenderEncrypted(EncryptionMode.Aes, KeySource.Provider)
                 : DataIOSetupGenerator.RenderPlain(format);
-            Assert.That(code, Does.Contain("Initialize(Action<DataIOConfig> configure = null, Action<DataStoreOptions> configureStore = null)"));
-            Assert.That(code, Does.Contain("CreateStore(string subFolder, Action<DataIOConfig> configure = null, Action<DataStoreOptions> configureStore = null)"));
+            Assert.That(code, Does.Contain("static partial void ConfigureStore(DataStoreOptions options);"));
+            Assert.That(code, Does.Contain("options => ConfigureStore(options)"));
+            Assert.That(code, Does.Contain("RuntimeInitializeLoadType.BeforeSceneLoad"));
+            Assert.That(code, Does.Not.Contain("Action<DataIOConfig>"), "Settings cannot be overridden at runtime.");
+            Assert.That(code, Does.Not.Contain("public static void Shutdown"));
             Assert.That(code, Does.Not.Contain("RSA"));
             Assert.That(code, Does.Not.Contain("CreateServerStore"));
             if (format == DataFormat.Encrypted)
             {
-                Assert.That(code, Does.Contain("InitializeWithKeys(EncryptionKeys keys, Action<DataIOConfig> configure = null, Action<DataStoreOptions> configureStore = null)"));
-                Assert.That(code, Does.Contain("store = config.CreateStore(null, clientKeys, configureStore);"));
-                Assert.That(code, Does.Contain("copy.format == DataFormat.Encrypted ? _clientKeys : null, configureStore)"));
-                Assert.That(code, Does.Contain("Create(keys, configure, configureStore);"));
+                Assert.That(code, Does.Contain("public static void InitializeWithKeys(EncryptionKeys keys)"));
+                Assert.That(code, Does.Contain("config.CreateStore(null, clientKeys, options => ConfigureStore(options))"));
             }
             else
             {
-                Assert.That(code, Does.Contain("store = config.CreateStore(configure: configureStore);"));
-                Assert.That(code, Does.Contain("copy.CreateStore(DataRoots.PersistentData(subFolder), configure: configureStore)"));
+                Assert.That(code, Does.Contain("config.CreateStore(configure: options => ConfigureStore(options))"));
             }
         }
 
@@ -298,19 +299,21 @@ namespace Pretzel.Data.Tests
             DataIOSetupGenerator.Write(folder, DataIOSetupGenerator.RenderPlain(DataFormat.PlainText));
 
             List<string> created = DataIOSetupGenerator.CreateExamples(folder, false);
-            Assert.That(created, Has.Count.EqualTo(4), "Three scripts and the guide.");
-            foreach (string name in new[] { "ProjectSaveData.cs", "ProjectSaveService.cs", "ProjectSaveExample.cs", "DataIOSetup.md" })
+            Assert.That(created, Has.Count.EqualTo(6), "Five scripts and the guide.");
+            foreach (string name in new[]
+                     {
+                         "ISaveService.cs", "SaveService.cs", "SaveController.cs", "ProjectSaveData.cs", "ProjectSaveManager.cs", "DataIOSetup.md"
+                     })
             {
                 Assert.That(File.Exists(folder + "/" + name), Is.True, name);
             }
 
             Assert.That(File.Exists(folder + "/PretzelEncryptionExample.cs"), Is.False, "The text demo is for encrypted setups.");
-            Assert.That(File.ReadAllText(folder + "/ProjectSaveExample.cs"), Does.Contain("ProjectDataIO.Initialize()"));
-            Assert.That(File.ReadAllText(folder + "/ProjectSaveExample.cs"), Does.Not.Contain("ProjectDataBootstrap"));
-            Assert.That(File.ReadAllText(folder + "/ProjectSaveExample.cs"),
-                Does.Contain("ex is IOException or InvalidDataException or UnauthorizedAccessException"));
+            string manager = File.ReadAllText(folder + "/ProjectSaveManager.cs");
+            Assert.That(manager, Does.Contain("ProjectDataIO.WhenReadyAsync"));
+            Assert.That(manager, Does.Contain("ex is IOException or InvalidDataException or UnauthorizedAccessException"));
 
-            string service = folder + "/ProjectSaveService.cs";
+            string service = folder + "/SaveService.cs";
             string edited = File.ReadAllText(service) + "\n// my change\n";
             File.WriteAllText(service, edited);
             Assert.That(DataIOSetupGenerator.CreateExamples(folder, false), Is.Empty);

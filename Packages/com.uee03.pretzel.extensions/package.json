@@ -14,7 +14,7 @@
   "samples": [
     {
       "displayName": "Extensions Usage",
-      "description": "Examples for the string, collection, float, Transform, GameObject and file extensions.",
+      "description": "Every extension: strings, bytes, collections, floats, objects, layer masks, Transform, GameObject, MonoBehaviour, Texture2D and file IO.",
       "path": "Samples~/ExtensionsUsage"
     }
   ]

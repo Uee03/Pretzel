@@ -14,7 +14,7 @@
   "samples": [
     {
       "displayName": "UI Toolkit Usage",
-      "description": "Element factories, fades, a hover fade and a controller.",
+      "description": "Two screens with UIControllerBase, every element factory, fades, UIHoverFade, UIDocumentFader and an Editor window for the Editor-only factories.",
       "path": "Samples~/UIUsage"
     }
   ]

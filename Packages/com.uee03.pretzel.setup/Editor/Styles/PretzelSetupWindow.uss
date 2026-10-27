@@ -40,6 +40,37 @@
     padding: var(--pretzel-gap);
 }
 
+/* Progress footer */
+.pretzel-progress {
+    padding: 6px 12px 8px;
+    background-color: var(--pretzel-surface-raised);
+    border-top-width: 1px;
+    border-top-color: var(--pretzel-border);
+}
+
+.pretzel-progress--hidden {
+    display: none;
+}
+
+.pretzel-progress__label {
+    margin-bottom: 4px;
+}
+
+.pretzel-progress__track {
+    height: 6px;
+    overflow: hidden;
+    background-color: var(--pretzel-border);
+    border-radius: 3px;
+}
+
+.pretzel-progress__fill {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    background-color: var(--pretzel-honey-deep);
+    border-radius: 3px;
+}
+
 /* Sections */
 .pretzel-section {
     margin-bottom: var(--pretzel-gap);

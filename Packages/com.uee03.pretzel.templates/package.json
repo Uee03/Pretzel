@@ -9,5 +9,12 @@
   "dependencies": {
     "com.uee03.pretzel.core": "0.1.0",
     "com.uee03.pretzel.ui": "0.1.0"
-  }
+  },
+  "samples": [
+    {
+      "displayName": "Templates Usage",
+      "description": "Finished scripts made from each template: a MonoBehaviour, a UI controller and a singleton.",
+      "path": "Samples~/TemplatesUsage"
+    }
+  ]
 }

@@ -135,6 +135,11 @@ namespace Pretzel.Setup.Addons.Tabs
             }
             else
             {
+                if (SampleService.Find(info).Count > 0)
+                {
+                    model.Actions.Add(SampleService.CreateAction(info, busy));
+                }
+
                 string dependent = InstalledDependent(entry, catalog);
                 model.Actions.Add(new CardAction("Uninstall", () => PackageService.Uninstall(entry.packageName, model.Title), !busy && dependent == null, danger: true,
                     tooltip: dependent == null ? null : "Required by " + dependent + "."));

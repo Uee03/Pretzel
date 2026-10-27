@@ -144,7 +144,7 @@ namespace Pretzel.Data.Editor
                     c.format = format;
                     c.fileExtension = DataFormats.DefaultExtension(format);
                 });
-                Succeed($"Created {path} for {format}. Call ProjectDataIO.Initialize() once at startup, then use DataIO.Save and DataIO.Load.", path);
+                Succeed($"Created {path} for {format}. It initializes itself before the first scene loads. Add the examples for a ready save manager.", path);
             }
             catch (Exception ex) when (PanelUi.IsExpectedFailure(ex))
             {
@@ -210,7 +210,7 @@ namespace Pretzel.Data.Editor
                 string path = DataIOSetupGenerator.Write(Folder, code);
                 completed = true;
                 Succeed($"Created {path} and exported the key to {keyPath}. Key source: {_state.Config.keySource}. "
-                    + "Call ProjectDataIO.Initialize() once at startup, then use DataIO.Save and DataIO.Load. Back up the key.", path);
+                    + "It loads the key and initializes itself before the first scene loads. Back up the key.", path);
             }
             catch (Exception ex) when (PanelUi.IsExpectedFailure(ex))
             {
@@ -250,7 +250,7 @@ namespace Pretzel.Data.Editor
                 PanelUi.SetText(_result, created.Count == 0
                     ? "Every example already exists, so nothing was replaced."
                     : $"Added {created.Count} file(s) to {Folder}: {string.Join(", ", created.ConvertAll(file => Path.GetFileName(file)))}. "
-                      + $"Read {DataIOSetupGenerator.GuideName} next. Add ProjectSaveExample to a GameObject to try it in Play mode.");
+                      + $"Read {DataIOSetupGenerator.GuideName} next. Add ProjectSaveManager to a GameObject in your first scene.");
             }
             catch (Exception ex) when (PanelUi.IsExpectedFailure(ex))
             {

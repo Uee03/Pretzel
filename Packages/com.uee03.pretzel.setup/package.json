@@ -8,5 +8,12 @@
   "license": "MIT",
   "dependencies": {
     "com.unity.nuget.newtonsoft-json": "3.2.2"
-  }
+  },
+  "samples": [
+    {
+      "displayName": "Setup Extensions",
+      "description": "Add your own Project Setup tab and Main tab section with IPretzelTab and IPretzelMainSection.",
+      "path": "Samples~/SetupExtensions"
+    }
+  ]
 }

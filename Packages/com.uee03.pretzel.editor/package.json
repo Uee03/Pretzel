@@ -5,5 +5,12 @@
   "unity": "6000.0",
   "description": "Standalone editor utilities that work in any project and need no other Pretzel module.",
   "author": { "name": "Uee03" },
-  "license": "MIT"
+  "license": "MIT",
+  "samples": [
+    {
+      "displayName": "Editor Usage",
+      "description": "Builds a demo hierarchy and groups it with Group Selected Objects, with undo.",
+      "path": "Samples~/EditorUsage"
+    }
+  ]
 }

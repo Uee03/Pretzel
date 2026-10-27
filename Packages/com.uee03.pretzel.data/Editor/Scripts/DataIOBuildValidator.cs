@@ -133,12 +133,19 @@ namespace Pretzel.Data.Editor
                 Error("PretzelDataSetup.RequestKeyAsync is still the generated stub, so the game can never fetch its key. Implement it before building.");
             }
 
+            if (delivery == DeliveryScript.Embedded && deliveryScript.Contains("RuntimeInitializeLoadType.BeforeSceneLoad"))
+            {
+                Error("PretzelDataSetup registers its key at BeforeSceneLoad, the same time ProjectDataIO initializes, so the key may be missed. "
+                      + "Export the embedded setup again on the Keys tab.");
+            }
+
             switch (source)
             {
                 case KeySource.Provider:
                     if (delivery == DeliveryScript.None)
                     {
-                        Warn("The key source is Provider, but no PretzelDataSetup script was found. Make sure your own code assigns EncryptionKeys.Provider before ProjectDataIO.Initialize.");
+                        Warn("The key source is Provider, but no PretzelDataSetup script was found. Assign EncryptionKeys.Provider at AfterAssembliesLoaded, "
+                             + "or call ProjectDataIO.InitializeWithKeys once your key arrives.");
                     }
                     else if (delivery == DeliveryScript.Environment)
                     {

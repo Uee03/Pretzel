@@ -14,7 +14,7 @@
   "samples": [
     {
       "displayName": "Data Usage",
-      "description": "Keys, slots, ScriptableObjects, migrations, async saves and AES save/load.",
+      "description": "Keys, slots, GUIDs, JSON helpers, interface fields, ScriptableObjects, migrations, async saves, transforms and AES save/load.",
       "path": "Samples~/DataUsage"
     }
   ]

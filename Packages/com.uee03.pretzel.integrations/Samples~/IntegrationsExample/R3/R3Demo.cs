@@ -54,6 +54,17 @@ namespace Pretzel.Samples.Integrations
                 .Switch()
                 .Subscribe(response => status.text = response.Ok ? response.Data.title : "Failed: " + response.Error)
                 .AddTo(_subscriptions);
+
+            // Raw text and JSON POST streams. Each subscription sends one request; disposing it aborts the request.
+            Label raw = UIToolkitUtility.CreateLabel("Raw: -", root);
+            Button rawButton = UIToolkitUtility.CreateButton("GET raw text and POST json", null, root);
+            rawButton.ClickedAsObservable()
+                .Select(_ => _client.GetAsObservable("todos/2")
+                    .Zip(_client.PostJsonAsObservable<Todo, Todo>("todos", new Todo { title = "From R3" }),
+                        (text, created) => $"Raw: {text.Data?.Length ?? 0} chars, created id {created.Data?.id}"))
+                .Switch()
+                .Subscribe(summary => raw.text = summary)
+                .AddTo(_subscriptions);
         }
 
         private void OnDisable()

@@ -1,0 +1,81 @@
+using System;
+using System.IO;
+using System.Threading;
+using UnityEngine;
+
+/// <summary>
+/// Scene entry point for saves. Waits for ProjectDataIO, injects one SaveService into each controller and optionally
+/// loads on start and saves on pause and quit. Add a SaveController field per kind of data and inject it in Start.
+/// </summary>
+[DisallowMultipleComponent]
+public sealed class ProjectSaveManager : MonoBehaviour
+{
+    [SerializeField] private SaveController<ProjectSaveData> _profile = new("profile", "Profiles", useSlots: true);
+
+    [Tooltip("Load the selected profile slot once ProjectDataIO is ready.")]
+    [SerializeField] private bool _loadOnStart = true;
+
+    [Tooltip("Save with a blocking write when the app pauses or quits. Mobile platforms may close a paused app without warning.")]
+    [SerializeField] private bool _saveOnPauseAndQuit = true;
+
+    public SaveController<ProjectSaveData> Profile => _profile;
+
+    /// <summary>Null until ProjectDataIO is ready. Share it with code that saves its own data.</summary>
+    public ISaveService Service { get; private set; }
+
+    public bool IsReady => Service != null;
+
+    public event Action Ready;
+
+    // async void is the Unity event boundary here; every expected failure is handled below.
+    private async void Start()
+    {
+        CancellationToken cancellationToken = destroyCancellationToken;
+        try
+        {
+            Service = new SaveService(await ProjectDataIO.WhenReadyAsync(cancellationToken));
+            _profile.Inject(Service);
+            Ready?.Invoke();
+
+            if (_loadOnStart)
+            {
+                await _profile.LoadAsync(cancellationToken);
+            }
+        }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+        {
+        }
+        catch (Exception ex) when (ex is IOException or InvalidDataException or UnauthorizedAccessException)
+        {
+            Debug.LogError($"[ProjectSaveManager] Loading the profile failed. Nothing was overwritten: {ex.Message}", this);
+        }
+    }
+
+    private void OnApplicationPause(bool paused)
+    {
+        if (paused)
+        {
+            SaveOnExit();
+        }
+    }
+
+    private void OnApplicationQuit() => SaveOnExit();
+
+    private void SaveOnExit()
+    {
+        if (!_saveOnPauseAndQuit || !IsReady)
+        {
+            return;
+        }
+
+        try
+        {
+            _profile.SaveNow();
+        }
+        catch (Exception ex) when (ex is IOException or InvalidDataException or UnauthorizedAccessException
+            or System.Security.Cryptography.CryptographicException or Newtonsoft.Json.JsonException)
+        {
+            Debug.LogError($"[ProjectSaveManager] Saving the profile on exit failed: {ex.Message}", this);
+        }
+    }
+}

@@ -15,7 +15,7 @@
   "samples": [
     {
       "displayName": "UGUI Usage",
-      "description": "UIFader on a CanvasGroup with a hover fade and Button extensions.",
+      "description": "UIFader on a CanvasGroup, OnMouseHoverFade, and the Button and placeholder extensions.",
       "path": "Samples~/UGUIUsage"
     }
   ]

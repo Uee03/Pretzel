@@ -119,8 +119,8 @@ namespace Pretzel.Data.Editor
 
             KeySource source = Selected == KeyDelivery.Environment ? KeySource.Environment : KeySource.Provider;
             GameKeyExport.SyncKeySource(_state, source);
-            PanelUi.SetText(_result, $"Created {path}. Key source set to {source}. Generate the setup code on the Setup tab "
-                + "and call ProjectDataIO.Initialize() once at startup, after this has run.");
+            PanelUi.SetText(_result, $"Created {path}. Key source set to {source}. Generate the setup code on the Setup tab; "
+                + "ProjectDataIO initializes itself before the first scene loads.");
             Object script = AssetDatabase.LoadAssetAtPath<Object>(path);
             if (script)
             {

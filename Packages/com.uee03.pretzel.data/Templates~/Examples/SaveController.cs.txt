@@ -1,0 +1,193 @@
+using System;
+using System.Collections.Generic;
+using System.Threading;
+using Pretzel.Data;
+using UnityEngine;
+
+/// <summary>
+/// Owns one kind of saved data in memory (a profile, settings, a world region). Add it as a serialized field to any
+/// component, inject an ISaveService, then Load, change Data and Save. One operation runs at a time.
+/// </summary>
+[Serializable]
+public sealed class SaveController<T> where T : class, new()
+{
+    [Tooltip("File name without extension.")]
+    [SerializeField] private string _name = "data";
+
+    [Tooltip("Optional sub-folder inside the save folder, for example Profiles.")]
+    [SerializeField] private string _folder;
+
+    [Tooltip("Keep one file per slot. Turn off for single files such as settings.")]
+    [SerializeField] private bool _useSlots;
+
+    [SerializeField, Min(0)] private int _slot;
+
+    private ISaveService _service;
+    private DataKey _loadedKey;
+
+    public SaveController()
+    {
+    }
+
+    public SaveController(string name, string folder = null, bool useSlots = false)
+    {
+        _name = name;
+        _folder = folder;
+        _useSlots = useSlots;
+    }
+
+    /// <summary>The loaded value, or null before a successful Load or StartNew.</summary>
+    public T Data { get; private set; }
+
+    public bool IsLoaded => Data != null;
+
+    public bool IsBusy { get; private set; }
+
+    /// <summary>The slot that Load, StartNew, Delete and ListSlots use.</summary>
+    public int Slot => _slot;
+
+    /// <summary>The key Data was loaded from. Save always writes back there, even after SelectSlot.</summary>
+    public DataKey LoadedKey => IsLoaded ? _loadedKey : default;
+
+    public event Action<T> Loaded;
+    public event Action<T> Saved;
+
+    public void Inject(ISaveService service)
+    {
+        _service = service ?? throw new ArgumentNullException(nameof(service));
+    }
+
+    public void SelectSlot(int slot)
+    {
+        if (!_useSlots)
+        {
+            throw new InvalidOperationException($"'{_name}' does not use slots.");
+        }
+
+        if (slot < 0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(slot), slot, "Slot must be 0 or greater.");
+        }
+
+        _slot = slot;
+    }
+
+    /// <summary>Loads the selected slot, or creates new data when it has no file. Throws when the file is unreadable.</summary>
+    public async Awaitable<T> LoadAsync(CancellationToken cancellationToken = default)
+    {
+        ISaveService service = Begin();
+        DataKey key = SelectedKey();
+        // A failed load must not leave old data that a later Save would write over another slot.
+        Data = null;
+        try
+        {
+            Data = await service.LoadOrCreateAsync<T>(key, cancellationToken);
+            _loadedKey = key;
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+
+        Loaded?.Invoke(Data);
+        return Data;
+    }
+
+    /// <summary>Replaces Data with a fresh value for the selected slot. Nothing is written until Save.</summary>
+    public T StartNew()
+    {
+        ThrowIfBusy();
+        _loadedKey = SelectedKey();
+        Data = new T();
+        Loaded?.Invoke(Data);
+        return Data;
+    }
+
+    public async Awaitable SaveAsync(CancellationToken cancellationToken = default)
+    {
+        ISaveService service = Begin();
+        T data = Data;
+        try
+        {
+            if (data == null)
+            {
+                throw new InvalidOperationException($"Load or start '{_name}' before saving it.");
+            }
+
+            await service.SaveAsync(_loadedKey, data, cancellationToken);
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+
+        Saved?.Invoke(data);
+    }
+
+    /// <summary>Blocking save for pause and quit. Returns false when nothing is loaded. Safe while an async save runs: the newest write wins.</summary>
+    public bool SaveNow()
+    {
+        if (_service == null || Data == null)
+        {
+            return false;
+        }
+
+        _service.Save(_loadedKey, Data);
+        Saved?.Invoke(Data);
+        return true;
+    }
+
+    /// <summary>Permanently deletes the selected slot. Call only after the player confirms.</summary>
+    public async Awaitable<bool> DeleteAsync(CancellationToken cancellationToken = default)
+    {
+        ISaveService service = Begin();
+        DataKey key = SelectedKey();
+        try
+        {
+            bool deleted = await service.DeleteAsync(key, cancellationToken);
+            if (IsLoaded && _loadedKey == key)
+            {
+                Data = null;
+            }
+
+            return deleted;
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
+    public Awaitable<IReadOnlyList<int>> ListSlotsAsync(CancellationToken cancellationToken = default)
+    {
+        if (!_useSlots)
+        {
+            throw new InvalidOperationException($"'{_name}' does not use slots.");
+        }
+
+        return Service.ListSlotsAsync(SelectedKey(), cancellationToken);
+    }
+
+    private ISaveService Service => _service ?? throw new InvalidOperationException($"Inject an ISaveService into the '{_name}' controller first.");
+
+    private DataKey SelectedKey()
+    {
+        return new DataKey(_name, _useSlots ? _slot : null, string.IsNullOrWhiteSpace(_folder) ? null : _folder);
+    }
+
+    private ISaveService Begin()
+    {
+        ISaveService service = Service;
+        ThrowIfBusy();
+        IsBusy = true;
+        return service;
+    }
+
+    private void ThrowIfBusy()
+    {
+        if (IsBusy)
+        {
+            throw new InvalidOperationException($"'{_name}' is still loading or saving. Wait for it to finish.");
+        }
+    }
+}

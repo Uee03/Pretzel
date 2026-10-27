@@ -2,7 +2,7 @@ using System;
 using Pretzel.Data;
 using UnityEngine.Scripting;
 
-/// <summary>The data one save slot holds. Add your own fields; bump SchemaVersion and add a migration when their meaning changes.</summary>
+/// <summary>The data one profile slot holds. Add your own fields; bump SchemaVersion and add a migration when their meaning changes.</summary>
 // Preserve keeps the type and constructor that Newtonsoft needs when IL2CPP strips code.
 [Serializable, Preserve, SchemaVersion(1)]
 public sealed class ProjectSaveData
