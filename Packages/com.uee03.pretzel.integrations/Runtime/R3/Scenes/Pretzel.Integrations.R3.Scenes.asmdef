@@ -1,0 +1,34 @@
+{
+  "name": "Pretzel.Integrations.R3.Scenes",
+  "rootNamespace": "Pretzel.Integrations.R3",
+  "references": [
+    "Pretzel.Core",
+    "Pretzel.Scenes",
+    "R3.Unity"
+  ],
+  "includePlatforms": [],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": true,
+  "precompiledReferences": [
+    "R3.dll"
+  ],
+  "autoReferenced": true,
+  "defineConstraints": [
+    "PRETZEL_R3",
+    "PRETZEL_SCENES"
+  ],
+  "versionDefines": [
+    {
+      "name": "com.cysharp.r3",
+      "expression": "",
+      "define": "PRETZEL_R3"
+    },
+    {
+      "name": "com.uee03.pretzel.scenes",
+      "expression": "",
+      "define": "PRETZEL_SCENES"
+    }
+  ],
+  "noEngineReferences": false
+}

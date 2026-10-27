@@ -9,6 +9,7 @@ dependencies. Do not run a second Editor against an open or locked project.
 | Gate | Scope | Evidence / required follow-up |
 |---|---|---|
 | Unity 6000.6.5f1, Windows Editor | Seventeen first-party packages, EditMode suites of thirteen packages, DataIO samples | Local validation; results below |
+| Scene loading, PlayMode | `SceneLoader` pipeline, policies, groups, preload, cancellation, failure cleanup and fallback with generated test scenes | 17 PlayMode tests passed twice in a clean host, 6000.6.5f1 (2026-10-27) |
 | Package samples | Every `Samples~` folder imported into one host | Compiled with zero C# errors and warnings (integration samples are skipped by their define constraints) |
 | Generated examples | Plain, binary and AES use cases and the profile service and startup | Separate compile gate; generation tests also inspect source |
 | UI Toolkit theme template | `PretzelTheme.tss` imported as a theme | Imported without errors |
@@ -16,8 +17,8 @@ dependencies. Do not run a second Editor against an open or locked project.
 | Player persistence | Save, quit, relaunch, load; previous-release saves | Required per shipping platform; not proven by EditMode |
 | IL2CPP / stripping, Windows x64 | Generated AES startup and profile service; plain, binary (async) and encrypted round trips | One local smoke player, 6000.6.5f1, Managed Stripping High, passed (2026-10-24). Audio, scenes, pooling and the console were not part of it |
 | IL2CPP on other platforms, consoles, mobile | Actual player and backend | Not certified |
-| Runtime behaviour in a player | Scene transitions and setup phases, audio mixing, safe area on notched devices, world-space panels, console input | Manual checks; not covered by EditMode tests |
-| R3, UniTask, LitMotion adapters | Third-party packages present | Optional assemblies are absent from clean hosts unless those packages are installed |
+| Runtime behaviour in a player | Scene transitions in a player, audio mixing, safe area on notched devices, world-space panels, console input | Manual checks; scene loading is covered in the Editor by PlayMode tests only |
+| R3, UniTask, LitMotion adapters | Third-party packages present | Optional assemblies are absent from clean hosts unless those packages are installed. `Pretzel.Integrations.R3` and `.R3.Scenes` compiled against R3 1.3.0 on 6000.6.5f1 (2026-10-27); R3's own Editor tree view does not compile on 6000.6 (obsolete `TreeView` API) |
 | Performance and size | Representative target-player payloads | No speed, size or allocation claim |
 
 ## Reproduce a clean local run
@@ -58,6 +59,9 @@ or `Binary` for those startup variants). Some generation tests intentionally ski
 classes; the clean-host run must have no skips.
 
 Do not pass `-quit` to the Unity test runner. Inspect XML totals, failures and compiler errors, not only the exit code.
+
+Run the PlayMode suite in the same host with `-testPlatform PlayMode`. The scenes tests create their scenes under
+`Assets/PretzelSceneLoaderTests`, add them to the build scene list, and remove both afterwards.
 `dotnet build` is not a Unity import or player gate.
 
 ## Module catalog

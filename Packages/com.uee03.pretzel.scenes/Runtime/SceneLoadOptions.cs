@@ -37,5 +37,17 @@ namespace Pretzel.Scenes
 
         /// <summary>Status shown while the scene loads, when the transition implements <see cref="ISceneStatusDisplay"/>.</summary>
         public string LoadingStatus { get; set; }
+
+        /// <summary>
+        /// Application.backgroundLoadingPriority during the load, restored afterwards. High loads fastest behind a loading
+        /// screen; Low suits preloading during gameplay. Null leaves it alone.
+        /// </summary>
+        public ThreadPriority? LoadingPriority { get; set; } = ThreadPriority.High;
+
+        /// <summary>
+        /// A scene, for example the main menu, loaded in single mode behind the transition when the load fails.
+        /// The loader then throws <see cref="SceneLoadException"/>. Cancellation never falls back.
+        /// </summary>
+        public string FallbackScene { get; set; }
     }
 }

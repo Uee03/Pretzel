@@ -1,0 +1,10 @@
+{
+  "name": "Pretzel.Scenes.PlayModeTests",
+  "rootNamespace": "Pretzel.Scenes.Tests",
+  "references": ["Pretzel.Scenes", "Pretzel.Core", "UnityEngine.TestRunner", "UnityEditor.TestRunner"],
+  "includePlatforms": [],
+  "overrideReferences": true,
+  "precompiledReferences": ["nunit.framework.dll"],
+  "autoReferenced": false,
+  "defineConstraints": ["UNITY_INCLUDE_TESTS"]
+}

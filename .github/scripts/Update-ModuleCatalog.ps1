@@ -77,7 +77,10 @@ foreach ($directory in Get-ChildItem $packagesRoot -Directory -Filter "$prefix*"
         foreach ($asmdefFile in Get-ChildItem $runtime -Recurse -Filter "*.asmdef" | Sort-Object FullName) {
             $asmdef = [System.IO.File]::ReadAllText($asmdefFile.FullName) | ConvertFrom-Json
             foreach ($versionDefine in @($asmdef.versionDefines)) {
-                if ($versionDefine -and @($asmdef.defineConstraints) -contains $versionDefine.define) {
+                # Pretzel modules are not third-party libraries, and a library adapted by several assemblies is listed once.
+                $isModule = $versionDefine -and $versionDefine.name.StartsWith($prefix)
+                $listed = @($optional | Where-Object { $_.PackageName -eq $versionDefine.name }).Count -gt 0
+                if ($versionDefine -and -not $isModule -and -not $listed -and @($asmdef.defineConstraints) -contains $versionDefine.define) {
                     $optional += [pscustomobject]@{ DisplayName = $asmdefFile.Directory.Name; PackageName = $versionDefine.name }
                 }
             }

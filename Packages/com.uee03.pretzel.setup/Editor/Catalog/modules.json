@@ -85,7 +85,7 @@
     {
       "name": "com.uee03.pretzel.scenes",
       "displayName": "Scenes",
-      "description": "An Awaitable scene loader with additive loading, activation gating, a setup phase behind the loading screen, weighted progress, status text, minimum duration, cancellation and fade transitions.",
+      "description": "An Awaitable scene loader with scene groups, background preloading, request queuing, observable state and load reports, a setup phase behind the loading screen, weighted progress, failure fallback, cancellation and fade transitions.",
       "version": "0.2.0",
       "dependencies": ["com.uee03.pretzel.core", "com.uee03.pretzel.tween", "com.uee03.pretzel.ui"],
       "packages": [],

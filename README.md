@@ -67,7 +67,7 @@ graph TD
 | [api](Packages/com.uee03.pretzel.api/README.md) | HTTP client on `Awaitable` |
 | [events](Packages/com.uee03.pretzel.events/README.md) | Typed event bus and ScriptableObject event channels |
 | [pooling](Packages/com.uee03.pretzel.pooling/README.md) | Prefab pools with prewarming and reset hooks |
-| [scenes](Packages/com.uee03.pretzel.scenes/README.md) | Gated scene loading with transitions, progress and cancellation |
+| [scenes](Packages/com.uee03.pretzel.scenes/README.md) | Scene loading with groups, preloading, request queuing, observable state, setup phases, transitions and fallback |
 | [audio](Packages/com.uee03.pretzel.audio/README.md) | Audio manager with pooled voices, cues, mixer channels and music crossfades |
 | [preferences](Packages/com.uee03.pretzel.preferences/README.md) | Saved player preferences for audio, graphics, controls and language |
 | [devconsole](Packages/com.uee03.pretzel.devconsole/README.md) | In-game log overlay and command console for development builds |
