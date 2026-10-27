@@ -1,0 +1,14 @@
+{
+  "name": "Pretzel.DI.Tests.Fixtures",
+  "rootNamespace": "Pretzel.DI.Tests",
+  "references": ["Pretzel.DI"],
+  "includePlatforms": [],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": false,
+  "defineConstraints": ["UNITY_INCLUDE_TESTS"],
+  "versionDefines": [],
+  "noEngineReferences": false
+}

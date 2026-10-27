@@ -2,11 +2,18 @@
   "dependencies": {
     "com.github-glitchenzo.nugetforunity": "https://github.com/GlitchEnzo/NuGetForUnity.git?path=/src/NuGetForUnity#v4.5.0",
     "com.uee03.pretzel.api": "file:../../Packages/com.uee03.pretzel.api",
+    "com.uee03.pretzel.audio": "file:../../Packages/com.uee03.pretzel.audio",
     "com.uee03.pretzel.core": "file:../../Packages/com.uee03.pretzel.core",
     "com.uee03.pretzel.data": "file:../../Packages/com.uee03.pretzel.data",
+    "com.uee03.pretzel.devconsole": "file:../../Packages/com.uee03.pretzel.devconsole",
+    "com.uee03.pretzel.di": "file:../../Packages/com.uee03.pretzel.di",
     "com.uee03.pretzel.editor": "file:../../Packages/com.uee03.pretzel.editor",
+    "com.uee03.pretzel.events": "file:../../Packages/com.uee03.pretzel.events",
     "com.uee03.pretzel.extensions": "file:../../Packages/com.uee03.pretzel.extensions",
     "com.uee03.pretzel.integrations": "file:../../Packages/com.uee03.pretzel.integrations",
+    "com.uee03.pretzel.pooling": "file:../../Packages/com.uee03.pretzel.pooling",
+    "com.uee03.pretzel.preferences": "file:../../Packages/com.uee03.pretzel.preferences",
+    "com.uee03.pretzel.scenes": "file:../../Packages/com.uee03.pretzel.scenes",
     "com.uee03.pretzel.setup": "file:../../Packages/com.uee03.pretzel.setup",
     "com.uee03.pretzel.templates": "file:../../Packages/com.uee03.pretzel.templates",
     "com.uee03.pretzel.tween": "file:../../Packages/com.uee03.pretzel.tween",
@@ -68,6 +75,18 @@
     "com.unity.modules.xr": "1.0.0"
   },
   "testables": [
-    "com.uee03.pretzel.data"
+    "com.uee03.pretzel.api",
+    "com.uee03.pretzel.audio",
+    "com.uee03.pretzel.core",
+    "com.uee03.pretzel.data",
+    "com.uee03.pretzel.devconsole",
+    "com.uee03.pretzel.di",
+    "com.uee03.pretzel.events",
+    "com.uee03.pretzel.extensions",
+    "com.uee03.pretzel.pooling",
+    "com.uee03.pretzel.preferences",
+    "com.uee03.pretzel.setup",
+    "com.uee03.pretzel.tween",
+    "com.uee03.pretzel.ui"
   ]
 }

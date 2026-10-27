@@ -1,0 +1,158 @@
+{
+  "generatedBy": ".github/scripts/Update-ModuleCatalog.ps1",
+  "modules": [
+    {
+      "name": "com.uee03.pretzel.core",
+      "displayName": "Core",
+      "description": "Guard checks, singletons, timers and disposables shared by every Pretzel module.",
+      "version": "0.2.0",
+      "dependencies": [],
+      "packages": [],
+      "optionalLibraries": []
+    },
+    {
+      "name": "com.uee03.pretzel.extensions",
+      "displayName": "Extensions",
+      "description": "Extension methods for .NET and Unity types (string, IO, GameObject, Transform, collections and more).",
+      "version": "0.2.0",
+      "dependencies": ["com.uee03.pretzel.core"],
+      "packages": [],
+      "optionalLibraries": []
+    },
+    {
+      "name": "com.uee03.pretzel.data",
+      "displayName": "Data",
+      "description": "Save and load with keys, save slots, recoverable writes, migrations, auto-save and a pluggable serializer. Includes the Data Format window and the SerializableGuid drawer.",
+      "version": "0.2.0",
+      "dependencies": ["com.uee03.pretzel.core"],
+      "packages": ["com.unity.nuget.newtonsoft-json"],
+      "optionalLibraries": []
+    },
+    {
+      "name": "com.uee03.pretzel.tween",
+      "displayName": "Tween",
+      "description": "Easing functions for float, Vector2, Vector3 and Color.",
+      "version": "0.2.0",
+      "dependencies": ["com.uee03.pretzel.core"],
+      "packages": [],
+      "optionalLibraries": []
+    },
+    {
+      "name": "com.uee03.pretzel.ui",
+      "displayName": "UI (UI Toolkit)",
+      "description": "UI Toolkit helpers: element factories, fades, screen navigation, safe area, toasts, world-space helpers, a screen controller base and Editor UI building blocks.",
+      "version": "0.2.0",
+      "dependencies": ["com.uee03.pretzel.core", "com.uee03.pretzel.tween"],
+      "packages": [],
+      "optionalLibraries": []
+    },
+    {
+      "name": "com.uee03.pretzel.ui.ugui",
+      "displayName": "UI (UGUI)",
+      "description": "UGUI components: UIFader, hover fade and Button and Graphic extensions.",
+      "version": "0.2.0",
+      "dependencies": ["com.uee03.pretzel.core", "com.uee03.pretzel.ui", "com.uee03.pretzel.tween"],
+      "packages": ["com.unity.ugui"],
+      "optionalLibraries": []
+    },
+    {
+      "name": "com.uee03.pretzel.api",
+      "displayName": "API",
+      "description": "An Awaitable HTTP client on UnityWebRequest with retries, timeouts, progress and cancellation.",
+      "version": "0.2.0",
+      "dependencies": ["com.uee03.pretzel.core", "com.uee03.pretzel.data"],
+      "packages": [],
+      "optionalLibraries": []
+    },
+    {
+      "name": "com.uee03.pretzel.events",
+      "displayName": "Events",
+      "description": "A typed in-memory event bus and ScriptableObject event channels with listener components.",
+      "version": "0.2.0",
+      "dependencies": ["com.uee03.pretzel.core"],
+      "packages": [],
+      "optionalLibraries": []
+    },
+    {
+      "name": "com.uee03.pretzel.di",
+      "displayName": "DI",
+      "description": "A small reflection-based dependency injection container with singleton, scoped and transient lifetimes, [Inject] members, child scopes, entry points and a LifetimeScope component.",
+      "version": "0.2.0",
+      "dependencies": ["com.uee03.pretzel.core"],
+      "packages": [],
+      "optionalLibraries": []
+    },
+    {
+      "name": "com.uee03.pretzel.pooling",
+      "displayName": "Pooling",
+      "description": "Prefab pools on UnityEngine.Pool with prewarming, IPoolable reset hooks, self-releasing PooledObject and a per-prefab PoolRegistry.",
+      "version": "0.2.0",
+      "dependencies": ["com.uee03.pretzel.core"],
+      "packages": [],
+      "optionalLibraries": []
+    },
+    {
+      "name": "com.uee03.pretzel.scenes",
+      "displayName": "Scenes",
+      "description": "An Awaitable scene loader with additive loading, activation gating, progress, minimum duration, cancellation and fade transitions.",
+      "version": "0.2.0",
+      "dependencies": ["com.uee03.pretzel.core", "com.uee03.pretzel.tween", "com.uee03.pretzel.ui"],
+      "packages": [],
+      "optionalLibraries": []
+    },
+    {
+      "name": "com.uee03.pretzel.audio",
+      "displayName": "Audio",
+      "description": "An audio manager with pooled AudioSources, AudioCue assets, per-channel volume through an AudioMixer or directly, and crossfading music.",
+      "version": "0.2.0",
+      "dependencies": ["com.uee03.pretzel.core"],
+      "packages": [],
+      "optionalLibraries": []
+    },
+    {
+      "name": "com.uee03.pretzel.preferences",
+      "displayName": "Preferences",
+      "description": "Player preferences for audio, graphics, controls and language, saved through Pretzel Data, with change events and graphics apply.",
+      "version": "0.2.0",
+      "dependencies": ["com.uee03.pretzel.core", "com.uee03.pretzel.data"],
+      "packages": [],
+      "optionalLibraries": []
+    },
+    {
+      "name": "com.uee03.pretzel.devconsole",
+      "displayName": "Dev Console",
+      "description": "An in-game UI Toolkit log overlay and command console for development builds, with a thread-safe log buffer and a command registry.",
+      "version": "0.2.0",
+      "dependencies": ["com.uee03.pretzel.core"],
+      "packages": [],
+      "optionalLibraries": []
+    },
+    {
+      "name": "com.uee03.pretzel.templates",
+      "displayName": "Templates",
+      "description": "Script templates for Pretzel types (MonoBehaviour, UI controller, singleton) and a UI Toolkit theme template.",
+      "version": "0.2.0",
+      "dependencies": ["com.uee03.pretzel.core", "com.uee03.pretzel.ui"],
+      "packages": [],
+      "optionalLibraries": []
+    },
+    {
+      "name": "com.uee03.pretzel.integrations",
+      "displayName": "Integrations",
+      "description": "Optional adapters between Pretzel and LitMotion, UniTask and R3. Each adapter assembly compiles only when its library is installed.",
+      "version": "0.2.0",
+      "dependencies": ["com.uee03.pretzel.core", "com.uee03.pretzel.tween", "com.uee03.pretzel.api", "com.uee03.pretzel.ui"],
+      "packages": [],
+      "optionalLibraries": [{ "displayName": "LitMotion", "packageName": "com.annulusgames.lit-motion" }, { "displayName": "R3", "packageName": "com.cysharp.r3" }, { "displayName": "UniTask", "packageName": "com.cysharp.unitask" }]
+    },
+    {
+      "name": "com.uee03.pretzel.editor",
+      "displayName": "Editor",
+      "description": "Standalone editor utilities that work in any project and need no other Pretzel module.",
+      "version": "0.2.0",
+      "dependencies": [],
+      "packages": [],
+      "optionalLibraries": []
+    }
+  ]
+}

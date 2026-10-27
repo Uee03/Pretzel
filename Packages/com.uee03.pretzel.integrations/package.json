@@ -1,16 +1,16 @@
 {
   "name": "com.uee03.pretzel.integrations",
   "displayName": "Pretzel Integrations",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "unity": "6000.0",
   "description": "Optional adapters between Pretzel and LitMotion, UniTask and R3. Each adapter assembly compiles only when its library is installed.",
   "author": { "name": "Uee03" },
   "license": "MIT",
   "dependencies": {
-    "com.uee03.pretzel.core": "0.1.0",
-    "com.uee03.pretzel.tween": "0.1.0",
-    "com.uee03.pretzel.api": "0.1.0",
-    "com.uee03.pretzel.ui": "0.1.0"
+    "com.uee03.pretzel.core": "0.2.0",
+    "com.uee03.pretzel.tween": "0.2.0",
+    "com.uee03.pretzel.api": "0.2.0",
+    "com.uee03.pretzel.ui": "0.2.0"
   },
   "samples": [
     {

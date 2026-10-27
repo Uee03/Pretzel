@@ -1,13 +1,21 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Pretzel.Setup.Settings;
 using UnityEditor.PackageManager;
+using UnityEngine;
+using PackageInfo = UnityEditor.PackageManager.PackageInfo;
 
 namespace Pretzel.Setup.Addons.Catalog
 {
     public static class ModuleCatalog
     {
-        private const string Prefix = "com.uee03.pretzel.";
-        private const string SetupPackage = Prefix + "setup";
+        private const string CatalogPath = "Editor/Catalog/modules.json";
+
+        private static IReadOnlyList<ModuleInfo> _all;
 
         /// <summary>The repository and tag modules install from: the Settings values, else the git source this package was installed from.</summary>
         public static (string Url, string Version) ResolveSource(PretzelProjectSettings settings)
@@ -48,19 +56,61 @@ namespace Pretzel.Setup.Addons.Catalog
             return (query >= 0 ? rest.Substring(0, query) : rest, version);
         }
 
-        public static IReadOnlyList<ModuleInfo> All { get; } = new List<ModuleInfo>
+        /// <summary>
+        /// Every Pretzel module, read once from <c>Editor/Catalog/modules.json</c>. That file is generated from the module
+        /// manifests by <c>.github/scripts/Update-ModuleCatalog.ps1</c>; do not edit it by hand.
+        /// </summary>
+        public static IReadOnlyList<ModuleInfo> All => _all ??= Load();
+
+        private static IReadOnlyList<ModuleInfo> Load()
         {
-            new(Prefix + "core", "Core", "Guard checks and singletons shared by every module.", new string[0]),
-            new(Prefix + "extensions", "Extensions", "Extension methods for strings, collections, GameObjects, Transforms and files.", new[] { Prefix + "core" }),
-            new(Prefix + "data", "Data", "Save and load with keys, slots, recoverable writes, migrations and a pluggable serializer. Includes the Data Format window and the SerializableGuid drawer.", new[] { Prefix + "core", Prefix + "extensions" }, null, new[] { "com.unity.nuget.newtonsoft-json" }),
-            new(Prefix + "tween", "Tween", "Easing functions for float, Vector2, Vector3 and Color.", new[] { Prefix + "core" }),
-            new(Prefix + "ui", "UI (UI Toolkit)", "Element factories, USS-transition fades, a hover fade and a screen controller base.", new[] { Prefix + "core", Prefix + "tween" }),
-            new(Prefix + "ui.ugui", "UI (UGUI)", "UIFader, hover fade and Button extensions for Unity UI.", new[] { Prefix + "core", Prefix + "ui", Prefix + "tween" }),
-            new(Prefix + "api", "API", "An Awaitable HTTP client with retries, timeouts and cancellation.", new[] { Prefix + "core", Prefix + "data" }),
-            new(Prefix + "templates", "Templates", "Script templates for Pretzel types: MonoBehaviour, UI controller and singleton.", new[] { Prefix + "core", Prefix + "ui" }),
-            new(Prefix + "integrations", "Integrations", "Adapters between Pretzel and LitMotion, UniTask and R3.", new[] { Prefix + "core", Prefix + "tween", Prefix + "api", Prefix + "ui" },
-                new[] { ("LitMotion", "com.annulusgames.lit-motion"), ("UniTask", "com.cysharp.unitask"), ("R3", "com.cysharp.r3") }),
-            new(Prefix + "editor", "Editor", "Standalone editor utilities that work in any project, such as grouping selected objects.", new string[0])
-        };
+            PackageInfo info = PackageInfo.FindForAssembly(typeof(ModuleCatalog).Assembly);
+            string path = info == null ? null : Path.Combine(info.resolvedPath, CatalogPath);
+            if (path == null || !File.Exists(path))
+            {
+                Debug.LogWarning($"Pretzel module catalog not found at {path ?? CatalogPath}. The Addons tab lists no modules.");
+                return Array.Empty<ModuleInfo>();
+            }
+
+            try
+            {
+                return Parse(File.ReadAllText(path));
+            }
+            catch (Exception ex) when (ex is JsonException || ex is IOException || ex is InvalidCastException)
+            {
+                Debug.LogError($"Pretzel module catalog at {path} could not be read: {ex.Message}");
+                return Array.Empty<ModuleInfo>();
+            }
+        }
+
+        /// <summary>Parses the generated catalog format.</summary>
+        public static IReadOnlyList<ModuleInfo> Parse(string json)
+        {
+            JObject root = JObject.Parse(json);
+            List<ModuleInfo> modules = new();
+            foreach (JToken module in root["modules"] ?? new JArray())
+            {
+                List<(string, string)> optional = new();
+                foreach (JToken library in module["optionalLibraries"] ?? new JArray())
+                {
+                    optional.Add(((string)library["displayName"], (string)library["packageName"]));
+                }
+
+                modules.Add(new ModuleInfo(
+                    (string)module["name"],
+                    (string)module["displayName"],
+                    (string)module["description"],
+                    Strings(module["dependencies"]),
+                    optional.ToArray(),
+                    Strings(module["packages"])));
+            }
+
+            return modules;
+        }
+
+        private static string[] Strings(JToken token)
+        {
+            return token == null ? Array.Empty<string>() : token.Values<string>().ToArray();
+        }
     }
 }

@@ -1,0 +1,19 @@
+{
+  "name": "com.uee03.pretzel.di",
+  "displayName": "Pretzel DI",
+  "version": "0.2.0",
+  "unity": "6000.0",
+  "description": "A small reflection-based dependency injection container with singleton, scoped and transient lifetimes, [Inject] members, child scopes, entry points and a LifetimeScope component.",
+  "author": { "name": "Uee03" },
+  "license": "MIT",
+  "dependencies": {
+    "com.uee03.pretzel.core": "0.2.0"
+  },
+  "samples": [
+    {
+      "displayName": "DI Usage",
+      "description": "A LifetimeScope that registers services, a ticking entry point and a MonoBehaviour with [Inject] members.",
+      "path": "Samples~/DIUsage"
+    }
+  ]
+}

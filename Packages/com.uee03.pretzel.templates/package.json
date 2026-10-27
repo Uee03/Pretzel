@@ -1,14 +1,14 @@
 {
   "name": "com.uee03.pretzel.templates",
   "displayName": "Pretzel Templates",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "unity": "6000.0",
-  "description": "Script templates for Pretzel types.",
+  "description": "Script templates for Pretzel types (MonoBehaviour, UI controller, singleton) and a UI Toolkit theme template.",
   "author": { "name": "Uee03" },
   "license": "MIT",
   "dependencies": {
-    "com.uee03.pretzel.core": "0.1.0",
-    "com.uee03.pretzel.ui": "0.1.0"
+    "com.uee03.pretzel.core": "0.2.0",
+    "com.uee03.pretzel.ui": "0.2.0"
   },
   "samples": [
     {

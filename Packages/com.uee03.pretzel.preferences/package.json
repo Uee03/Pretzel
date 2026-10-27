@@ -1,0 +1,20 @@
+{
+  "name": "com.uee03.pretzel.preferences",
+  "displayName": "Pretzel Preferences",
+  "version": "0.2.0",
+  "unity": "6000.0",
+  "description": "Player preferences for audio, graphics, controls and language, saved through Pretzel Data, with change events and graphics apply.",
+  "author": { "name": "Uee03" },
+  "license": "MIT",
+  "dependencies": {
+    "com.uee03.pretzel.core": "0.2.0",
+    "com.uee03.pretzel.data": "0.2.0"
+  },
+  "samples": [
+    {
+      "displayName": "Preferences Usage",
+      "description": "Loads preferences at startup, applies graphics and forwards audio volumes to an AudioMixer.",
+      "path": "Samples~/PreferencesUsage"
+    }
+  ]
+}

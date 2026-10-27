@@ -18,6 +18,9 @@ namespace Pretzel.Templates
         [MenuItem(MenuRoot + "C# Singleton", false, MenuPriority + 2)]
         private static void CreateSingleton() => Create("PretzelSingleton.cs.txt", "NewSingleton.cs");
 
+        [MenuItem(MenuRoot + "UI Toolkit Theme", false, MenuPriority + 20)]
+        private static void CreateTheme() => Create("PretzelTheme.tss.txt", "NewTheme.tss");
+
         private static void Create(string template, string defaultName)
         {
             UnityEditor.PackageManager.PackageInfo package = UnityEditor.PackageManager.PackageInfo.FindForAssembly(typeof(ScriptTemplateMenu).Assembly);

@@ -329,7 +329,7 @@ namespace Pretzel.Api
             return new UnityWebRequest(url, method, downloadHandler, upload);
         }
 
-        private RequestOptions Merge(RequestOptions call)
+        internal RequestOptions Merge(RequestOptions call)
         {
             RequestOptions merged = new()
             {
@@ -356,7 +356,7 @@ namespace Pretzel.Api
             return merged;
         }
 
-        private string ResolveUrl(string url)
+        internal string ResolveUrl(string url)
         {
             Guard.NotNullOrEmpty(url, nameof(url));
             // Uri.TryCreate treats "/path" as an absolute file URI on Linux and macOS, so check for a scheme.

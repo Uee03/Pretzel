@@ -1,0 +1,6 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements">
+    <ui:VisualElement name="loading-screen" style="flex-grow: 1; background-color: rgb(20, 20, 26); justify-content: center; align-items: center;">
+        <ui:Label text="Loading..." style="font-size: 28px; color: rgb(242, 242, 245); -unity-font-style: bold; margin-bottom: 16px;" />
+        <ui:ProgressBar name="progress" low-value="0" high-value="1" style="width: 50%;" />
+    </ui:VisualElement>
+</ui:UXML>

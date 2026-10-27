@@ -1,0 +1,10 @@
+{
+  "name": "Pretzel.Tween.Tests",
+  "rootNamespace": "Pretzel.Tween.Tests",
+  "references": ["Pretzel.Tween", "UnityEngine.TestRunner", "UnityEditor.TestRunner"],
+  "includePlatforms": ["Editor"],
+  "overrideReferences": true,
+  "precompiledReferences": ["nunit.framework.dll"],
+  "autoReferenced": false,
+  "defineConstraints": ["UNITY_INCLUDE_TESTS"]
+}

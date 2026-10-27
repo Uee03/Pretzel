@@ -1,14 +1,14 @@
 {
   "name": "com.uee03.pretzel.api",
   "displayName": "Pretzel API",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "unity": "6000.0",
-  "description": "HTTP client built on UnityWebRequest and Awaitable.",
+  "description": "An Awaitable HTTP client on UnityWebRequest with retries, timeouts, progress and cancellation.",
   "author": { "name": "Uee03" },
   "license": "MIT",
   "dependencies": {
-    "com.uee03.pretzel.core": "0.1.0",
-    "com.uee03.pretzel.data": "0.1.0",
+    "com.uee03.pretzel.core": "0.2.0",
+    "com.uee03.pretzel.data": "0.2.0",
     "com.unity.modules.unitywebrequest": "1.0.0",
     "com.unity.modules.unitywebrequesttexture": "1.0.0",
     "com.unity.modules.unitywebrequestaudio": "1.0.0"

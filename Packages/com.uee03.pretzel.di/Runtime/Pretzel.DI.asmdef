@@ -1,0 +1,16 @@
+{
+  "name": "Pretzel.DI",
+  "rootNamespace": "Pretzel.DI",
+  "references": [
+    "Pretzel.Core"
+  ],
+  "includePlatforms": [],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": true,
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": false
+}

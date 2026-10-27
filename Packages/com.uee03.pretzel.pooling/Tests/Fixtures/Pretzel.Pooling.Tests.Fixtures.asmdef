@@ -1,0 +1,14 @@
+{
+  "name": "Pretzel.Pooling.Tests.Fixtures",
+  "rootNamespace": "Pretzel.Pooling.Tests",
+  "references": ["Pretzel.Pooling"],
+  "includePlatforms": [],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": false,
+  "defineConstraints": ["UNITY_INCLUDE_TESTS"],
+  "versionDefines": [],
+  "noEngineReferences": false
+}

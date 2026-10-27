@@ -1,0 +1,21 @@
+{
+  "name": "com.uee03.pretzel.scenes",
+  "displayName": "Pretzel Scenes",
+  "version": "0.2.0",
+  "unity": "6000.0",
+  "description": "An Awaitable scene loader with additive loading, activation gating, progress, minimum duration, cancellation and fade transitions.",
+  "author": { "name": "Uee03" },
+  "license": "MIT",
+  "dependencies": {
+    "com.uee03.pretzel.core": "0.2.0",
+    "com.uee03.pretzel.tween": "0.2.0",
+    "com.uee03.pretzel.ui": "0.2.0"
+  },
+  "samples": [
+    {
+      "displayName": "Scenes Usage",
+      "description": "A loading screen with UIDocumentSceneTransition and a menu that loads scenes additively or as a single scene.",
+      "path": "Samples~/ScenesUsage"
+    }
+  ]
+}

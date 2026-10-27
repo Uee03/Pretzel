@@ -3,7 +3,7 @@ using Pretzel.Setup.Settings;
 
 namespace Pretzel.Setup.Addons.Catalog
 {
-    /// <summary>One Pretzel module. Mirrors the dependencies in each module's package.json.</summary>
+    /// <summary>One Pretzel module, as listed in the generated <c>Editor/Catalog/modules.json</c>.</summary>
     public sealed class ModuleInfo
     {
         public string Name { get; }

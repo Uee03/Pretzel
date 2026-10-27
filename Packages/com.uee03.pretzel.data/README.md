@@ -191,6 +191,33 @@ Newtonsoft creates save types through reflection. With Managed Stripping Level a
 your save types: mark them `[UnityEngine.Scripting.Preserve]` (type and constructor) or list their
 assembly in a `link.xml`. Test a stripped IL2CPP player before release.
 
+## Save slots and auto-save
+
+`SaveSlots<T>` manages numbered slots for one save type on any `IDataStore` (default `DataIO.Default`). Each slot
+stores the data, then a `SaveSlotInfo` (label, UTC save time, play time, scene, summary) that marks the slot complete,
+and an optional PNG thumbnail.
+
+```csharp
+SaveSlots<GameSave> slots = new();                         // files under Saves/, named save and slot-info
+await slots.SaveAsync(1, save, new SaveSlotInfo { label = "Forest", playTimeSeconds = playTime });
+slots.SaveThumbnail(1, ImageConversion.EncodeToPNG(screenshot));
+
+foreach (SaveSlotInfo info in slots.ListInfos())           // newest first, half-written slots skipped
+{
+    Debug.Log($"{info.slot}: {info.label} {info.SavedAtUtc.ToLocalTime()}");
+}
+
+LoadResult<GameSave> loaded = slots.Load(1);
+int free = slots.FindFreeSlot(3);                         // -1 when all three are used
+slots.Delete(1);                                           // data, info and thumbnail
+```
+
+Thumbnails are stored through the serializer, so they need the Newtonsoft serializer (the default).
+
+`AutoSaveTrigger` raises `SaveRequested` (and a UnityEvent) every **Interval Seconds** of unscaled time and, when
+enabled, on pause, focus loss and quit, dropping requests closer together than **Minimum Gap Seconds**. It decides
+when to save; your code decides what. On mobile, pause is the last reliable save point.
+
 ## AES key delivery
 
 Use one backed-up key for a typical game's lifetime.

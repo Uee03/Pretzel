@@ -1,0 +1,20 @@
+{
+  "name": "com.uee03.pretzel.audio",
+  "displayName": "Pretzel Audio",
+  "version": "0.2.0",
+  "unity": "6000.0",
+  "description": "An audio manager with pooled AudioSources, AudioCue assets, per-channel volume through an AudioMixer or directly, and crossfading music.",
+  "author": { "name": "Uee03" },
+  "license": "MIT",
+  "dependencies": {
+    "com.uee03.pretzel.core": "0.2.0",
+    "com.unity.modules.audio": "1.0.0"
+  },
+  "samples": [
+    {
+      "displayName": "Audio Usage",
+      "description": "Plays cues, crossfades music and binds channel volumes to sliders.",
+      "path": "Samples~/AudioUsage"
+    }
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "name": "com.uee03.pretzel.devconsole",
+  "displayName": "Pretzel Dev Console",
+  "version": "0.2.0",
+  "unity": "6000.0",
+  "description": "An in-game UI Toolkit log overlay and command console for development builds, with a thread-safe log buffer and a command registry.",
+  "author": { "name": "Uee03" },
+  "license": "MIT",
+  "dependencies": {
+    "com.uee03.pretzel.core": "0.2.0",
+    "com.unity.modules.uielements": "1.0.0"
+  },
+  "samples": [
+    {
+      "displayName": "Dev Console Usage",
+      "description": "Registers gameplay commands such as timescale and god mode on a DeveloperConsole.",
+      "path": "Samples~/DevConsoleUsage"
+    }
+  ]
+}

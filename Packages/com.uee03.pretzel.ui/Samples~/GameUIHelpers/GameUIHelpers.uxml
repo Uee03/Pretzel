@@ -1,0 +1,23 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:pretzel="Pretzel.UI">
+    <pretzel:SafeAreaElement name="safe-area">
+        <ui:VisualElement name="menu" class="screen" style="justify-content: center; align-items: center;">
+            <ui:Label text="Main Menu" class="screen__title" />
+            <ui:Button name="play" text="Play" />
+            <ui:Button name="options" text="Options" />
+            <ui:Button name="quit-dialog" text="Quit" />
+        </ui:VisualElement>
+        <ui:VisualElement name="options-screen" class="screen" style="justify-content: center; align-items: center;">
+            <ui:Label text="Options" class="screen__title" />
+            <ui:Slider name="volume" label="Volume" low-value="0" high-value="1" value="1" style="width: 300px;" />
+            <ui:Button name="options-back" text="Back" />
+        </ui:VisualElement>
+        <ui:VisualElement name="dialog" style="position: absolute; left: 0; right: 0; top: 0; bottom: 0; background-color: rgba(0, 0, 0, 0.6); justify-content: center; align-items: center;">
+            <ui:VisualElement class="panel" style="align-items: center;">
+                <ui:Label text="Quit the game?" />
+                <ui:Button name="dialog-yes" text="Yes" />
+                <ui:Button name="dialog-no" text="No" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+        <ui:VisualElement name="toasts" picking-mode="Ignore" style="position: absolute; right: 16px; bottom: 16px; align-items: flex-end;" />
+    </pretzel:SafeAreaElement>
+</ui:UXML>

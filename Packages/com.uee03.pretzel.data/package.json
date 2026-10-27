@@ -1,13 +1,13 @@
 {
   "name": "com.uee03.pretzel.data",
   "displayName": "Pretzel Data",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "unity": "6000.0",
-  "description": "Save and load with a pluggable serializer, plus SerializableGuid.",
+  "description": "Save and load with keys, save slots, recoverable writes, migrations, auto-save and a pluggable serializer. Includes the Data Format window and the SerializableGuid drawer.",
   "author": { "name": "Uee03" },
   "license": "MIT",
   "dependencies": {
-    "com.uee03.pretzel.core": "0.1.0",
+    "com.uee03.pretzel.core": "0.2.0",
     "com.unity.modules.jsonserialize": "1.0.0",
     "com.unity.nuget.newtonsoft-json": "3.2.2"
   },

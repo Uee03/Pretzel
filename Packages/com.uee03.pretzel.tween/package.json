@@ -1,13 +1,13 @@
 {
   "name": "com.uee03.pretzel.tween",
   "displayName": "Pretzel Tween",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "unity": "6000.0",
   "description": "Easing functions for float, Vector2, Vector3 and Color.",
   "author": { "name": "Uee03" },
   "license": "MIT",
   "dependencies": {
-    "com.uee03.pretzel.core": "0.1.0"
+    "com.uee03.pretzel.core": "0.2.0"
   },
   "samples": [
     {

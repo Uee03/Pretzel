@@ -1,7 +1,7 @@
 # Pretzel Plan
 
 Living plan for Pretzel, a modular UPM successor to LazyJedi (`c:\Projects\Git\Unity\lazyjedi`).
-Update the status boxes and the Decisions section as work happens. Last updated: 2026-10-19.
+Update the status boxes and the Decisions section as work happens. Last updated: 2026-10-27.
 
 Status key: `[x]` done, `[ ]` not started, `[~]` partly done.
 
@@ -227,7 +227,7 @@ A missing or corrupt file falls back to defaults. One `PretzelSettings` accessor
 - [x] 20. `pretzel.editor` keeps only standalone editors that work in any project (`GroupHierarchyObjects`). No dependencies.
 - [x] 21. Styles: each package is self-contained. The Data Format window has one stylesheet with its own tokens and the few shared components, and its own copy of the sunflower tile (about 150 KB) as header logo and window icon. The Setup window keeps `Variables.uss`, its own stylesheet and branding.
 - Setup reaches the Data Format window with `EditorApplication.ExecuteMenuItem("Pretzel/Data Format")`, so there is no compile-time link. It shows a hint when `pretzel.data` is not installed.
-- Open: `ModuleCatalog` still mirrors each module's `package.json` dependencies by hand. A generated `modules.json`, or reading the installed package's dependencies, would give one source of truth.
+- Open: `ModuleCatalog` still mirrors each module's `package.json` dependencies by hand. A generated `modules.json`, or reading the installed package's dependencies, would give one source of truth. Resolved in Phase 8.
 - Verified: headless compile of a scratch copy with 0 errors and 0 warnings. Behavior checks in the scratch project: see the check list in the repo memory.
 
 ## Phase 4 notes
@@ -238,3 +238,12 @@ A missing or corrupt file falls back to defaults. One `PretzelSettings` accessor
 - The Addons tab installs Pretzel modules from a git repository set in Settings (`moduleSourceUrl`, `moduleSourceVersion`), because the Pretzel repository URL is not known yet. Install is disabled until it is set. Modules already in the project show as Local.
 - Extension points added to `pretzel.editor`: `IPretzelMainSection` (cards on the Main tab). The starter kit card is the first one. It stays until it is used or skipped, and the Setup window opens once by itself (`firstRunShown` in the user settings).
 - Verified headless: manifest edit, catalog merge, pins, remote catalog loading, a real install and remove of a registry package through the Package Manager, 4 tabs and 20 cards. Screenshots checked for all four tabs. Not verified: installing from a git URL, the NuGet window handoff, and a remote http catalog.
+
+## Phase 8: 0.2.0 release (2026-10-27)
+
+- [x] 22. Hosted CI removed; validation is local through `New-UnityValidationHost.ps1` (see COMPATIBILITY.md).
+- [x] 23. Module catalog generated from the manifests: `.github/scripts/Update-ModuleCatalog.ps1` writes `setup/Editor/Catalog/modules.json`; `-Check` and `ModuleCatalogTests` guard drift. Package descriptions in `package.json` are the catalog text.
+- [x] 24. New packages: `events` (EventBus, SO channels, listeners), `di` (container, lifetimes, scopes, entry points, `LifetimeScope`), `pooling` (`ComponentPool<T>`, `PooledObject`, `PoolRegistry`), `scenes` (`SceneLoader`, `UIDocumentSceneTransition`), `audio` (`AudioManager`, `AudioCue`), `preferences` (`PreferencesService`), `devconsole` (`DeveloperConsole`, `CommandRegistry`, `LogBuffer`).
+- [x] 25. Additions: core timers and `DisposableAction`; data `SaveSlots<T>` and `AutoSaveTrigger`; ui screen stack, toasts, safe area, element extensions, world helpers (world-space panels behind `UNITY_6000_2_OR_NEWER`) and the `Pretzel.UI.Editor` assembly; templates UI Toolkit theme.
+- [x] 26. EditMode tests for every package with logic (271 tests). MonoBehaviours used by tests live in `Tests/Fixtures` runtime asmdefs, because components from Editor assemblies cannot be added.
+- [x] 27. All packages at 0.2.0, first tag `v0.2.0`. RSA, BSON and gzip removal is not a breaking change, because nothing shipped before.

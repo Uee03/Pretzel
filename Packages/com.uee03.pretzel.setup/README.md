@@ -35,6 +35,13 @@ Installs and removals use the Package Manager API in one call. Uninstall asks fo
 - Catalog files (JSON, see `CatalogFile`) listed under Settings > Catalog sources add entries or replace built-in ones by id.
 - Pretzel modules install from the git repository and tag that this package was installed from. The Settings tab (`moduleSourceUrl`, `moduleSourceVersion`) overrides that. When Setup is embedded or local and no URL is set, Install stays disabled.
 
+### Module catalog
+
+The Addons tab reads `Editor/Catalog/modules.json`. It is generated from every module's `package.json` (display
+name, description, Pretzel dependencies, required packages) and from the integration asmdefs (optional libraries) by
+`.github/scripts/Update-ModuleCatalog.ps1`. Run the script after changing a module manifest, and use `-Check` before
+a release; `ModuleCatalogTests` also compares the catalog with the installed manifests. Do not edit the JSON by hand.
+
 ## Recommended folder structure
 
 All scripts live in `Assets/_Scripts`, split into `Editor` and `Runtime`. Everything else lives in `Assets/_Project`. The leading underscore sorts both to the top of the Project window. The presets create these folders and can be edited on the Main tab.

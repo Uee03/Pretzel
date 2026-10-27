@@ -1,9 +1,9 @@
 {
   "name": "com.uee03.pretzel.core",
   "displayName": "Pretzel Core",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "unity": "6000.0",
-  "description": "Foundational guards and singletons shared by all Pretzel modules.",
+  "description": "Guard checks, singletons, timers and disposables shared by every Pretzel module.",
   "author": { "name": "Uee03" },
   "license": "MIT",
   "samples": [

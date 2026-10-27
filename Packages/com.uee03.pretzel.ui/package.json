@@ -1,14 +1,14 @@
 {
   "name": "com.uee03.pretzel.ui",
-  "displayName": "Pretzel UI",
-  "version": "0.1.0",
+  "displayName": "Pretzel UI (UI Toolkit)",
+  "version": "0.2.0",
   "unity": "6000.0",
-  "description": "Runtime UI Toolkit helpers, element factories and transitions.",
+  "description": "UI Toolkit helpers: element factories, fades, screen navigation, safe area, toasts, world-space helpers, a screen controller base and Editor UI building blocks.",
   "author": { "name": "Uee03" },
   "license": "MIT",
   "dependencies": {
-    "com.uee03.pretzel.core": "0.1.0",
-    "com.uee03.pretzel.tween": "0.1.0",
+    "com.uee03.pretzel.core": "0.2.0",
+    "com.uee03.pretzel.tween": "0.2.0",
     "com.unity.modules.uielements": "1.0.0"
   },
   "samples": [
@@ -16,6 +16,16 @@
       "displayName": "UI Toolkit Usage",
       "description": "Two screens with UIControllerBase, every element factory, fades, UIHoverFade, UIDocumentFader and an Editor window for the Editor-only factories.",
       "path": "Samples~/UIUsage"
+    },
+    {
+      "displayName": "Game UI Helpers",
+      "description": "Screen navigation with UIScreenStack, a modal dialog, toasts, a safe-area root and a name tag that follows a 3D object.",
+      "path": "Samples~/GameUIHelpers"
+    },
+    {
+      "displayName": "Editor UI Helpers",
+      "description": "An editor window and a custom inspector built with EditorUI and InspectorBase.",
+      "path": "Samples~/EditorUIHelpers"
     }
   ]
 }

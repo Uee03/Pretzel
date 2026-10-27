@@ -1,0 +1,189 @@
+/*
+ * #SCRIPTNAME# - a UI Toolkit runtime theme.
+ * Assign it to PanelSettings > Theme Style Sheet. It starts from Unity's default runtime theme and overrides it.
+ * Change the variables first; the rules below only read them. Selectors use the built-in .unity-* classes and
+ * Pretzel's .pretzel-* classes, so most screens restyle without touching their UXML.
+ */
+@import url("unity-theme://default");
+
+:root {
+    /* Palette */
+    --theme-color-primary: #FF9B00;
+    --theme-color-primary-hover: #FFB733;
+    --theme-color-primary-active: #E08700;
+    --theme-color-on-primary: #1C1400;
+    --theme-color-background: #1E1E24;
+    --theme-color-surface: #2A2A33;
+    --theme-color-surface-raised: #353541;
+    --theme-color-border: #4A4A57;
+    --theme-color-text: #F2F2F5;
+    --theme-color-text-muted: #A6A6B3;
+    --theme-color-success: #4CAF50;
+    --theme-color-warning: #FFC107;
+    --theme-color-error: #F44336;
+    --theme-color-focus: #FFE100;
+
+    /* Shape and spacing */
+    --theme-radius: 6px;
+    --theme-border-width: 1px;
+    --theme-spacing-s: 4px;
+    --theme-spacing-m: 8px;
+    --theme-spacing-l: 16px;
+
+    /* Typography. Set -unity-font-definition: url("...") on :root to change the font. */
+    --theme-font-size-s: 12px;
+    --theme-font-size-m: 16px;
+    --theme-font-size-l: 24px;
+
+    /* Motion */
+    --theme-transition-fast: 0.12s;
+}
+
+/* Text */
+.unity-label {
+    color: var(--theme-color-text);
+    font-size: var(--theme-font-size-m);
+}
+
+/* Buttons */
+.unity-button {
+    background-color: var(--theme-color-primary);
+    color: var(--theme-color-on-primary);
+    border-top-left-radius: var(--theme-radius);
+    border-top-right-radius: var(--theme-radius);
+    border-bottom-left-radius: var(--theme-radius);
+    border-bottom-right-radius: var(--theme-radius);
+    border-left-width: 0;
+    border-right-width: 0;
+    border-top-width: 0;
+    border-bottom-width: 0;
+    padding-left: var(--theme-spacing-l);
+    padding-right: var(--theme-spacing-l);
+    padding-top: var(--theme-spacing-s);
+    padding-bottom: var(--theme-spacing-s);
+    font-size: var(--theme-font-size-m);
+    -unity-font-style: bold;
+    transition-property: background-color, scale;
+    transition-duration: var(--theme-transition-fast);
+}
+
+.unity-button:hover {
+    background-color: var(--theme-color-primary-hover);
+}
+
+.unity-button:active {
+    background-color: var(--theme-color-primary-active);
+    scale: 0.97 0.97;
+}
+
+.unity-button:focus {
+    border-left-width: 2px;
+    border-right-width: 2px;
+    border-top-width: 2px;
+    border-bottom-width: 2px;
+    border-left-color: var(--theme-color-focus);
+    border-right-color: var(--theme-color-focus);
+    border-top-color: var(--theme-color-focus);
+    border-bottom-color: var(--theme-color-focus);
+}
+
+.unity-button:disabled {
+    opacity: 0.5;
+}
+
+/* Inputs */
+.unity-base-text-field__input,
+.unity-base-popup-field__input {
+    background-color: var(--theme-color-surface);
+    border-left-color: var(--theme-color-border);
+    border-right-color: var(--theme-color-border);
+    border-top-color: var(--theme-color-border);
+    border-bottom-color: var(--theme-color-border);
+    color: var(--theme-color-text);
+}
+
+.unity-toggle__checkmark {
+    background-color: var(--theme-color-surface);
+    border-left-color: var(--theme-color-border);
+    border-right-color: var(--theme-color-border);
+    border-top-color: var(--theme-color-border);
+    border-bottom-color: var(--theme-color-border);
+}
+
+.unity-base-slider__dragger {
+    background-color: var(--theme-color-primary);
+}
+
+.unity-progress-bar__progress {
+    background-color: var(--theme-color-primary);
+}
+
+/* Pretzel: toasts from ToastService */
+.pretzel-toast {
+    background-color: var(--theme-color-surface-raised);
+    color: var(--theme-color-text);
+    border-top-left-radius: var(--theme-radius);
+    border-top-right-radius: var(--theme-radius);
+    border-bottom-left-radius: var(--theme-radius);
+    border-bottom-right-radius: var(--theme-radius);
+    border-left-width: 4px;
+    border-left-color: var(--theme-color-primary);
+    padding-left: var(--theme-spacing-l);
+    padding-right: var(--theme-spacing-l);
+    padding-top: var(--theme-spacing-m);
+    padding-bottom: var(--theme-spacing-m);
+    margin-top: var(--theme-spacing-s);
+}
+
+.pretzel-toast--success {
+    border-left-color: var(--theme-color-success);
+}
+
+.pretzel-toast--warning {
+    border-left-color: var(--theme-color-warning);
+}
+
+.pretzel-toast--error {
+    border-left-color: var(--theme-color-error);
+}
+
+/* Your own screens. BEM keeps rules flat and fast: .block, .block__element, .block--modifier */
+.screen {
+    flex-grow: 1;
+    background-color: var(--theme-color-background);
+    padding-left: var(--theme-spacing-l);
+    padding-right: var(--theme-spacing-l);
+    padding-top: var(--theme-spacing-l);
+    padding-bottom: var(--theme-spacing-l);
+}
+
+.screen__title {
+    font-size: var(--theme-font-size-l);
+    -unity-font-style: bold;
+    margin-bottom: var(--theme-spacing-l);
+}
+
+.panel {
+    background-color: var(--theme-color-surface);
+    border-top-left-radius: var(--theme-radius);
+    border-top-right-radius: var(--theme-radius);
+    border-bottom-left-radius: var(--theme-radius);
+    border-bottom-right-radius: var(--theme-radius);
+    border-left-width: var(--theme-border-width);
+    border-right-width: var(--theme-border-width);
+    border-top-width: var(--theme-border-width);
+    border-bottom-width: var(--theme-border-width);
+    border-left-color: var(--theme-color-border);
+    border-right-color: var(--theme-color-border);
+    border-top-color: var(--theme-color-border);
+    border-bottom-color: var(--theme-color-border);
+    padding-left: var(--theme-spacing-m);
+    padding-right: var(--theme-spacing-m);
+    padding-top: var(--theme-spacing-m);
+    padding-bottom: var(--theme-spacing-m);
+}
+
+.text--muted {
+    color: var(--theme-color-text-muted);
+    font-size: var(--theme-font-size-s);
+}

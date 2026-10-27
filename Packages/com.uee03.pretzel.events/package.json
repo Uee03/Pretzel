@@ -1,0 +1,19 @@
+{
+  "name": "com.uee03.pretzel.events",
+  "displayName": "Pretzel Events",
+  "version": "0.2.0",
+  "unity": "6000.0",
+  "description": "A typed in-memory event bus and ScriptableObject event channels with listener components.",
+  "author": { "name": "Uee03" },
+  "license": "MIT",
+  "dependencies": {
+    "com.uee03.pretzel.core": "0.2.0"
+  },
+  "samples": [
+    {
+      "displayName": "Events Usage",
+      "description": "An EventBus publisher and subscriber, and a ScriptableObject channel raised from code.",
+      "path": "Samples~/EventsUsage"
+    }
+  ]
+}
