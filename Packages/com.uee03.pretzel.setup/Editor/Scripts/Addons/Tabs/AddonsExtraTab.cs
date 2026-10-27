@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Linq;
 using Pretzel.Setup.Addons.Catalog;
 using Pretzel.Setup.Addons.Controls;
@@ -27,11 +27,11 @@ namespace Pretzel.Setup.Addons.Tabs
             _search.RegisterValueChangedCallback(_ => Rebuild());
             toolbar.Add(_search);
 
-            Button refresh = new(RefreshSources) { text = "Reload catalogs", tooltip = "Reload the catalog sources listed on the Settings tab." };
+            Button refresh = new(RefreshSourcesAsync) { text = "Reload catalogs", tooltip = "Reload the catalog sources listed on the Settings tab." };
             toolbar.Add(refresh);
         }
 
-        private async void RefreshSources()
+        private async void RefreshSourcesAsync()
         {
             if (_refreshing)
             {

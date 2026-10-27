@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -15,7 +15,7 @@ namespace Pretzel.Setup.Settings
     {
         private const int SchemaVersion = 1;
 
-        private static readonly JsonSerializer Serializer = JsonSerializer.Create(new JsonSerializerSettings
+        private static readonly JsonSerializer _serializer = JsonSerializer.Create(new JsonSerializerSettings
         {
             ObjectCreationHandling = ObjectCreationHandling.Replace
         });
@@ -83,7 +83,7 @@ namespace Pretzel.Setup.Settings
                     ? envelope["data"]
                     : root;
 
-                return data.ToObject<T>(Serializer) ?? new T();
+                return data.ToObject<T>(_serializer) ?? new T();
             }
             catch (Exception ex)
             {
@@ -97,7 +97,7 @@ namespace Pretzel.Setup.Settings
             JObject envelope = new()
             {
                 ["schemaVersion"] = SchemaVersion,
-                ["data"] = JToken.FromObject(value, Serializer)
+                ["data"] = JToken.FromObject(value, _serializer)
             };
 
             Directory.CreateDirectory(Path.GetDirectoryName(path));

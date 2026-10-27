@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -16,10 +16,10 @@ namespace Pretzel.Setup.Addons.Catalog
     /// </summary>
     public static class CatalogService
     {
-        private static readonly List<CatalogEntry> Remote = new();
-        private static readonly List<string> Errors = new();
+        private static readonly List<CatalogEntry> _remote = new();
+        private static readonly List<string> _errors = new();
 
-        public static IReadOnlyList<string> LoadErrors => Errors;
+        public static IReadOnlyList<string> LoadErrors => _errors;
 
         public static event Action Changed;
 
@@ -28,7 +28,7 @@ namespace Pretzel.Setup.Addons.Catalog
             Dictionary<string, CatalogEntry> byId = new();
             List<CatalogEntry> ordered = new();
 
-            foreach (CatalogEntry entry in BuiltInCatalog.Create().Concat(Remote.Select(e => e.Clone())))
+            foreach (CatalogEntry entry in BuiltInCatalog.Create().Concat(_remote.Select(e => e.Clone())))
             {
                 if (string.IsNullOrWhiteSpace(entry.id) || string.IsNullOrWhiteSpace(entry.packageName))
                 {
@@ -76,8 +76,8 @@ namespace Pretzel.Setup.Addons.Catalog
         /// <summary>Reloads every catalog source from the settings. Failed sources are listed in <see cref="LoadErrors"/>.</summary>
         public static async Awaitable RefreshAsync()
         {
-            Remote.Clear();
-            Errors.Clear();
+            _remote.Clear();
+            _errors.Clear();
 
             foreach (string source in PretzelSettings.Project.catalogSources.Where(s => !string.IsNullOrWhiteSpace(s)).ToList())
             {
@@ -86,12 +86,12 @@ namespace Pretzel.Setup.Addons.Catalog
                     CatalogFile file = await LoadAsync(source.Trim());
                     if (file?.entries != null)
                     {
-                        Remote.AddRange(file.entries);
+                        _remote.AddRange(file.entries);
                     }
                 }
                 catch (Exception ex)
                 {
-                    Errors.Add($"{source}: {ex.Message}");
+                    _errors.Add($"{source}: {ex.Message}");
                 }
             }
 

@@ -1,4 +1,4 @@
-﻿
+
 namespace Pretzel.Data.Editor
 {
     internal sealed class FormatInfo
@@ -18,13 +18,13 @@ namespace Pretzel.Data.Editor
         {
             return format switch
             {
-                DataFormat.Binary => Binary,
-                DataFormat.Encrypted => Encrypted,
-                _ => PlainText
+                DataFormat.Binary => _binary,
+                DataFormat.Encrypted => _encrypted,
+                _ => _plainText
             };
         }
 
-        private static readonly FormatInfo PlainText = new()
+        private static readonly FormatInfo _plainText = new()
         {
             Title = "Plain text",
             Summary = "Readable JSON. The default.",
@@ -45,7 +45,7 @@ namespace Pretzel.Data.Editor
             BestFor = "Settings, development builds, single-player games where cheating does not matter, and data you want to diff."
         };
 
-        private static readonly FormatInfo Binary = new()
+        private static readonly FormatInfo _binary = new()
         {
             Title = "Binary",
             Summary = "Versioned binary values using .NET BinaryWriter and BinaryReader. Never BinaryFormatter.",
@@ -67,7 +67,7 @@ namespace Pretzel.Data.Editor
             BestFor = "Saves you do not want players to casually open and edit."
         };
 
-        private static readonly FormatInfo Encrypted = new()
+        private static readonly FormatInfo _encrypted = new()
         {
             Title = "Encrypted",
             Summary = "JSON encrypted with AES-256, tamper-checked with HMAC-SHA256.",

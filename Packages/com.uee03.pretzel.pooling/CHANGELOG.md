@@ -9,4 +9,5 @@ First published release. Version 0.1.0 was internal and never tagged.
 ### Added
 
 - `ComponentPool<T>` on `UnityEngine.Pool` with prewarming and side-effect-free creation, `IPoolable` hooks, self-releasing `PooledObject` and `PoolRegistry`.
+- `PoolFactory<TKey, T>`: Inspector-configured pools by key (for example an enum) with up-front validation, per-key prewarm, grouped Hierarchy containers and runtime registration, plus serializable `PoolSettings`.
 - EditMode tests.

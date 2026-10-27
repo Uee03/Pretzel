@@ -1,4 +1,4 @@
-﻿using Pretzel.Setup.Settings;
+using Pretzel.Setup.Settings;
 using UnityEditor;
 using UnityEngine;
 

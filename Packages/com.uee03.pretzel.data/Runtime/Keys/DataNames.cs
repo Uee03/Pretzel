@@ -10,9 +10,9 @@ namespace Pretzel.Data
     {
         public const int MaxLength = 128;
 
-        private static readonly char[] ForbiddenChars = { '\\', '/', ':', '*', '?', '"', '<', '>', '|' };
+        private static readonly char[] _forbiddenChars = { '\\', '/', ':', '*', '?', '"', '<', '>', '|' };
 
-        private static readonly string[] ReservedNames =
+        private static readonly string[] _reservedNames =
         {
             "CON", "PRN", "AUX", "NUL",
             "COM0", "COM1", "COM2", "COM3", "COM4", "COM5", "COM6", "COM7", "COM8", "COM9",
@@ -42,7 +42,7 @@ namespace Pretzel.Data
                 return "Name cannot start or end with a space, or end with a dot.";
             }
 
-            if (name.IndexOfAny(ForbiddenChars) >= 0 || name.IndexOfAny(Path.GetInvalidFileNameChars()) >= 0)
+            if (name.IndexOfAny(_forbiddenChars) >= 0 || name.IndexOfAny(Path.GetInvalidFileNameChars()) >= 0)
             {
                 return "Name contains a path separator or an invalid character.";
             }
@@ -57,7 +57,7 @@ namespace Pretzel.Data
 
             int dot = name.IndexOf('.');
             string stem = dot < 0 ? name : name.Substring(0, dot);
-            if (Array.Exists(ReservedNames, reserved => string.Equals(reserved, stem, StringComparison.OrdinalIgnoreCase)))
+            if (Array.Exists(_reservedNames, reserved => string.Equals(reserved, stem, StringComparison.OrdinalIgnoreCase)))
             {
                 return $"'{stem}' is a reserved device name.";
             }

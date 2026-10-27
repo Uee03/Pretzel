@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -6,7 +6,7 @@ namespace Pretzel.Data.Editor
 {
     internal sealed class FormatPanel : IDataFormatPanel
     {
-        private static readonly DataFormat[] Formats =
+        private static readonly DataFormat[] _formats =
         {
             DataFormat.PlainText, DataFormat.Binary, DataFormat.Encrypted
         };
@@ -52,7 +52,7 @@ namespace Pretzel.Data.Editor
             _warning = view.Q<HelpBox>("format-panel__warning");
 
             VisualElement picker = view.Q("format-panel__picker");
-            foreach (DataFormat format in Formats)
+            foreach (DataFormat format in _formats)
             {
                 DataFormat chosen = format;
                 Button button = new(() => Select(chosen))
@@ -114,9 +114,9 @@ namespace Pretzel.Data.Editor
                 return;
             }
 
-            for (int i = 0; i < Formats.Length; i++)
+            for (int i = 0; i < _formats.Length; i++)
             {
-                _buttons[i].EnableInClassList("pretzel-format-picker__option--selected", Formats[i] == config.format);
+                _buttons[i].EnableInClassList("pretzel-format-picker__option--selected", _formats[i] == config.format);
             }
 
             if (_shown != config.format)

@@ -23,7 +23,6 @@ graph TD
     templates[templates]
     integrations[integrations]
     events[events]
-    di[di]
     pooling[pooling]
     scenes[scenes]
     audio[audio]
@@ -46,7 +45,6 @@ graph TD
     integrations --> api
     integrations --> ui
     events --> core
-    di --> core
     pooling --> core
     scenes --> core
     scenes --> ui
@@ -68,7 +66,6 @@ graph TD
 | [ui.ugui](Packages/com.uee03.pretzel.ui.ugui/README.md) | UGUI `UIFader`, hover fade, extensions |
 | [api](Packages/com.uee03.pretzel.api/README.md) | HTTP client on `Awaitable` |
 | [events](Packages/com.uee03.pretzel.events/README.md) | Typed event bus and ScriptableObject event channels |
-| [di](Packages/com.uee03.pretzel.di/README.md) | Dependency injection container with lifetimes, scopes, entry points and a `LifetimeScope` component |
 | [pooling](Packages/com.uee03.pretzel.pooling/README.md) | Prefab pools with prewarming and reset hooks |
 | [scenes](Packages/com.uee03.pretzel.scenes/README.md) | Gated scene loading with transitions, progress and cancellation |
 | [audio](Packages/com.uee03.pretzel.audio/README.md) | Audio manager with pooled voices, cues, mixer channels and music crossfades |
@@ -103,7 +100,6 @@ In Unity, open `Window > Package Manager`, choose `+ > Install package from git 
 | api | `https://github.com/Uee03/Pretzel.git?path=Packages/com.uee03.pretzel.api` |
 | templates | `https://github.com/Uee03/Pretzel.git?path=Packages/com.uee03.pretzel.templates` |
 | events | `https://github.com/Uee03/Pretzel.git?path=Packages/com.uee03.pretzel.events` |
-| di | `https://github.com/Uee03/Pretzel.git?path=Packages/com.uee03.pretzel.di` |
 | pooling | `https://github.com/Uee03/Pretzel.git?path=Packages/com.uee03.pretzel.pooling` |
 | scenes | `https://github.com/Uee03/Pretzel.git?path=Packages/com.uee03.pretzel.scenes` |
 | audio | `https://github.com/Uee03/Pretzel.git?path=Packages/com.uee03.pretzel.audio` |

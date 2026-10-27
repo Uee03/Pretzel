@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Text.RegularExpressions;
 using Pretzel.Setup.Paths;
@@ -11,7 +11,7 @@ namespace Pretzel.Setup.Addons.Services
     {
         private const string MenuPath = "NuGet/Manage NuGet Packages";
 
-        private static readonly string[] ConfigPaths =
+        private static readonly string[] _configPaths =
         {
             "Assets/packages.config",
             "Packages/nuget-packages/packages.config"
@@ -25,7 +25,7 @@ namespace Pretzel.Setup.Addons.Services
             }
 
             Regex pattern = new($"<package\\s+id=\"{Regex.Escape(nugetId)}\"", RegexOptions.IgnoreCase);
-            foreach (string relative in ConfigPaths)
+            foreach (string relative in _configPaths)
             {
                 string path = Path.Combine(PretzelPaths.ProjectFolder, relative);
                 if (File.Exists(path) && pattern.IsMatch(File.ReadAllText(path)))

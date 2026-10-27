@@ -14,7 +14,7 @@ namespace Pretzel.Audio
     [AddComponentMenu("Pretzel/Audio/Audio Manager")]
     public sealed class AudioManager : MonoBehaviour
     {
-        private static readonly int ChannelCount = Enum.GetValues(typeof(AudioChannel)).Length;
+        private static readonly int _channelCount = Enum.GetValues(typeof(AudioChannel)).Length;
 
         [SerializeField] private AudioMixer _mixer;
         [SerializeField] private List<AudioChannelBinding> _channels = new();
@@ -41,13 +41,13 @@ namespace Pretzel.Audio
 
         private void Awake()
         {
-            _volumes = new float[ChannelCount];
-            for (int i = 0; i < ChannelCount; i++)
+            _volumes = new float[_channelCount];
+            for (int i = 0; i < _channelCount; i++)
             {
                 _volumes[i] = 1f;
             }
 
-            _bindings = new AudioChannelBinding[ChannelCount];
+            _bindings = new AudioChannelBinding[_channelCount];
             foreach (AudioChannelBinding binding in _channels)
             {
                 if (binding != null)
@@ -68,7 +68,7 @@ namespace Pretzel.Audio
         // AudioMixer.SetFloat does not stick when called in Awake.
         private void Start()
         {
-            for (int i = 0; i < ChannelCount; i++)
+            for (int i = 0; i < _channelCount; i++)
             {
                 ApplyMixerVolume((AudioChannel)i);
             }

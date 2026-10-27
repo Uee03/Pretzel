@@ -3,7 +3,7 @@
   "displayName": "Pretzel Pooling",
   "version": "0.2.0",
   "unity": "6000.0",
-  "description": "Prefab pools on UnityEngine.Pool with prewarming, IPoolable reset hooks, self-releasing PooledObject and a per-prefab PoolRegistry.",
+  "description": "Prefab pools on UnityEngine.Pool with prewarming, IPoolable reset hooks, self-releasing PooledObject, Inspector-configured keyed PoolFactory and a per-prefab PoolRegistry.",
   "author": { "name": "Uee03" },
   "license": "MIT",
   "dependencies": {
@@ -12,7 +12,7 @@
   "samples": [
     {
       "displayName": "Pooling Usage",
-      "description": "A spawner that prewarms a pool and projectiles that release themselves after a delay.",
+      "description": "An enum-keyed projectile factory configured in the Inspector, with prewarming and projectiles that release themselves after a delay.",
       "path": "Samples~/PoolingUsage"
     }
   ]

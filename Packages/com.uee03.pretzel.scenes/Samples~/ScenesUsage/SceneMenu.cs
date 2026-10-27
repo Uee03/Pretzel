@@ -22,7 +22,7 @@ namespace Pretzel.Samples.Scenes
         public void LoadAdditive() => _ = LoadAsync(_additiveScene, LoadSceneMode.Additive);
 
         [ContextMenu("Unload Additive")]
-        public async void UnloadAdditive()
+        public async void UnloadAdditiveAsync()
         {
             try
             {

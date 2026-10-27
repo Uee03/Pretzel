@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Text;
 using Newtonsoft.Json;
@@ -27,7 +27,7 @@ namespace Pretzel.Data.Editor
     /// <summary>Decodes and encodes pasted text with the same transforms a <see cref="DataStore"/> uses.</summary>
     internal static class DataCodec
     {
-        private static readonly UTF8Encoding Utf8 = new(false);
+        private static readonly UTF8Encoding _utf8 = new(false);
 
         /// <summary>Plain JSON is used as it is. Anything else is read as Base64 of the file bytes.</summary>
         public static CodecResult Decode(string input, DataFormat? forced, EncryptionKeys keys)
@@ -63,7 +63,7 @@ namespace Pretzel.Data.Editor
             {
                 IDataTransform transform = TransformFor(format.Value, keys);
                 byte[] decoded = transform.Decode(bytes);
-                string json = Utf8.GetString(decoded).TrimStart('\uFEFF');
+                string json = _utf8.GetString(decoded).TrimStart('\uFEFF');
                 return CodecResult.Success(Pretty(json), $"Decoded {format.Value} data ({bytes.Length} bytes).");
             }
             catch (Exception ex)
@@ -96,7 +96,7 @@ namespace Pretzel.Data.Editor
 
             try
             {
-                byte[] bytes = Utf8.GetBytes(json);
+                byte[] bytes = _utf8.GetBytes(json);
                 foreach (IDataTransform transform in DataStoreFactory.CreateTransforms(format, keys, mode, base64))
                 {
                     bytes = transform.Encode(bytes);
@@ -139,7 +139,7 @@ namespace Pretzel.Data.Editor
                 }
             }
 
-            return Utf8.GetString(bytes).TrimStart('\uFEFF');
+            return _utf8.GetString(bytes).TrimStart('\uFEFF');
         }
 
         private static IDataTransform TransformFor(DataFormat format, EncryptionKeys keys)

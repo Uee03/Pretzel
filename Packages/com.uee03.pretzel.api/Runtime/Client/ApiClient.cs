@@ -18,7 +18,7 @@ namespace Pretzel.Api
     {
         private const string JsonContentType = "application/json";
 
-        private static readonly UTF8Encoding Utf8 = new(false);
+        private static readonly UTF8Encoding _utf8 = new(false);
 
         private readonly ISerializer _serializer;
 
@@ -77,7 +77,7 @@ namespace Pretzel.Api
         {
             string target = ResolveUrl(url);
             string contentType = Merge(options).ContentType;
-            byte[] payload = string.IsNullOrEmpty(body) ? null : Utf8.GetBytes(body);
+            byte[] payload = string.IsNullOrEmpty(body) ? null : _utf8.GetBytes(body);
 
             if (method == HttpMethodType.HEAD)
             {

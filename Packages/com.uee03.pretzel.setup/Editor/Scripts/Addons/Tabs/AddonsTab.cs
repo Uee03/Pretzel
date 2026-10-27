@@ -1,10 +1,10 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using Pretzel.Setup.Settings;
 using Pretzel.Setup.Addons.Catalog;
 using Pretzel.Setup.Addons.Controls;
 using Pretzel.Setup.Addons.Services;
+using Pretzel.Setup.Settings;
 using UnityEngine.UIElements;
 using PackageInfo = UnityEditor.PackageManager.PackageInfo;
 using UpmSource = UnityEditor.PackageManager.PackageSource;

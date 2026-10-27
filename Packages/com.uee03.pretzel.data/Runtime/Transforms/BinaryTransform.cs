@@ -12,8 +12,8 @@ namespace Pretzel.Data
     public sealed class BinaryTransform : IDataTransform
     {
         private const int MaxDepth = 128;
-        private static readonly byte[] Magic = { (byte)'P', (byte)'Z', (byte)'B', (byte)'N', 1 };
-        private static readonly UTF8Encoding Utf8 = new(false, true);
+        private static readonly byte[] _magic = { (byte)'P', (byte)'Z', (byte)'B', (byte)'N', 1 };
+        private static readonly UTF8Encoding _utf8 = new(false, true);
 
         private enum Tag : byte
         {
@@ -23,12 +23,12 @@ namespace Pretzel.Data
         public static bool HasHeader(byte[] data)
         {
             return data != null && data.Length >= 4
-                && data[0] == Magic[0] && data[1] == Magic[1] && data[2] == Magic[2] && data[3] == Magic[3];
+                && data[0] == _magic[0] && data[1] == _magic[1] && data[2] == _magic[2] && data[3] == _magic[3];
         }
 
         public byte[] Encode(byte[] data)
         {
-            using StringReader text = new(Utf8.GetString(data));
+            using StringReader text = new(_utf8.GetString(data));
             using JsonTextReader json = new(text) { DateParseHandling = DateParseHandling.None, MaxDepth = MaxDepth };
             JToken token = JToken.ReadFrom(json);
             if (json.Read())
@@ -37,8 +37,8 @@ namespace Pretzel.Data
             }
 
             using MemoryStream output = new();
-            using BinaryWriter writer = new(output, Utf8, true);
-            writer.Write(Magic);
+            using BinaryWriter writer = new(output, _utf8, true);
+            writer.Write(_magic);
             Write(writer, token, 0);
             return output.ToArray();
         }
@@ -46,8 +46,8 @@ namespace Pretzel.Data
         public byte[] Decode(byte[] data)
         {
             using MemoryStream input = new(data, false);
-            using BinaryReader reader = new(input, Utf8);
-            foreach (byte expected in Magic)
+            using BinaryReader reader = new(input, _utf8);
+            foreach (byte expected in _magic)
             {
                 if (reader.ReadByte() != expected)
                 {
@@ -61,7 +61,7 @@ namespace Pretzel.Data
                 throw new InvalidDataException("Unexpected bytes after the binary value.");
             }
 
-            return Utf8.GetBytes(token.ToString(Formatting.None));
+            return _utf8.GetBytes(token.ToString(Formatting.None));
         }
 
         private static void Write(BinaryWriter writer, JToken token, int depth)

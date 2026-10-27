@@ -5,6 +5,10 @@
 		},
 		{
 			"path": "../../Claude"
+		},
+		{
+			"name": "arcadespace2d",
+			"path": "../arcadespace2d"
 		}
 	],
 	"settings": {}

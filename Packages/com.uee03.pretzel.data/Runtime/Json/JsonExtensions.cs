@@ -6,21 +6,21 @@ namespace Pretzel.Data
     /// </summary>
     public static class JsonExtensions
     {
-        private static readonly ISerializer DefaultSerializer = new NewtonsoftSerializer();
+        private static readonly ISerializer _defaultSerializer = new NewtonsoftSerializer();
 
         public static string ToJson<T>(this T value, bool prettyPrint = false, ISerializer serializer = null)
         {
-            return (serializer ?? DefaultSerializer).Serialize(value, prettyPrint);
+            return (serializer ?? _defaultSerializer).Serialize(value, prettyPrint);
         }
 
         public static T FromJson<T>(this string json, ISerializer serializer = null)
         {
-            return (serializer ?? DefaultSerializer).Deserialize<T>(json);
+            return (serializer ?? _defaultSerializer).Deserialize<T>(json);
         }
 
         public static void FromJsonOverwrite<T>(this string json, T target, ISerializer serializer = null) where T : class
         {
-            (serializer ?? DefaultSerializer).Populate(json, target);
+            (serializer ?? _defaultSerializer).Populate(json, target);
         }
     }
 }

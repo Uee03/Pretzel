@@ -30,10 +30,10 @@ namespace Pretzel.Api
             Error = error;
             ErrorBody = errorBody;
             TimedOut = timedOut;
-            Headers = headers ?? EmptyHeaders;
+            Headers = headers ?? _emptyHeaders;
         }
 
-        private static readonly IReadOnlyDictionary<string, string> EmptyHeaders = new Dictionary<string, string>();
+        private static readonly IReadOnlyDictionary<string, string> _emptyHeaders = new Dictionary<string, string>();
 
         internal static Response<T> Failure(string error) => new(false, 0, default, error, null, false, null);
 

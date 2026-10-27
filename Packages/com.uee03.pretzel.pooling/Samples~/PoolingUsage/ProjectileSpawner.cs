@@ -3,27 +3,20 @@ using UnityEngine;
 
 namespace Pretzel.Samples.Pooling
 {
-    /// <summary>Owns a pool for its lifetime, prewarms it, and fires on an interval.</summary>
+    /// <summary>Owns a keyed factory configured in the Inspector, and fires bullets with a rocket every fifth shot.</summary>
     public sealed class ProjectileSpawner : MonoBehaviour
     {
-        [SerializeField] private Projectile _prefab;
+        [Tooltip("One entry per ProjectileKind: the prefab and how many to prewarm.")]
+        [SerializeField] private PoolFactory<ProjectileKind, Projectile> _projectiles = new();
         [SerializeField, Min(0.02f)] private float _interval = 0.1f;
-        [SerializeField, Min(0)] private int _prewarm = 20;
 
-        private ComponentPool<Projectile> _pool;
         private float _next;
+        private int _shots;
 
         private void Awake()
         {
-            if (!_prefab)
-            {
-                Debug.LogError("Assign a Projectile prefab.", this);
-                enabled = false;
-                return;
-            }
-
-            _pool = new ComponentPool<Projectile>(_prefab, transform, defaultCapacity: _prewarm, maxSize: 200);
-            _pool.Prewarm(_prewarm);
+            // At the scene root, so spawned projectiles do not move with the spawner.
+            _projectiles.Initialize();
         }
 
         private void Update()
@@ -34,13 +27,18 @@ namespace Pretzel.Samples.Pooling
             }
 
             _next = Time.time + _interval;
+            ProjectileKind kind = ++_shots % 5 == 0 ? ProjectileKind.Rocket : ProjectileKind.Bullet;
             Quaternion spread = Quaternion.Euler(0f, Random.Range(-20f, 20f), 0f);
-            _pool.Get(transform.position, transform.rotation * spread);
+            if (!_projectiles.TrySpawn(kind, transform.position, transform.rotation * spread, out _))
+            {
+                Debug.LogWarning($"No prefab for {kind}. Add an entry to Projectiles.", this);
+                enabled = false;
+            }
         }
 
         private void OnDestroy()
         {
-            _pool?.Dispose();
+            _projectiles.Dispose();
         }
     }
 }

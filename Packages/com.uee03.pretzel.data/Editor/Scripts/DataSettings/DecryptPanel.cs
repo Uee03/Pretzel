@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.IO;
 using UnityEditor;
 using UnityEngine.UIElements;
@@ -7,12 +7,12 @@ namespace Pretzel.Data.Editor
 {
     internal sealed class DecryptPanel : IDataFormatPanel
     {
-        private static readonly string[] FormatChoices =
+        private static readonly string[] _formatChoices =
         {
             "Auto-detect", "Plain text JSON", "Binary", "Encrypted"
         };
 
-        private static readonly DataFormat?[] FormatValues =
+        private static readonly DataFormat?[] _formatValues =
         {
             null, DataFormat.PlainText, DataFormat.Binary, DataFormat.Encrypted
         };
@@ -38,8 +38,8 @@ namespace Pretzel.Data.Editor
             _status = view.Q<Label>("decrypt-panel__status");
             _aes = view.Q<TextField>("decrypt-panel__aes");
 
-            _format.choices = new List<string>(FormatChoices);
-            _format.SetValueWithoutNotify(FormatChoices[0]);
+            _format.choices = new List<string>(_formatChoices);
+            _format.SetValueWithoutNotify(_formatChoices[0]);
 
             view.Q<Button>("decrypt-panel__decode").clicked += OnDecode;
             view.Q<Button>("decrypt-panel__encode").clicked += OnEncode;
@@ -61,7 +61,7 @@ namespace Pretzel.Data.Editor
                 return;
             }
 
-            DataFormat? forced = FormatValues[System.Math.Max(0, _format.index)];
+            DataFormat? forced = _formatValues[System.Math.Max(0, _format.index)];
             Show(DataCodec.Decode(_input.value, forced, keys));
         }
 

@@ -8,13 +8,13 @@ dependencies. Do not run a second Editor against an open or locked project.
 
 | Gate | Scope | Evidence / required follow-up |
 |---|---|---|
-| Unity 6000.6.5f1, Windows Editor | Eighteen first-party packages, EditMode suites of thirteen packages, DataIO samples | Local validation; results below |
+| Unity 6000.6.5f1, Windows Editor | Seventeen first-party packages, EditMode suites of twelve packages, DataIO samples | Local validation; results below |
 | Package samples | Every `Samples~` folder imported into one host | Compiled with zero C# errors and warnings (integration samples are skipped by their define constraints) |
 | Generated examples | Plain, binary and AES use cases and the profile service and startup | Separate compile gate; generation tests also inspect source |
 | UI Toolkit theme template | `PretzelTheme.tss` imported as a theme | Imported without errors |
 | Unity 6000.0 minimum | Clean consumer tests and generated examples | Not executed. World-space helpers compile only on 6000.2 or newer by design |
 | Player persistence | Save, quit, relaunch, load; previous-release saves | Required per shipping platform; not proven by EditMode |
-| IL2CPP / stripping, Windows x64 | Generated AES startup and profile service; plain, binary (async) and encrypted round trips | One local smoke player, 6000.6.5f1, Managed Stripping High, passed (2026-10-24). DI, audio, scenes and the console were not part of it |
+| IL2CPP / stripping, Windows x64 | Generated AES startup and profile service; plain, binary (async) and encrypted round trips | One local smoke player, 6000.6.5f1, Managed Stripping High, passed (2026-10-24). Audio, scenes, pooling and the console were not part of it |
 | IL2CPP on other platforms, consoles, mobile | Actual player and backend | Not certified |
 | Runtime behaviour in a player | Scene transitions, audio mixing, safe area on notched devices, world-space panels, console input | Manual checks; not covered by EditMode tests |
 | R3, UniTask, LitMotion adapters | Third-party packages present | Optional assemblies are absent from clean hosts unless those packages are installed |
@@ -100,9 +100,10 @@ validation. They do not replace a shipped-player upgrade exercise.
 
 ### Local results for v0.2.0
 
-- Unity 6000.6.5f1 / Windows, clean host with eighteen embedded packages: **271 of 271 EditMode tests passed, zero
-  skipped**, across core, extensions, tween, api, data, events, di, pooling, ui, audio, preferences, devconsole and
+- Unity 6000.6.5f1 / Windows, clean host with seventeen embedded packages: **263 of 263 EditMode tests passed, zero
+  skipped**, across core, extensions, tween, api, data, events, pooling, ui, audio, preferences, devconsole and
   setup.
 - Every package sample compiled in one host with zero C# errors and warnings; the theme template imported cleanly.
-- `Update-ModuleCatalog.ps1 -Check` passed with seventeen modules.
+- The generated DataIO examples (AES startup) compiled with zero C# errors and warnings.
+- `Update-ModuleCatalog.ps1 -Check` passed with sixteen modules.
 - Unity 6000.0, Linux, player, IL2CPP for the new modules, and visual and interaction checks remain unrun.

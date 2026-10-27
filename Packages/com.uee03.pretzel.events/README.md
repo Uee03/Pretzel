@@ -4,7 +4,7 @@ Decoupled messaging in two flavours. Depends on Pretzel Core.
 
 ## EventBus
 
-A typed in-memory bus. Own one per game or scope and pass it in (Pretzel DI can register it as a singleton).
+A typed in-memory bus. Own one per game or scope and pass it in, for example as a singleton in your DI container.
 
 ```csharp
 public readonly struct EnemyDefeated { public readonly int Points; public EnemyDefeated(int p) => Points = p; }

@@ -1,4 +1,4 @@
-﻿using System.IO;
+using System.IO;
 using Pretzel.Setup.Folders;
 using Pretzel.Setup.Paths;
 using Pretzel.Setup.Settings;

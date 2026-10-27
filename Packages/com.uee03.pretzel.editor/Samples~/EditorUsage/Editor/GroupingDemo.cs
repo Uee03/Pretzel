@@ -13,7 +13,7 @@ namespace Pretzel.Samples.EditorUtilities
         private const string GroupMenuPath = "GameObject/Pretzel/Group Selected Objects";
         private const string UndoName = "Create Grouping Demo";
 
-        private static readonly PrimitiveType[] Shapes = { PrimitiveType.Cube, PrimitiveType.Sphere, PrimitiveType.Capsule, PrimitiveType.Cylinder };
+        private static readonly PrimitiveType[] _shapes = { PrimitiveType.Cube, PrimitiveType.Sphere, PrimitiveType.Capsule, PrimitiveType.Cylinder };
 
         [MenuItem(MenuRoot + "Create Objects To Group", true)]
         [MenuItem(MenuRoot + "Group Selection", true)]
@@ -25,11 +25,11 @@ namespace Pretzel.Samples.EditorUtilities
             Undo.IncrementCurrentGroup();
             int undoGroup = Undo.GetCurrentGroup();
 
-            GameObject[] created = new GameObject[Shapes.Length];
-            for (int i = 0; i < Shapes.Length; i++)
+            GameObject[] created = new GameObject[_shapes.Length];
+            for (int i = 0; i < _shapes.Length; i++)
             {
-                GameObject shape = GameObject.CreatePrimitive(Shapes[i]);
-                shape.name = "Demo " + Shapes[i];
+                GameObject shape = GameObject.CreatePrimitive(_shapes[i]);
+                shape.name = "Demo " + _shapes[i];
                 shape.transform.position = new Vector3(i * 2f - 3f, 0.5f, i % 2 * 2f);
                 Undo.RegisterCreatedObjectUndo(shape, UndoName);
                 created[i] = shape;

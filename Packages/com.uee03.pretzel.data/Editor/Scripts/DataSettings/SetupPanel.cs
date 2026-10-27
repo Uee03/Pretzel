@@ -11,9 +11,9 @@ namespace Pretzel.Data.Editor
     /// <summary>Generates project setup and independent examples for each supported use case.</summary>
     internal sealed class SetupPanel : IDataFormatPanel
     {
-        private static readonly DataFormat[] PlainFormats = { DataFormat.PlainText, DataFormat.Binary };
-        private static readonly string[] PlainChoices = { "Plain JSON (.json)", "BinaryWriter / BinaryReader (.bin)" };
-        private static readonly string[] DeliveryChoices = { "Embedded C# (obfuscated)", "Bundled JSON (Resources)" };
+        private static readonly DataFormat[] _plainFormats = { DataFormat.PlainText, DataFormat.Binary };
+        private static readonly string[] _plainChoices = { "Plain JSON (.json)", "BinaryWriter / BinaryReader (.bin)" };
+        private static readonly string[] _deliveryChoices = { "Embedded C# (obfuscated)", "Bundled JSON (Resources)" };
 
         private DataFormatState _state;
         private TextField _folder;
@@ -50,12 +50,12 @@ namespace Pretzel.Data.Editor
             _summary = view.Q<Label>("setup-panel__summary");
 
             _folder.SetValueWithoutNotify(DataIOSetupGenerator.DefaultFolder);
-            _plainFormat.choices = new List<string>(PlainChoices);
-            _delivery.choices = new List<string>(DeliveryChoices);
+            _plainFormat.choices = new List<string>(_plainChoices);
+            _delivery.choices = new List<string>(_deliveryChoices);
 
             // Start from what the project already uses, then leave the choices to the user.
             DataIOConfig config = _state.Config;
-            int plain = Array.IndexOf(PlainFormats, config.format);
+            int plain = Array.IndexOf(_plainFormats, config.format);
             _plainFormat.index = Mathf.Max(0, plain);
             _delivery.index = config.keySource == KeySource.BundledJson ? 1 : 0;
 
@@ -129,7 +129,7 @@ namespace Pretzel.Data.Editor
 
         private void OnGeneratePlain()
         {
-            DataFormat format = PlainFormats[Mathf.Clamp(_plainFormat.index, 0, PlainFormats.Length - 1)];
+            DataFormat format = _plainFormats[Mathf.Clamp(_plainFormat.index, 0, _plainFormats.Length - 1)];
             try
             {
                 string source = DataIOSetupGenerator.RenderPlain(format);

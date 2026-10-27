@@ -74,18 +74,9 @@
       "optionalLibraries": []
     },
     {
-      "name": "com.uee03.pretzel.di",
-      "displayName": "DI",
-      "description": "A small reflection-based dependency injection container with singleton, scoped and transient lifetimes, [Inject] members, child scopes, entry points and a LifetimeScope component.",
-      "version": "0.2.0",
-      "dependencies": ["com.uee03.pretzel.core"],
-      "packages": [],
-      "optionalLibraries": []
-    },
-    {
       "name": "com.uee03.pretzel.pooling",
       "displayName": "Pooling",
-      "description": "Prefab pools on UnityEngine.Pool with prewarming, IPoolable reset hooks, self-releasing PooledObject and a per-prefab PoolRegistry.",
+      "description": "Prefab pools on UnityEngine.Pool with prewarming, IPoolable reset hooks, self-releasing PooledObject, Inspector-configured keyed PoolFactory and a per-prefab PoolRegistry.",
       "version": "0.2.0",
       "dependencies": ["com.uee03.pretzel.core"],
       "packages": [],

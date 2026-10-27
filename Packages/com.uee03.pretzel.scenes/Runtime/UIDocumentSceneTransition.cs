@@ -101,14 +101,12 @@ namespace Pretzel.Scenes
                 root.FadeOut(_fadeDuration, _ease, done);
             }
 
-            using (cancellationToken.Register(() =>
-                   {
-                       root.GetFader().Cancel();
-                       completion.TrySetCanceled();
-                   }))
+            using CancellationTokenRegistration registration = cancellationToken.Register(() =>
             {
-                await completion.Awaitable;
-            }
+                root.GetFader().Cancel();
+                completion.TrySetCanceled();
+            });
+            await completion.Awaitable;
         }
     }
 }

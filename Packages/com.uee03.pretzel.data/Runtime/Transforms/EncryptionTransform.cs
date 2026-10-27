@@ -14,7 +14,7 @@ namespace Pretzel.Data
     /// </summary>
     public sealed class EncryptionTransform : IDataTransform
     {
-        private static readonly byte[] Magic = { (byte)'P', (byte)'R', (byte)'T', (byte)'Z' };
+        private static readonly byte[] _magic = { (byte)'P', (byte)'R', (byte)'T', (byte)'Z' };
         private const byte FormatVersion = 1;
         private const byte ModeAes = 1;
         private const int IvSize = 16;
@@ -65,7 +65,7 @@ namespace Pretzel.Data
             }
 
             using MemoryStream output = new();
-            output.Write(Magic, 0, Magic.Length);
+            output.Write(_magic, 0, _magic.Length);
             output.WriteByte(FormatVersion);
             output.WriteByte(ModeAes);
 
@@ -89,9 +89,9 @@ namespace Pretzel.Data
                 throw new InvalidDataException("The data is too short to be a Pretzel encrypted file.");
             }
 
-            for (int i = 0; i < Magic.Length; i++)
+            for (int i = 0; i < _magic.Length; i++)
             {
-                if (data[i] != Magic[i])
+                if (data[i] != _magic[i])
                 {
                     throw new InvalidDataException("This is not a Pretzel encrypted file (missing the PRTZ header).");
                 }

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Pretzel.Setup.Settings;
 using UnityEngine.UIElements;
 

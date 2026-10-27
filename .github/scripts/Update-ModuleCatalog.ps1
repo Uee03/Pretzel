@@ -24,7 +24,7 @@ $setupName = $prefix + "setup"
 $output = Join-Path $packagesRoot "$setupName\Editor\Catalog\modules.json"
 
 # Order of the Addons tab: the base layer first, optional extras last. Unlisted modules follow alphabetically.
-$order = @("core", "extensions", "data", "tween", "ui", "ui.ugui", "api", "events", "di", "pooling", "scenes",
+$order = @("core", "extensions", "data", "tween", "ui", "ui.ugui", "api", "events", "pooling", "scenes",
     "audio", "preferences", "devconsole", "templates", "integrations", "editor")
 
 function ConvertTo-JsonString([string]$value) {
@@ -113,8 +113,8 @@ for ($i = 0; $i -lt $sorted.Count; $i++) {
     $optionalJson = "[]"
     if ($module.Optional.Count -gt 0) {
         $optionalJson = "[" + (($module.Optional | ForEach-Object {
-            '{ "displayName": ' + (ConvertTo-JsonString $_.DisplayName) + ', "packageName": ' + (ConvertTo-JsonString $_.PackageName) + ' }'
-        }) -join ", ") + "]"
+                    '{ "displayName": ' + (ConvertTo-JsonString $_.DisplayName) + ', "packageName": ' + (ConvertTo-JsonString $_.PackageName) + ' }'
+                }) -join ", ") + "]"
     }
 
     $lines.Add("    {")

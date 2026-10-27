@@ -38,6 +38,11 @@ namespace Pretzel.Pooling
             _pool = new ObjectPool<T>(Create, null, OnRelease, OnDestroyItem, collectionCheck, Mathf.Max(1, defaultCapacity), Mathf.Max(1, maxSize));
         }
 
+        public ComponentPool(T prefab, Transform parent, PoolSettings settings)
+            : this(prefab, parent, Guard.NotNull(settings, nameof(settings)).defaultCapacity, settings.maxSize, settings.collectionCheck)
+        {
+        }
+
         public T Get() => Take(_parent, false, default, default);
 
         public T Get(Transform parent) => Take(parent, false, default, default);

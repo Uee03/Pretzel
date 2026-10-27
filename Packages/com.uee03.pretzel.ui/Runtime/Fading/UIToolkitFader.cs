@@ -22,7 +22,7 @@ namespace Pretzel.UI
         // Transitions never finish on an element that is not rendered, so a timer completes the fade anyway.
         private const long FallbackMarginMs = 150;
 
-        private static readonly StylePropertyName Opacity = new("opacity");
+        private static readonly StylePropertyName _opacity = new("opacity");
 
         private readonly VisualElement _element;
         private int _version;
@@ -174,7 +174,7 @@ namespace Pretzel.UI
         {
             foreach (StylePropertyName property in evt.stylePropertyNames)
             {
-                if (property == Opacity)
+                if (property == _opacity)
                 {
                     return true;
                 }
@@ -223,7 +223,7 @@ namespace Pretzel.UI
         private void ApplyTransition(float duration, EaseType ease)
         {
             IStyle style = _element.style;
-            style.transitionProperty = new List<StylePropertyName> { Opacity };
+            style.transitionProperty = new List<StylePropertyName> { _opacity };
             style.transitionDuration = new List<TimeValue> { new(duration, TimeUnit.Second) };
             style.transitionDelay = new List<TimeValue> { new(0f, TimeUnit.Second) };
             style.transitionTimingFunction = new List<EasingFunction> { new(ease.ToEasingMode()) };

@@ -16,7 +16,7 @@ namespace Pretzel.Data.Editor
         public const string EncryptionDemoName = "PretzelEncryptionExample.cs";
         public const string EncryptionDemoEditorName = "PretzelEncryptionExampleEditor.cs";
 
-        private static readonly string[] SaveExampleFiles =
+        private static readonly string[] _saveExampleFiles =
         {
             "ISaveService.cs", "SaveService.cs", "SaveController.cs", "ProjectSaveData.cs", "ProjectSaveManager.cs"
         };
@@ -111,7 +111,7 @@ namespace Pretzel.Data.Editor
             }
 
             List<(string Template, string Destination)> plan = new();
-            foreach (string name in SaveExampleFiles)
+            foreach (string name in _saveExampleFiles)
             {
                 plan.Add(("Examples/" + name + ".txt", folder + "/" + name));
             }

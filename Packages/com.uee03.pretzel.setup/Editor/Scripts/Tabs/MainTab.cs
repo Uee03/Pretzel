@@ -1,12 +1,12 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Pretzel.Setup.Folders;
 using Pretzel.Setup.Settings;
 using UnityEditor;
 using UnityEditor.Build;
-using UnityEditor.SceneTemplate;
 using UnityEditor.SceneManagement;
+using UnityEditor.SceneTemplate;
 using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;

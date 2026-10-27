@@ -30,7 +30,7 @@ audio.SetVolume(AudioChannel.Music, 0.4f);                       // 0 to 1
   Without one, the manager scales AudioSource volume. Master always applies.
 - Music fades use unscaled time, so they keep running while the game is paused.
 
-Pair it with Pretzel Preferences to save volumes, and with Pretzel DI or your own composition root to share one
+Pair it with Pretzel Preferences to save volumes, and with your DI container or composition root to share one
 manager. It is not a singleton on purpose.
 
 ## Sample

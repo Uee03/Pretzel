@@ -1,9 +1,9 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using Pretzel.Setup.Paths;
 using Pretzel.Setup.Addons.Catalog;
+using Pretzel.Setup.Paths;
 using UnityEditor;
 using UnityEditor.PackageManager;
 using UnityEditor.PackageManager.Requests;
@@ -18,7 +18,7 @@ namespace Pretzel.Setup.Addons.Services
     /// </summary>
     public static class PackageService
     {
-        private static readonly Dictionary<string, PackageInfo> Installed = new(StringComparer.Ordinal);
+        private static readonly Dictionary<string, PackageInfo> _installed = new(StringComparer.Ordinal);
 
         private static Request _request;
         private static ListRequest _list;
@@ -41,11 +41,11 @@ namespace Pretzel.Setup.Addons.Services
             Refresh();
         }
 
-        public static bool IsInstalled(string packageName) => packageName != null && Installed.ContainsKey(packageName);
+        public static bool IsInstalled(string packageName) => packageName != null && _installed.ContainsKey(packageName);
 
         public static PackageInfo Get(string packageName)
         {
-            return packageName != null && Installed.TryGetValue(packageName, out PackageInfo info) ? info : null;
+            return packageName != null && _installed.TryGetValue(packageName, out PackageInfo info) ? info : null;
         }
 
         public static void Refresh()
@@ -191,10 +191,10 @@ namespace Pretzel.Setup.Addons.Services
             {
                 if (_list.Status == StatusCode.Success)
                 {
-                    Installed.Clear();
+                    _installed.Clear();
                     foreach (PackageInfo info in _list.Result)
                     {
-                        Installed[info.name] = info;
+                        _installed[info.name] = info;
                     }
                 }
 

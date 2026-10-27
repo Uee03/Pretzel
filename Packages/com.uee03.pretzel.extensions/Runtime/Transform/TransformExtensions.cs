@@ -39,13 +39,11 @@ namespace Pretzel.Extensions
                 throw new ArgumentException($"Layer '{layerName}' does not exist.", nameof(layerName));
             }
 
-            using (ListPool<Collider>.Get(out List<Collider> colliders))
+            using PooledObject<List<Collider>> pooled = ListPool<Collider>.Get(out List<Collider> colliders);
+            transform.GetComponentsInChildren(colliders);
+            foreach (Collider collider in colliders)
             {
-                transform.GetComponentsInChildren(colliders);
-                foreach (Collider collider in colliders)
-                {
-                    collider.gameObject.layer = layer;
-                }
+                collider.gameObject.layer = layer;
             }
         }
 

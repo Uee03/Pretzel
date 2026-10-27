@@ -8,13 +8,13 @@ namespace Pretzel.UI
 {
     public static class VisualElementFadeExtensions
     {
-        private static readonly ConditionalWeakTable<VisualElement, UIToolkitFader> Faders = new();
+        private static readonly ConditionalWeakTable<VisualElement, UIToolkitFader> _faders = new();
 
         /// <summary>Returns the one fader of this element, creating it on first use.</summary>
         public static UIToolkitFader GetFader(this VisualElement element)
         {
             Guard.NotNull(element, nameof(element));
-            return Faders.GetValue(element, e => new UIToolkitFader(e));
+            return _faders.GetValue(element, e => new UIToolkitFader(e));
         }
 
         public static void Fade(this VisualElement element, FadeType type, float duration = UIToolkitFader.DefaultDuration, EaseType ease = EaseType.Linear, Action onComplete = null)

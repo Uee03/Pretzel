@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using Pretzel.Setup.Settings;
 using Pretzel.Setup.Tabs;

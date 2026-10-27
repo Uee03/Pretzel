@@ -10,8 +10,8 @@ namespace Pretzel.Samples.Tween
     /// </summary>
     public class TweenUsageExample : MonoBehaviour
     {
-        private static readonly int ColorId = Shader.PropertyToID("_Color");
-        private static readonly int BaseColorId = Shader.PropertyToID("_BaseColor");
+        private static readonly int _colorId = Shader.PropertyToID("_Color");
+        private static readonly int _baseColorId = Shader.PropertyToID("_BaseColor");
 
         [Header("Movement")]
         [SerializeField] private EaseType _ease = EaseType.OutBack;
@@ -48,7 +48,7 @@ namespace Pretzel.Samples.Tween
             if (TryGetComponent(out _renderer) && _renderer.sharedMaterial)
             {
                 Material material = _renderer.sharedMaterial;
-                _colorProperty = material.HasProperty(BaseColorId) ? BaseColorId : material.HasProperty(ColorId) ? ColorId : -1;
+                _colorProperty = material.HasProperty(_baseColorId) ? _baseColorId : material.HasProperty(_colorId) ? _colorId : -1;
                 _block = new MaterialPropertyBlock();
             }
 

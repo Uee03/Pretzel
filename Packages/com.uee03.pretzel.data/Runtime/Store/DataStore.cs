@@ -18,10 +18,10 @@ namespace Pretzel.Data
     /// </summary>
     public sealed class DataStore : IDataStore
     {
-        private static readonly UTF8Encoding Utf8 = new(false);
+        private static readonly UTF8Encoding _utf8 = new(false);
 
         // Versioned types are written as {"schemaVersion": n, "data": <serializer output>}. This needs a JSON serializer.
-        private static readonly Regex EnvelopeStart = new("\\A\\s*\\{\\s*\"schemaVersion\"\\s*:\\s*(\\d+)\\s*,\\s*\"data\"\\s*:");
+        private static readonly Regex _envelopeStart = new("\\A\\s*\\{\\s*\"schemaVersion\"\\s*:\\s*(\\d+)\\s*,\\s*\"data\"\\s*:");
 
         private readonly IDataRoot _root;
         private readonly string _extension;
@@ -318,7 +318,7 @@ namespace Pretzel.Data
 
         private void WriteText(string path, string text, long sequence)
         {
-            byte[] bytes = Utf8.GetBytes(text);
+            byte[] bytes = _utf8.GetBytes(text);
             foreach (IDataTransform transform in _transforms)
             {
                 bytes = transform.Encode(bytes);
@@ -399,7 +399,7 @@ namespace Pretzel.Data
                 }
 
                 bool hasBom = bytes.Length >= 3 && bytes[0] == 0xEF && bytes[1] == 0xBB && bytes[2] == 0xBF;
-                string text = hasBom ? Utf8.GetString(bytes, 3, bytes.Length - 3) : Utf8.GetString(bytes);
+                string text = hasBom ? _utf8.GetString(bytes, 3, bytes.Length - 3) : _utf8.GetString(bytes);
                 return new RawRead(true, text, null);
             }
             catch (Exception ex) when (IsReadFailure(ex))
@@ -547,7 +547,7 @@ namespace Pretzel.Data
             Newtonsoft.Json.Linq.JToken.Parse(text);
             int version = 0;
             string payload = text;
-            Match match = EnvelopeStart.Match(text);
+            Match match = _envelopeStart.Match(text);
             int end = text.LastIndexOf('}');
             if (match.Success && end > match.Length)
             {

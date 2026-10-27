@@ -1,6 +1,6 @@
-﻿using Pretzel.Setup.Tabs;
 using Pretzel.Setup.Addons.Catalog;
 using Pretzel.Setup.Addons.Services;
+using Pretzel.Setup.Tabs;
 using UnityEditor;
 using UnityEngine.UIElements;
 

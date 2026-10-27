@@ -14,7 +14,7 @@ namespace Pretzel.Samples.Data
     /// </summary>
     public sealed class EncryptionUsageExample : MonoBehaviour
     {
-        private static readonly DataKey ExampleKey = new("encryption-example-profile", slot: 1, folder: "PretzelSamples");
+        private static readonly DataKey _exampleKey = new("encryption-example-profile", slot: 1, folder: "PretzelSamples");
 
         [ContextMenu("Encryption/Save and load configured AES profile")]
         public void SaveAndLoadConfiguredAes()
@@ -29,8 +29,8 @@ namespace Pretzel.Samples.Data
             {
                 // A local store built from the DataIOConfig asset and its key source. DataIO.Default is left alone.
                 DataStore store = RequireAesConfig().CreateStore();
-                store.Save(ExampleKey, new PlayerProfile { displayName = "Encrypted player", level = 7 });
-                Report(store.Load<PlayerProfile>(ExampleKey), this);
+                store.Save(_exampleKey, new PlayerProfile { displayName = "Encrypted player", level = 7 });
+                Report(store.Load<PlayerProfile>(_exampleKey), this);
             }
             catch (Exception ex) when (IsExpectedFailure(ex))
             {

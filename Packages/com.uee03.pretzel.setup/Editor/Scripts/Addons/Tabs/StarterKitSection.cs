@@ -1,10 +1,10 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Linq;
+using Pretzel.Setup.Addons.Catalog;
+using Pretzel.Setup.Addons.Services;
 using Pretzel.Setup.Folders;
 using Pretzel.Setup.Settings;
 using Pretzel.Setup.Tabs;
-using Pretzel.Setup.Addons.Catalog;
-using Pretzel.Setup.Addons.Services;
 using UnityEngine.UIElements;
 
 namespace Pretzel.Setup.Addons.Tabs
@@ -16,7 +16,7 @@ namespace Pretzel.Setup.Addons.Tabs
     public sealed class StarterKitSection : IPretzelMainSection
     {
         // Catalog ids that need no manual NuGet step, so one click can install them.
-        private static readonly Dictionary<string, string[]> Recommended = new()
+        private static readonly Dictionary<string, string[]> _recommended = new()
         {
             [FolderPreset.Game] = new[] { "litmotion", "unitask", "vcontainer" },
             [FolderPreset.Tool] = new[] { "unitask" },
@@ -57,7 +57,7 @@ namespace Pretzel.Setup.Addons.Tabs
                 addons.Clear();
                 toggles.Clear();
                 List<CatalogEntry> catalog = CatalogService.GetEntries();
-                foreach (string id in Recommended[kit.value])
+                foreach (string id in _recommended[kit.value])
                 {
                     CatalogEntry entry = catalog.FirstOrDefault(e => e.id == id);
                     if (entry == null || PackageService.IsInstalled(entry.packageName))

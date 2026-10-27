@@ -1,7 +1,7 @@
+using Pretzel.UI.Editor;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
-using Pretzel.UI.Editor;
 
 namespace Pretzel.Samples.EditorUIHelpers
 {
