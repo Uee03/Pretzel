@@ -18,7 +18,7 @@ dependencies. Do not run a second Editor against an open or locked project.
 | IL2CPP / stripping, Windows x64 | Generated AES startup and profile service; plain, binary (async) and encrypted round trips | One local smoke player, 6000.6.5f1, Managed Stripping High, passed (2026-10-24). Audio, scenes, pooling and the console were not part of it |
 | IL2CPP on other platforms, consoles, mobile | Actual player and backend | Not certified |
 | Runtime behaviour in a player | Scene transitions in a player, audio mixing, safe area on notched devices, world-space panels, console input | Manual checks; scene loading is covered in the Editor by PlayMode tests only |
-| R3, UniTask, LitMotion adapters | Third-party packages present | Optional assemblies are absent from clean hosts unless those packages are installed. `Pretzel.Integrations.R3` and `.R3.Scenes` compiled against R3 1.3.0 on 6000.6.5f1 (2026-10-27); R3's own Editor tree view does not compile on 6000.6 (obsolete `TreeView` API) |
+| R3, UniTask, LitMotion adapters | Third-party packages present | Optional assemblies are absent from clean hosts unless those packages are installed. `Pretzel.Integrations.R3` compiled against R3 1.3.0 on 6000.6.5f1 (2026-10-27); R3's own Editor tree view does not compile on 6000.6 (obsolete `TreeView` API) |
 | Performance and size | Representative target-player payloads | No speed, size or allocation claim |
 
 ## Reproduce a clean local run

@@ -131,11 +131,6 @@ It starts hidden, moves itself to DontDestroyOnLoad (so single-mode loads do not
 it), and uses the Pretzel UI fader with an `EaseType`. Implement `ISceneTransition` for any other screen (UGUI,
 a camera fade, a shader wipe), and `ISceneStatusDisplay` if it can show status text.
 
-## R3
-
-With R3 installed, Pretzel Integrations adds `ObserveState`, `ObserveProgress`, `ObserveIsLoading`,
-`ObserveLoadStarted` and `ObserveLoadFinished` on `SceneLoader`.
-
 ## Samples
 
 - `Samples~/ScenesUsage`: a loading screen and a menu with single and additive loads.

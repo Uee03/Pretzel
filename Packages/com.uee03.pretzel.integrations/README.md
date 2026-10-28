@@ -9,7 +9,6 @@ Each library has its own assembly under `Runtime/`. An assembly compiles only wh
 | `Runtime/LitMotion` | `Pretzel.Integrations.LitMotion` | [LitMotion](https://github.com/annulusgames/LitMotion) v2.0.2 | `com.annulusgames.lit-motion` | `PRETZEL_LITMOTION` |
 | `Runtime/UniTask` | `Pretzel.Integrations.UniTask` | [UniTask](https://github.com/Cysharp/UniTask) 2.5.11 | `com.cysharp.unitask` | `PRETZEL_UNITASK` |
 | `Runtime/R3` | `Pretzel.Integrations.R3` | [R3](https://github.com/Cysharp/R3) 1.3.1 | `com.cysharp.r3` | `PRETZEL_R3` |
-| `Runtime/R3/Scenes` | `Pretzel.Integrations.R3.Scenes` | R3 and Pretzel Scenes | `com.cysharp.r3`, `com.uee03.pretzel.scenes` | `PRETZEL_R3`, `PRETZEL_SCENES` |
 
 ## LitMotion
 
@@ -57,18 +56,6 @@ client.GetJsonAsObservable<Item>("items/1").Subscribe(response => { });
 
 - `VisualElement.EventAsObservable<TEvent>()` and `Button.ClickedAsObservable()` unregister their callbacks when disposed.
 - `ApiClient.GetAsObservable`, `GetJsonAsObservable` and `PostJsonAsObservable`.
-
-With Pretzel Scenes also installed, `SceneLoader` gets observables:
-
-```csharp
-loader.ObserveIsLoading().Subscribe(loading => playerInput.enabled = !loading).AddTo(this);
-loader.ObserveProgress().Subscribe(p => bar.value = p).AddTo(this);
-loader.ObserveLoadFinished().Where(r => r.Error != null).Subscribe(r => Debug.LogWarning(r)).AddTo(this);
-```
-
-- `ObserveState` and `ObserveProgress` emit the current value on subscribe, then every change.
-- `ObserveIsLoading` is true while a load or activation runs; a held preload counts as not loading.
-- `ObserveLoadStarted` and `ObserveLoadFinished` emit `SceneLoadReport`s.
 
 ## Sample
 
