@@ -23,9 +23,9 @@ namespace Pretzel.Setup.Addons.Catalog
 
         public static event Action Changed;
 
-        public static List<CatalogEntry> GetEntries()
+        public static IReadOnlyList<CatalogEntry> GetEntries()
         {
-            Dictionary<string, CatalogEntry> byId = new();
+            Dictionary<string, CatalogEntry> byId = new(StringComparer.OrdinalIgnoreCase);
             List<CatalogEntry> ordered = new();
 
             foreach (CatalogEntry entry in BuiltInCatalog.Create().Concat(_remote.Select(e => e.Clone())))
@@ -61,7 +61,7 @@ namespace Pretzel.Setup.Addons.Catalog
         public static void SetPin(string id, string version)
         {
             List<PinnedVersion> pins = PretzelSettings.Project.pinnedVersions;
-            pins.RemoveAll(p => p.id == id);
+            pins.RemoveAll(p => string.Equals(p.id, id, StringComparison.OrdinalIgnoreCase));
             if (!string.IsNullOrWhiteSpace(version))
             {
                 pins.Add(new PinnedVersion { id = id, version = version.Trim() });
@@ -70,7 +70,7 @@ namespace Pretzel.Setup.Addons.Catalog
 
         public static string GetPin(string id)
         {
-            return PretzelSettings.Project.pinnedVersions.Find(p => p.id == id)?.version;
+            return PretzelSettings.Project.pinnedVersions.Find(p => string.Equals(p.id, id, StringComparison.OrdinalIgnoreCase))?.version;
         }
 
         /// <summary>Reloads every catalog source from the settings. Failed sources are listed in <see cref="LoadErrors"/>.</summary>

@@ -13,9 +13,15 @@ applyTo: "**/*.cs"
   Use braces for every control-flow block, including single-statement blocks.
 - Use `async`/`await` for genuinely asynchronous I/O when supported by the installed Unity API;
   preserve Unity main-thread requirements and use `Async` suffixes for asynchronous methods.
-- Choose string comparison semantics explicitly. Use ordinal, case-sensitive comparison for paths
-  and identifiers whose semantics are case-sensitive; use `OrdinalIgnoreCase` only when the domain
-  is intentionally case-insensitive. Do not change existing path semantics during style cleanup.
+- Choose string comparison semantics explicitly. Never compare strings with `==`/`!=` or `ToLower`/`ToUpper`;
+  use `string.Equals`/`StartsWith`/`Contains` with a `StringComparison`, and give string-keyed dictionaries,
+  sets and LINQ lookups a `StringComparer`. Use ordinal, case-sensitive comparison for paths, code tokens and
+  identifiers whose semantics are case-sensitive; use `OrdinalIgnoreCase` for text people type. Do not change
+  existing path semantics during style cleanup.
+- Expose `IReadOnlyList<T>`/`IReadOnlyDictionary<TKey, TValue>` from public properties and methods, and mutate
+  through explicit methods. Prefer classes; a struct needs a `// Value type: <reason>` line above it.
+- Name private and static fields `_camelCase` and constant fields `PascalCase`. Keep existing serialized field
+  names (they are save-file and asset keys); rename only with `[FormerlySerializedAs]` or a data migration.
 - Keep one public top-level type per file, named to match the file. Preserve public APIs when
   splitting declarations; do not change serialized identities or behavior.
 - Preserve nearby namespaces, braces, field naming, and member ordering. Where already used,
@@ -49,3 +55,5 @@ applyTo: "**/*.cs"
   Addressables, netcode, R3, or LitMotion calls, or hand-edit graph/scene YAML as a shortcut.
 - Write comments only for non-obvious intent or constraints, in one short line. Address the user
   as an experienced software engineer; explain trade-offs rather than introductory C# concepts.
+- Before finishing any C# change, run the checks in
+  [pretzel-code-standards](../skills/pretzel-code-standards/SKILL.md) and fix every error.

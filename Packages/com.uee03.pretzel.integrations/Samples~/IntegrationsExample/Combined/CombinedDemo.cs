@@ -59,7 +59,7 @@ namespace Pretzel.Samples.Integrations
 
         private async UniTaskVoid LoadAsync()
         {
-            Response<Todo> response = await _client.GetJsonUniTask<Todo>("todos/" + _next++, cancellationToken: destroyCancellationToken);
+            Response<Todo> response = await _client.GetJsonUniTaskAsync<Todo>("todos/" + _next++, cancellationToken: destroyCancellationToken);
             _card.text = response.Ok ? response.Data.title : "Failed: " + response.Error;
 
             if (_handle.IsActive())

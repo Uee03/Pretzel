@@ -7,7 +7,7 @@ namespace Pretzel.Setup.Settings
     [Serializable]
     public sealed class PretzelProjectSettings
     {
-        public List<FolderPreset> folderPresets = FolderPreset.CreateDefaults();
+        public List<FolderPreset> folderPresets = new(FolderPreset.CreateDefaults());
         public string activeFolderPreset = FolderPreset.Game;
 
         // The serializer, save folder and file extension live in the DataIOConfig asset, edited in Pretzel/Data Format.
@@ -24,7 +24,7 @@ namespace Pretzel.Setup.Settings
         {
             get
             {
-                FolderPreset preset = folderPresets.Find(p => p.name == activeFolderPreset);
+                FolderPreset preset = folderPresets.Find(p => string.Equals(p.name, activeFolderPreset, StringComparison.OrdinalIgnoreCase));
                 return preset ?? folderPresets[0];
             }
         }
@@ -38,7 +38,7 @@ namespace Pretzel.Setup.Settings
 
             foreach (FolderPreset fallback in FolderPreset.CreateDefaults())
             {
-                FolderPreset existing = folderPresets.Find(p => p.name == fallback.name);
+                FolderPreset existing = folderPresets.Find(p => string.Equals(p.name, fallback.name, StringComparison.OrdinalIgnoreCase));
                 if (existing == null)
                 {
                     folderPresets.Add(fallback);
@@ -55,7 +55,7 @@ namespace Pretzel.Setup.Settings
                 preset.MigrateScriptsFolder();
             }
 
-            if (!folderPresets.Exists(p => p.name == activeFolderPreset))
+            if (!folderPresets.Exists(p => string.Equals(p.name, activeFolderPreset, StringComparison.OrdinalIgnoreCase)))
             {
                 activeFolderPreset = FolderPreset.Game;
             }

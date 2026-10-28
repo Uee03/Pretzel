@@ -3,6 +3,7 @@ using UnityEngine;
 
 namespace Pretzel.DevConsole
 {
+    // Value type: stored in a fixed ring buffer from any thread, so logging never allocates an entry.
     public readonly struct LogEntry
     {
         public LogType Type { get; }

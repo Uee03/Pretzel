@@ -508,7 +508,7 @@ namespace Pretzel.Scenes
         {
             foreach (Scene scene in scenes)
             {
-                if (activeName != null && scene.name == activeName)
+                if (activeName != null && string.Equals(scene.name, activeName, StringComparison.Ordinal))
                 {
                     return scene;
                 }
@@ -648,7 +648,7 @@ namespace Pretzel.Scenes
 
         #endregion
 
-        private readonly struct SceneEntry
+        private sealed class SceneEntry
         {
             public readonly string Name;
             public readonly Func<LoadSceneMode, AsyncOperation> Begin;

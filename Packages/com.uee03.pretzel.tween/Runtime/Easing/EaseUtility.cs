@@ -12,7 +12,7 @@ namespace Pretzel.Tween
     public static class EaseUtility
     {
         private const float PI = Mathf.PI;
-        private const float HALF_PI = PI * 0.5f;
+        private const float HalfPi = PI * 0.5f;
         private const float C1 = 1.70158f;
         private const float C2 = C1 + 1f;
         private const float C3 = C1 * 1.525f;
@@ -125,10 +125,10 @@ namespace Pretzel.Tween
         #region SINE
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static float InSine(float time) => 1f - Mathf.Cos(time * HALF_PI);
+        public static float InSine(float time) => 1f - Mathf.Cos(time * HalfPi);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static float OutSine(float time) => Mathf.Sin(time * HALF_PI);
+        public static float OutSine(float time) => Mathf.Sin(time * HalfPi);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static float InOutSine(float time) => -(Mathf.Cos(PI * time) - 1f) * 0.5f;

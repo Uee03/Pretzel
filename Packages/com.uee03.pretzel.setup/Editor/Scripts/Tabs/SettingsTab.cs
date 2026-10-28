@@ -106,7 +106,7 @@ namespace Pretzel.Setup.Tabs
                     return;
                 }
 
-                _context.Project.folderPresets = FolderPreset.CreateDefaults();
+                _context.Project.folderPresets = new List<FolderPreset>(FolderPreset.CreateDefaults());
                 _context.Project.Normalize();
                 _context.MarkProjectDirty();
                 _context.RaiseSettingsReset();

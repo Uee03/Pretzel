@@ -7,6 +7,8 @@ namespace Pretzel.Data
     /// <summary>Settings for a <see cref="DataStore"/>. The store takes a snapshot when it is constructed.</summary>
     public sealed class DataStoreOptions
     {
+        private readonly List<IDataTransform> _transforms = new();
+
         /// <summary>Indent the JSON so it can be read and diffed.</summary>
         public bool PrettyPrint { get; set; }
 
@@ -17,9 +19,17 @@ namespace Pretzel.Data
         public string SlotPrefix { get; set; } = "Slot_";
 
         /// <summary>Byte transforms applied in list order on save and in reverse order on load.</summary>
-        public List<IDataTransform> Transforms { get; } = new();
+        public IReadOnlyList<IDataTransform> Transforms => _transforms;
 
         internal Dictionary<Type, List<IMigration>> Migrations { get; } = new();
+
+        /// <summary>Appends a byte transform. Transforms run in the order they were added on save.</summary>
+        public DataStoreOptions AddTransform(IDataTransform transform)
+        {
+            Guard.NotNull(transform, nameof(transform));
+            _transforms.Add(transform);
+            return this;
+        }
 
         /// <summary>Registers a migration step for <typeparamref name="T"/>. Pair it with <see cref="SchemaVersionAttribute"/>.</summary>
         public DataStoreOptions AddMigration<T>(IMigration migration)

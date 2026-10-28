@@ -8,7 +8,10 @@ namespace Pretzel.Api
     /// </summary>
     public sealed class RequestOptions
     {
-        public Dictionary<string, string> Headers { get; } = new(StringComparer.OrdinalIgnoreCase);
+        private readonly Dictionary<string, string> _headers = new(StringComparer.OrdinalIgnoreCase);
+
+        /// <summary>Header names are case-insensitive. Use <see cref="SetHeader"/> to add one.</summary>
+        public IReadOnlyDictionary<string, string> Headers => _headers;
 
         /// <summary>Per attempt. 0 means no timeout.</summary>
         public float? TimeoutSeconds { get; set; }
@@ -27,9 +30,11 @@ namespace Pretzel.Api
 
         public RequestOptions SetHeader(string name, string value)
         {
-            Headers[name] = value;
+            _headers[name] = value;
             return this;
         }
+
+        public bool RemoveHeader(string name) => _headers.Remove(name);
 
         public RequestOptions SetBearerToken(string token) => SetHeader("Authorization", "Bearer " + token);
     }

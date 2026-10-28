@@ -2,7 +2,7 @@ using System;
 
 namespace Pretzel.Setup.Addons.Controls
 {
-    public readonly struct CardAction
+    public sealed class CardAction
     {
         public readonly string Label;
         public readonly Action Invoke;

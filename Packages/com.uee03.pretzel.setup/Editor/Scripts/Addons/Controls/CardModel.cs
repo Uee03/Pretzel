@@ -5,16 +5,33 @@ namespace Pretzel.Setup.Addons.Controls
 {
     public sealed class CardModel
     {
-        public string Title;
-        public string Subtitle;
-        public string Description;
-        public string Detail;
-        public string Note;
-        public HelpBoxMessageType NoteType = HelpBoxMessageType.Info;
-        public List<CardChip> Chips = new();
-        public List<CardAction> Actions = new();
+        private readonly List<CardChip> _chips = new();
+        private readonly List<CardAction> _actions = new();
+        private readonly List<VisualElement> _extras = new();
+
+        public string Title { get; set; }
+
+        public string Subtitle { get; set; }
+
+        public string Description { get; set; }
+
+        public string Detail { get; set; }
+
+        public string Note { get; set; }
+
+        public HelpBoxMessageType NoteType { get; set; } = HelpBoxMessageType.Info;
+
+        public IReadOnlyList<CardChip> Chips => _chips;
+
+        public IReadOnlyList<CardAction> Actions => _actions;
 
         /// <summary>Extra elements shown under the description, for example a version field.</summary>
-        public List<VisualElement> Extras = new();
+        public IReadOnlyList<VisualElement> Extras => _extras;
+
+        public void AddChip(CardChip chip) => _chips.Add(chip);
+
+        public void AddAction(CardAction action) => _actions.Add(action);
+
+        public void AddExtra(VisualElement extra) => _extras.Add(extra);
     }
 }

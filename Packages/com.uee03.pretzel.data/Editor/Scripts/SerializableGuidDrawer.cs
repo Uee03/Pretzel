@@ -1,7 +1,9 @@
+using System;
 using UnityEditor;
 using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
+using Object = UnityEngine.Object;
 
 namespace Pretzel.Data.Editor
 {
@@ -28,7 +30,7 @@ namespace Pretzel.Data.Editor
 
             root.Add(CreateButton("Refresh", "Regenerate", "Generate a new GUID", () =>
             {
-                bool hasValue = guid.stringValue != SerializableGuid.EmptyGuidString();
+                bool hasValue = !string.Equals(guid.stringValue, SerializableGuid.EmptyGuidString(), StringComparison.OrdinalIgnoreCase);
                 if (hasValue && !EditorUtility.DisplayDialog("Regenerate GUID", "Replace the current GUID?", "Replace", "Cancel"))
                 {
                     return;

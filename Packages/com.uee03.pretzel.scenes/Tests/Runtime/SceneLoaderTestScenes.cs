@@ -1,4 +1,5 @@
 #if UNITY_EDITOR
+using System;
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEditor.SceneManagement;
@@ -33,7 +34,7 @@ namespace Pretzel.Scenes.Tests
                     EditorSceneManager.CloseScene(scene, true);
                 }
 
-                if (!buildScenes.Exists(entry => entry.path == path))
+                if (!buildScenes.Exists(entry => string.Equals(entry.path, path, StringComparison.Ordinal)))
                 {
                     buildScenes.Add(new EditorBuildSettingsScene(path, true));
                 }
@@ -45,7 +46,7 @@ namespace Pretzel.Scenes.Tests
         public void Cleanup()
         {
             List<EditorBuildSettingsScene> buildScenes = new(EditorBuildSettings.scenes);
-            buildScenes.RemoveAll(entry => entry.path.StartsWith(Folder + "/"));
+            buildScenes.RemoveAll(entry => entry.path.StartsWith(Folder + "/", StringComparison.Ordinal));
             EditorBuildSettings.scenes = buildScenes.ToArray();
             AssetDatabase.DeleteAsset(Folder);
         }

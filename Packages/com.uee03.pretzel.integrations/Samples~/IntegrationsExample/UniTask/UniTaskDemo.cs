@@ -27,7 +27,7 @@ namespace Pretzel.Samples.Integrations
 
         private readonly ApiClient _client = new("https://jsonplaceholder.typicode.com/");
 
-        [Tooltip("Optional. An image URL for DownloadTextureUniTask.")]
+        [Tooltip("Optional. An image URL for DownloadTextureUniTaskAsync.")]
         [SerializeField] private string _textureUrl;
 
         private CancellationTokenSource _cts;
@@ -57,8 +57,8 @@ namespace Pretzel.Samples.Integrations
             try
             {
                 (Response<Todo> first, Response<Todo> second) = await UniTask.WhenAll(
-                    _client.GetJsonUniTask<Todo>("todos/1", cancellationToken: token),
-                    _client.GetJsonUniTask<Todo>("todos/2", cancellationToken: token));
+                    _client.GetJsonUniTaskAsync<Todo>("todos/1", cancellationToken: token),
+                    _client.GetJsonUniTaskAsync<Todo>("todos/2", cancellationToken: token));
 
                 _status.text = first.Ok && second.Ok
                     ? first.Data.title + "\n" + second.Data.title
@@ -76,17 +76,17 @@ namespace Pretzel.Samples.Integrations
             _status.text = "Sending...";
             try
             {
-                Response<Todo> created = await _client.PostJsonUniTask<Todo, Todo>("todos", new Todo { title = "From UniTask" }, cancellationToken: token);
-                Response<string> raw = await _client.PostUniTask("todos", "{\"title\":\"Raw body\"}", cancellationToken: token);
-                Response<string> text = await _client.GetUniTask("todos/3", cancellationToken: token);
+                Response<Todo> created = await _client.PostJsonUniTaskAsync<Todo, Todo>("todos", new Todo { title = "From UniTask" }, cancellationToken: token);
+                Response<string> raw = await _client.PostUniTaskAsync("todos", "{\"title\":\"Raw body\"}", cancellationToken: token);
+                Response<string> text = await _client.GetUniTaskAsync("todos/3", cancellationToken: token);
 
                 string file = Path.Combine(Application.temporaryCachePath, "pretzel-unitask-todos.json");
-                Response<string> download = await _client.DownloadFileUniTask("todos", file, cancellationToken: token);
+                Response<string> download = await _client.DownloadFileUniTaskAsync("todos", file, cancellationToken: token);
 
                 string summary = $"POST json {created.StatusCode}, POST text {raw.StatusCode}, GET text {text.Data?.Length ?? 0} chars, file {(download.Ok ? download.Data : download.Error)}";
                 if (!string.IsNullOrWhiteSpace(_textureUrl))
                 {
-                    Response<Texture2D> texture = await _client.DownloadTextureUniTask(_textureUrl, cancellationToken: token);
+                    Response<Texture2D> texture = await _client.DownloadTextureUniTaskAsync(_textureUrl, cancellationToken: token);
                     if (texture.Ok)
                     {
                         summary += $", texture {texture.Data.width}x{texture.Data.height}";

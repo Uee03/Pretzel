@@ -43,7 +43,7 @@ namespace Pretzel.Setup.Addons.Services
                 changed = true;
             }
 
-            if (!scopes.Any(s => (string)s == packageName))
+            if (!scopes.Any(s => string.Equals((string)s, packageName, StringComparison.Ordinal)))
             {
                 scopes.Add(packageName);
                 changed = true;
@@ -56,7 +56,7 @@ namespace Pretzel.Setup.Addons.Services
                 changed = true;
             }
 
-            if ((string)dependencies[packageName] != version)
+            if (!string.Equals((string)dependencies[packageName], version, StringComparison.Ordinal))
             {
                 dependencies[packageName] = version;
                 changed = true;

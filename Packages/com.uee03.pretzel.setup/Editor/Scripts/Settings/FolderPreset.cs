@@ -28,7 +28,7 @@ namespace Pretzel.Setup.Settings
             this.folders = new List<string>(folders);
         }
 
-        public static List<FolderPreset> CreateDefaults()
+        public static IReadOnlyList<FolderPreset> CreateDefaults()
         {
             string[] scripts = { Scripts + "/Editor", Scripts + "/Runtime" };
 
@@ -59,7 +59,7 @@ namespace Pretzel.Setup.Settings
 
                 string normalized = folder.Trim().Replace('\\', '/').Trim('/');
                 const string old = Project + "/Scripts";
-                if (normalized == old || normalized.StartsWith(old + "/", StringComparison.Ordinal))
+                if (string.Equals(normalized, old, StringComparison.Ordinal) || normalized.StartsWith(old + "/", StringComparison.Ordinal))
                 {
                     folders[i] = Scripts + normalized.Substring(old.Length);
                     changed = true;

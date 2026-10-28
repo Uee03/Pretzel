@@ -130,7 +130,7 @@ namespace Pretzel.UI.Editor
                     continue;
                 }
 
-                bool isScript = iterator.propertyPath == "m_Script";
+                bool isScript = string.Equals(iterator.propertyPath, "m_Script", StringComparison.Ordinal);
                 if (isScript && !includeScript)
                 {
                     continue;

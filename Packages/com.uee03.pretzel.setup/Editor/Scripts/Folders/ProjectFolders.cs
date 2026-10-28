@@ -33,7 +33,7 @@ namespace Pretzel.Setup.Folders
             char[] invalid = Path.GetInvalidFileNameChars();
             foreach (string segment in normalized.Split('/'))
             {
-                if (segment.Length == 0 || segment == "." || segment == ".." || segment.IndexOfAny(invalid) >= 0 || segment.EndsWith(".", StringComparison.Ordinal))
+                if (segment.Length == 0 || string.Equals(segment, ".", StringComparison.Ordinal) || string.Equals(segment, "..", StringComparison.Ordinal) || segment.IndexOfAny(invalid) >= 0 || segment.EndsWith(".", StringComparison.Ordinal))
                 {
                     error = $"'{segment}' is not a valid folder name.";
                     return false;

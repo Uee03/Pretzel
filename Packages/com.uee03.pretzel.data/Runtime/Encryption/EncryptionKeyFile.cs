@@ -62,7 +62,7 @@ namespace Pretzel.Data
             FileDto dto = new()
             {
                 aesKey = keys.HasAesKey ? EncryptionKeys.EncodeAesKey(keys.AesKey) : null,
-                previousAesKeys = keys.PreviousAesKeys.Count == 0 ? null : keys.PreviousAesKeys.ConvertAll(EncryptionKeys.EncodeAesKey).ToArray()
+                previousAesKeys = keys.PreviousAesKeys.Count == 0 ? null : keys.EncodePreviousAesKeys()
             };
 
             string path = Path;

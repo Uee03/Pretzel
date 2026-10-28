@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 using UnityEditor;
 using UnityEngine;
@@ -95,7 +96,7 @@ namespace Pretzel.Data.Editor
             }
             else
             {
-                bool encryptedScript = File.ReadAllText(path).Contains("InitializeWithKeys");
+                bool encryptedScript = File.ReadAllText(path).Contains("InitializeWithKeys", StringComparison.Ordinal);
                 bool matches = encryptedScript == (config.format == DataFormat.Encrypted);
                 PanelUi.SetChip(_current, matches ? "Setup family detected (not validated)" : "Setup family differs from settings",
                     matches ? PanelUi.Warn : PanelUi.Missing);
@@ -246,10 +247,10 @@ namespace Pretzel.Data.Editor
         {
             try
             {
-                List<string> created = DataIOSetupGenerator.CreateExamples(Folder, _state.Config.format == DataFormat.Encrypted);
+                IReadOnlyList<string> created = DataIOSetupGenerator.CreateExamples(Folder, _state.Config.format == DataFormat.Encrypted);
                 PanelUi.SetText(_result, created.Count == 0
                     ? "Every example already exists, so nothing was replaced."
-                    : $"Added {created.Count} file(s) to {Folder}: {string.Join(", ", created.ConvertAll(file => Path.GetFileName(file)))}. "
+                    : $"Added {created.Count} file(s) to {Folder}: {string.Join(", ", created.Select(file => Path.GetFileName(file)))}. "
                       + $"Read {DataIOSetupGenerator.GuideName} next. Add ProjectSaveManager to a GameObject in your first scene.");
             }
             catch (Exception ex) when (PanelUi.IsExpectedFailure(ex))
@@ -274,7 +275,7 @@ namespace Pretzel.Data.Editor
 
         private void OnValidate()
         {
-            List<BuildIssue> issues = DataIOBuildValidator.Validate();
+            IReadOnlyList<BuildIssue> issues = DataIOBuildValidator.Validate();
             if (issues.Count == 0)
             {
                 PanelUi.SetText(_result, "No issues found by the limited build-delivery checks. This does not prove startup code, keys or player save/load work.");
@@ -349,7 +350,7 @@ namespace Pretzel.Data.Editor
                 const string key = "pretzel-diagnostic";
                 store.Save(key, expected);
                 LoadResult<DiagnosticData> loaded = store.Load<DiagnosticData>(key);
-                if (!loaded.Ok || loaded.Value == null || loaded.Value.token != expected.token || loaded.Value.number != expected.number)
+                if (!loaded.Ok || loaded.Value == null || !string.Equals(loaded.Value.token, expected.token, StringComparison.Ordinal) || loaded.Value.number != expected.number)
                 {
                     throw new InvalidDataException($"Diagnostic round trip failed ({loaded.Status}): {loaded.Error ?? "payload mismatch"}");
                 }

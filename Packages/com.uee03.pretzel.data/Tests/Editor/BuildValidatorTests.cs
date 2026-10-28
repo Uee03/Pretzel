@@ -1,8 +1,10 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using Pretzel.Data.Editor;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace Pretzel.Data.Tests
 {
@@ -35,10 +37,10 @@ namespace Pretzel.Data.Tests
 
         private static string AesJson() => GameEncryptionKeyConfig.ToJson(new EncryptionKeys { AesKey = EncryptionKeys.GenerateAesKey() }, EncryptionMode.Aes);
 
-        private static IEnumerable<string> Errors(List<BuildIssue> issues) =>
+        private static IEnumerable<string> Errors(IReadOnlyList<BuildIssue> issues) =>
             issues.Where(i => i.Severity == IssueSeverity.Error).Select(i => i.Message);
 
-        private static IEnumerable<string> Warnings(List<BuildIssue> issues) =>
+        private static IEnumerable<string> Warnings(IReadOnlyList<BuildIssue> issues) =>
             issues.Where(i => i.Severity == IssueSeverity.Warning).Select(i => i.Message);
 
         [Test]
@@ -51,7 +53,7 @@ namespace Pretzel.Data.Tests
         [Test]
         public void ALeftoverKeyFileIsWarnedAboutWhenNothingIsEncrypted()
         {
-            List<BuildIssue> issues = DataIOBuildValidator.Validate(Config(DataFormat.Binary, EncryptionMode.Aes, KeySource.Automatic), null, AesJson());
+            IReadOnlyList<BuildIssue> issues = DataIOBuildValidator.Validate(Config(DataFormat.Binary, EncryptionMode.Aes, KeySource.Automatic), null, AesJson());
             Assert.That(Errors(issues), Is.Empty);
             Assert.That(Warnings(issues).Single(), Does.Contain("not Encrypted"));
         }
@@ -59,14 +61,14 @@ namespace Pretzel.Data.Tests
         [Test]
         public void AutomaticWithoutAnyShippedKeyFailsTheBuild()
         {
-            List<BuildIssue> issues = DataIOBuildValidator.Validate(Config(DataFormat.Encrypted, EncryptionMode.Aes, KeySource.Automatic), null, null);
+            IReadOnlyList<BuildIssue> issues = DataIOBuildValidator.Validate(Config(DataFormat.Encrypted, EncryptionMode.Aes, KeySource.Automatic), null, null);
             Assert.That(Errors(issues).Single(), Does.Contain("No key ships"));
         }
 
         [Test]
         public void AutomaticWithEmbeddedSetupPassesAndWarnsThatTheKeyCanBeExtracted()
         {
-            List<BuildIssue> issues = DataIOBuildValidator.Validate(Config(DataFormat.Encrypted, EncryptionMode.Aes, KeySource.Automatic), EmbeddedAes, null);
+            IReadOnlyList<BuildIssue> issues = DataIOBuildValidator.Validate(Config(DataFormat.Encrypted, EncryptionMode.Aes, KeySource.Automatic), EmbeddedAes, null);
             Assert.That(Errors(issues), Is.Empty);
             Assert.That(Warnings(issues).Single(), Does.Contain("ships the AES key"));
         }
@@ -77,9 +79,9 @@ namespace Pretzel.Data.Tests
             DataIOConfig config = Config(DataFormat.Encrypted, EncryptionMode.Aes, KeySource.Provider);
             Assert.That(Errors(DataIOBuildValidator.Validate(config, EmbeddedAes, null)), Is.Empty);
 
-            List<BuildIssue> issues = DataIOBuildValidator.Validate(config, EmbeddedAes, AesJson());
+            IReadOnlyList<BuildIssue> issues = DataIOBuildValidator.Validate(config, EmbeddedAes, AesJson());
             Assert.That(Errors(issues), Is.Empty);
-            Assert.That(Warnings(issues).Any(w => w.Contains("not used") && w.Contains("Delete")), Is.True);
+            Assert.That(Warnings(issues).Any(w => w.Contains("not used", StringComparison.Ordinal) && w.Contains("Delete", StringComparison.Ordinal)), Is.True);
         }
 
         [Test]
@@ -93,14 +95,14 @@ namespace Pretzel.Data.Tests
         [Test]
         public void ProviderWithAnEnvironmentOnlySetupFails()
         {
-            List<BuildIssue> issues = DataIOBuildValidator.Validate(Config(DataFormat.Encrypted, EncryptionMode.Aes, KeySource.Provider), EnvironmentScript, null);
+            IReadOnlyList<BuildIssue> issues = DataIOBuildValidator.Validate(Config(DataFormat.Encrypted, EncryptionMode.Aes, KeySource.Provider), EnvironmentScript, null);
             Assert.That(Errors(issues).Single(), Does.Contain("registers no provider"));
         }
 
         [Test]
         public void EnvironmentSourceOnlyWarns()
         {
-            List<BuildIssue> issues = DataIOBuildValidator.Validate(Config(DataFormat.Encrypted, EncryptionMode.Aes, KeySource.Environment), EnvironmentScript, null);
+            IReadOnlyList<BuildIssue> issues = DataIOBuildValidator.Validate(Config(DataFormat.Encrypted, EncryptionMode.Aes, KeySource.Environment), EnvironmentScript, null);
             Assert.That(Errors(issues), Is.Empty);
             Assert.That(Warnings(issues).Single(), Does.Contain("only works for servers"));
         }
@@ -113,7 +115,7 @@ namespace Pretzel.Data.Tests
             Assert.That(Errors(DataIOBuildValidator.Validate(aes, null, "{}")).Single(), Does.Contain("invalid"));
             Assert.That(Errors(DataIOBuildValidator.Validate(aes, null, "{ not json")).Single(), Does.Contain("invalid"));
 
-            List<BuildIssue> good = DataIOBuildValidator.Validate(aes, null, AesJson());
+            IReadOnlyList<BuildIssue> good = DataIOBuildValidator.Validate(aes, null, AesJson());
             Assert.That(Errors(good), Is.Empty);
             Assert.That(Warnings(good).Single(), Does.Contain("ships the AES key"));
         }
@@ -129,9 +131,9 @@ namespace Pretzel.Data.Tests
         [Test]
         public void AProviderAndAJsonTogetherAreFlaggedUnderAutomatic()
         {
-            List<BuildIssue> issues = DataIOBuildValidator.Validate(Config(DataFormat.Encrypted, EncryptionMode.Aes, KeySource.Automatic), EmbeddedAes, AesJson());
+            IReadOnlyList<BuildIssue> issues = DataIOBuildValidator.Validate(Config(DataFormat.Encrypted, EncryptionMode.Aes, KeySource.Automatic), EmbeddedAes, AesJson());
             Assert.That(Errors(issues), Is.Empty);
-            Assert.That(Warnings(issues).Any(w => w.Contains("provider wins")), Is.True);
+            Assert.That(Warnings(issues).Any(w => w.Contains("provider wins", StringComparison.Ordinal)), Is.True);
         }
 
         [Test]

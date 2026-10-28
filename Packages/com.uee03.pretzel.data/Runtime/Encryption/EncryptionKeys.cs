@@ -13,6 +13,9 @@ namespace Pretzel.Data
         public const int SaltSize = 16;
         public const int DefaultPbkdf2Iterations = 600000;
         public const int MinPbkdf2Iterations = 100000;
+
+        private readonly List<byte[]> _previousAesKeys = new();
+
         /// <summary>
         /// Set this at startup to supply keys from code, for example keys fetched from a server with a token. It wins over every other source.
         /// Cleared when Play mode starts. Set it to null on sign-out so the next user cannot read the previous user's saves.
@@ -30,7 +33,7 @@ namespace Pretzel.Data
         /// Earlier AES keys, kept so saves written before a key change still open. They are only used to read:
         /// new files always use <see cref="AesKey"/>, so old files move to the new key as they are saved again.
         /// </summary>
-        public List<byte[]> PreviousAesKeys { get; } = new();
+        public IReadOnlyList<byte[]> PreviousAesKeys => _previousAesKeys;
 
         public bool HasAesKey => AesKey != null && AesKey.Length == AesKeySize;
 
@@ -214,7 +217,21 @@ namespace Pretzel.Data
                 }
             }
 
-            PreviousAesKeys.Add(key);
+            _previousAesKeys.Add(key);
+        }
+
+        public void ClearPreviousAesKeys() => _previousAesKeys.Clear();
+
+        /// <summary>The previous keys as Base64, for key files and configs.</summary>
+        public string[] EncodePreviousAesKeys()
+        {
+            string[] encoded = new string[_previousAesKeys.Count];
+            for (int i = 0; i < encoded.Length; i++)
+            {
+                encoded[i] = EncodeAesKey(_previousAesKeys[i]);
+            }
+
+            return encoded;
         }
 
         /// <summary>One line for logs and the Editor. Fingerprints only, never key material.</summary>

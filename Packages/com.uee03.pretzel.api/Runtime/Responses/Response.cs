@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 
 namespace Pretzel.Api
@@ -33,7 +34,7 @@ namespace Pretzel.Api
             Headers = headers ?? _emptyHeaders;
         }
 
-        private static readonly IReadOnlyDictionary<string, string> _emptyHeaders = new Dictionary<string, string>();
+        private static readonly IReadOnlyDictionary<string, string> _emptyHeaders = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
 
         internal static Response<T> Failure(string error) => new(false, 0, default, error, null, false, null);
 

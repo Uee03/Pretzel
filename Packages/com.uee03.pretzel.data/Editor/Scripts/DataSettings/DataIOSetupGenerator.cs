@@ -102,7 +102,7 @@ namespace Pretzel.Data.Editor
         /// Adds the optional examples next to ProjectDataIO.cs and returns what it created. Existing files are never replaced,
         /// so edits survive. The encryption text demo is only added when <paramref name="includeEncryptionDemo"/> is set.
         /// </summary>
-        public static List<string> CreateExamples(string folder, bool includeEncryptionDemo)
+        public static IReadOnlyList<string> CreateExamples(string folder, bool includeEncryptionDemo)
         {
             ShippingGenerator.ValidateFolder(folder);
             if (!File.Exists(ScriptPath(folder)))

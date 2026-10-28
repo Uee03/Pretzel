@@ -341,7 +341,7 @@ namespace Pretzel.Setup.Tabs
 
         private static CheckState IsSet(string value, string placeholder)
         {
-            return string.IsNullOrWhiteSpace(value) || value == placeholder ? CheckState.Todo : CheckState.Done;
+            return string.IsNullOrWhiteSpace(value) || string.Equals(value, placeholder, StringComparison.Ordinal) ? CheckState.Todo : CheckState.Done;
         }
 
         #endregion

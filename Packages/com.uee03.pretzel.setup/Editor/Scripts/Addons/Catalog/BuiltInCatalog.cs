@@ -10,7 +10,7 @@ namespace Pretzel.Setup.Addons.Catalog
     {
         public const string NuGetForUnityId = "nugetforunity";
 
-        public static List<CatalogEntry> Create()
+        public static IReadOnlyList<CatalogEntry> Create()
         {
             return new List<CatalogEntry>
             {

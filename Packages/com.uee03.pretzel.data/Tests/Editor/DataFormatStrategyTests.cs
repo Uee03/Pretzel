@@ -135,7 +135,7 @@ namespace Pretzel.Data.Tests
             // An unversioned save becomes schema 1 through the registered migration.
             store.Save("old", new Profile());
             DataStoreOptions options = new();
-            options.Transforms.Add(new BinaryDataStrategy());
+            options.AddTransform(new BinaryDataStrategy());
             options.AddMigration<VersionedProfile>(new DelegateMigration(0, 1, text => text));
             DataStore upgraded = new(DataRoots.Absolute(_folder), serializer, "bin", options);
             LoadResult<VersionedProfile> migrated = upgraded.Load<VersionedProfile>("old");

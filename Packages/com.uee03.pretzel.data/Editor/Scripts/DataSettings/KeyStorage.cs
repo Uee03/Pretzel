@@ -33,7 +33,7 @@ namespace Pretzel.Data.Editor
 
         #region ENVIRONMENT
 
-        public static List<(string Name, string Value)> Variables(string prefix, EncryptionKeys keys, KeyScope scope)
+        public static IReadOnlyList<(string Name, string Value)> Variables(string prefix, EncryptionKeys keys, KeyScope scope)
         {
             List<(string, string)> variables = new();
             if (scope == KeyScope.All && keys.HasAesKey)
@@ -123,8 +123,11 @@ namespace Pretzel.Data.Editor
                 {
                     // The history follows the key: clearing it in memory clears it in the file too.
                     merged.AesKey = keys.AesKey;
-                    merged.PreviousAesKeys.Clear();
-                    merged.PreviousAesKeys.AddRange(keys.PreviousAesKeys);
+                    merged.ClearPreviousAesKeys();
+                    foreach (byte[] previous in keys.PreviousAesKeys)
+                    {
+                        merged.AddPreviousAesKey(previous);
+                    }
                 }
 
             }
@@ -145,7 +148,7 @@ namespace Pretzel.Data.Editor
                     foreach (string raw in File.ReadAllLines(path))
                     {
                         string line = raw.Trim();
-                        if (line.Length > 0 && line[0] != '#' && line[0] != '!' && line.Contains("serSettings"))
+                        if (line.Length > 0 && line[0] != '#' && line[0] != '!' && line.Contains("serSettings", StringComparison.Ordinal))
                         {
                             return GitIgnoreState.Ignored;
                         }

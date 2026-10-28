@@ -77,11 +77,11 @@ namespace Pretzel.Setup.Addons.Tabs
 
             if (info == null)
             {
-                model.Chips.Add(new CardChip("Not installed", ChipKind.Missing));
+                model.AddChip(new CardChip("Not installed", ChipKind.Missing));
             }
             else
             {
-                model.Chips.Add(new CardChip(local ? "Local " + info.version : info.version, ChipKind.Ok));
+                model.AddChip(new CardChip(local ? "Local " + info.version : info.version, ChipKind.Ok));
             }
 
             if (module.OptionalLibraries.Count > 0)
@@ -90,7 +90,7 @@ namespace Pretzel.Setup.Addons.Tabs
                 foreach ((string libraryName, string packageName) in module.OptionalLibraries)
                 {
                     bool present = PackageService.IsInstalled(packageName);
-                    model.Chips.Add(new CardChip(present ? libraryName : libraryName + " not installed", present ? ChipKind.Ok : ChipKind.Neutral));
+                    model.AddChip(new CardChip(present ? libraryName : libraryName + " not installed", present ? ChipKind.Ok : ChipKind.Neutral));
                     if (!present)
                     {
                         missing.Add(libraryName);
@@ -107,36 +107,36 @@ namespace Pretzel.Setup.Addons.Tabs
             string identifier = module.GetIdentifier(settings);
             if (info == null)
             {
-                model.Actions.Add(new CardAction("Install", () => Install(module, settings), !busy && identifier != null, primary: true,
+                model.AddAction(new CardAction("Install", () => Install(module, settings), !busy && identifier != null, primary: true,
                     tooltip: identifier == null ? "Set the repository URL on the Settings tab." : null));
                 return model;
             }
 
-            model.Actions.Add(SampleService.CreateAction(info, busy));
+            model.AddAction(SampleService.CreateAction(info, busy));
 
             if (!local && info.source == UpmSource.Git && identifier != null)
             {
                 bool outdated = IsOutdated(info, settings);
                 if (outdated)
                 {
-                    model.Chips.Add(new CardChip("Update to " + ModuleCatalog.ResolveSource(settings).Version, ChipKind.Warn));
+                    model.AddChip(new CardChip("Update to " + ModuleCatalog.ResolveSource(settings).Version, ChipKind.Warn));
                 }
 
                 // Re-adding the git identifier makes Package Manager fetch the newest commit of the branch or tag.
-                model.Actions.Add(new CardAction("Update", () => PackageService.InstallIdentifiers(new[] { identifier }, "Updating " + module.DisplayName), !busy, primary: outdated,
+                model.AddAction(new CardAction("Update", () => PackageService.InstallIdentifiers(new[] { identifier }, "Updating " + module.DisplayName), !busy, primary: outdated,
                     tooltip: "Pull the latest version from the repository."));
             }
 
             if (info.source == UpmSource.Embedded)
             {
                 // Removing an embedded package would delete its folder from Packages.
-                model.Actions.Add(new CardAction("Uninstall", null, false, danger: true,
+                model.AddAction(new CardAction("Uninstall", null, false, danger: true,
                     tooltip: "Embedded in this project. Delete its folder under Packages to remove it."));
                 return model;
             }
 
             string dependent = InstalledDependent(module);
-            model.Actions.Add(new CardAction("Uninstall", () => PackageService.Uninstall(module.Name, module.DisplayName), !busy && dependent == null, danger: true,
+            model.AddAction(new CardAction("Uninstall", () => PackageService.Uninstall(module.Name, module.DisplayName), !busy && dependent == null, danger: true,
                 tooltip: dependent == null ? null : "Required by " + dependent + "."));
             return model;
         }
@@ -152,7 +152,7 @@ namespace Pretzel.Setup.Addons.Tabs
         private static void Collect(ModuleInfo module, PretzelProjectSettings settings, List<string> identifiers)
         {
             string identifier = module.GetIdentifier(settings);
-            if (identifier == null || PackageService.IsInstalled(module.Name) || identifiers.Contains(identifier))
+            if (identifier == null || PackageService.IsInstalled(module.Name) || identifiers.Contains(identifier, StringComparer.Ordinal))
             {
                 return;
             }
@@ -160,7 +160,7 @@ namespace Pretzel.Setup.Addons.Tabs
             identifiers.Add(identifier);
             foreach (string dependency in module.Dependencies)
             {
-                ModuleInfo other = ModuleCatalog.All.FirstOrDefault(m => m.Name == dependency);
+                ModuleInfo other = ModuleCatalog.All.FirstOrDefault(m => string.Equals(m.Name, dependency, StringComparison.Ordinal));
                 if (other != null)
                 {
                     Collect(other, settings, identifiers);
@@ -170,7 +170,7 @@ namespace Pretzel.Setup.Addons.Tabs
 
         private static string InstalledDependent(ModuleInfo module)
         {
-            ModuleInfo dependent = ModuleCatalog.All.FirstOrDefault(m => m.Dependencies.Contains(module.Name) && PackageService.IsInstalled(m.Name));
+            ModuleInfo dependent = ModuleCatalog.All.FirstOrDefault(m => m.Dependencies.Contains(module.Name, StringComparer.Ordinal) && PackageService.IsInstalled(m.Name));
             return dependent?.DisplayName;
         }
 
@@ -178,12 +178,12 @@ namespace Pretzel.Setup.Addons.Tabs
         {
             // A branch name has no version to compare, so only tags that look like versions are checked.
             string tag = (ModuleCatalog.ResolveSource(settings).Version ?? string.Empty).TrimStart('v');
-            return info.source == UpmSource.Git && Version.TryParse(tag, out _) && info.version != tag;
+            return info.source == UpmSource.Git && Version.TryParse(tag, out _) && !string.Equals(info.version, tag, StringComparison.Ordinal);
         }
 
         private static string DisplayName(string packageName)
         {
-            return ModuleCatalog.All.FirstOrDefault(m => m.Name == packageName)?.DisplayName ?? packageName;
+            return ModuleCatalog.All.FirstOrDefault(m => string.Equals(m.Name, packageName, StringComparison.Ordinal))?.DisplayName ?? packageName;
         }
     }
 }

@@ -108,7 +108,7 @@ namespace Pretzel.Data.Editor
                 SessionState.SetString(PendingKey, JsonUtility.ToJson(new Pending
                 {
                     aes = keys.HasAesKey ? EncryptionKeys.EncodeAesKey(keys.AesKey) : null,
-                    previous = keys.PreviousAesKeys.ConvertAll(EncryptionKeys.EncodeAesKey).ToArray()
+                    previous = keys.EncodePreviousAesKeys()
                 }));
             }
             else

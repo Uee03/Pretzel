@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Pretzel.Setup.Addons.Catalog;
@@ -56,7 +57,7 @@ namespace Pretzel.Setup.Addons.Tabs
                 list.Add(new HelpBox("Could not load catalog " + error, HelpBoxMessageType.Warning));
             }
 
-            List<CatalogEntry> catalog = CatalogService.GetEntries();
+            IReadOnlyList<CatalogEntry> catalog = CatalogService.GetEntries();
             string filter = _search?.value?.Trim() ?? string.Empty;
 
             foreach (CatalogEntry entry in catalog)
@@ -83,7 +84,7 @@ namespace Pretzel.Setup.Addons.Tabs
             return text != null && text.IndexOf(filter, System.StringComparison.OrdinalIgnoreCase) >= 0;
         }
 
-        private CardModel CreateModel(CatalogEntry entry, List<CatalogEntry> catalog)
+        private CardModel CreateModel(CatalogEntry entry, IReadOnlyList<CatalogEntry> catalog)
         {
             PackageInfo info = PackageService.Get(entry.packageName);
             bool busy = PackageService.IsBusy;
@@ -96,59 +97,59 @@ namespace Pretzel.Setup.Addons.Tabs
                 Note = entry.registryNote
             };
 
-            model.Chips.Add(info == null ? new CardChip("Not installed", ChipKind.Missing) : new CardChip(info.version, ChipKind.Ok));
-            model.Chips.Add(new CardChip("Pinned " + entry.version, ChipKind.Neutral));
+            model.AddChip(info == null ? new CardChip("Not installed", ChipKind.Missing) : new CardChip(info.version, ChipKind.Ok));
+            model.AddChip(new CardChip("Pinned " + entry.version, ChipKind.Neutral));
 
             bool needsNuGetPackage = entry.NeedsNuGet && !NuGetState.IsInstalled(entry.nugetPackage);
             if (entry.NeedsNuGet)
             {
-                model.Chips.Add(new CardChip(needsNuGetPackage ? "NuGet " + entry.nugetPackage + " needed" : "NuGet " + entry.nugetPackage, needsNuGetPackage ? ChipKind.Warn : ChipKind.Ok));
+                model.AddChip(new CardChip(needsNuGetPackage ? "NuGet " + entry.nugetPackage + " needed" : "NuGet " + entry.nugetPackage, needsNuGetPackage ? ChipKind.Warn : ChipKind.Ok));
             }
 
-            List<string> together = entry.dependencies.Select(id => catalog.FirstOrDefault(e => e.id == id)?.displayName ?? id).ToList();
+            List<string> together = entry.dependencies.Select(id => catalog.FirstOrDefault(e => string.Equals(e.id, id, StringComparison.OrdinalIgnoreCase))?.displayName ?? id).ToList();
             if (together.Count > 0)
             {
                 model.Detail = "Installs with: " + string.Join(", ", together);
             }
 
-            model.Extras.Add(CreatePinField(entry));
+            model.AddExtra(CreatePinField(entry));
 
-            bool nuGetForUnityInstalled = catalog.Any(e => e.id == BuiltInCatalog.NuGetForUnityId && PackageService.IsInstalled(e.packageName));
+            bool nuGetForUnityInstalled = catalog.Any(e => string.Equals(e.id, BuiltInCatalog.NuGetForUnityId, StringComparison.OrdinalIgnoreCase) && PackageService.IsInstalled(e.packageName));
 
             if (info == null)
             {
                 if (entry.NeedsNuGet && !nuGetForUnityInstalled)
                 {
-                    model.Actions.Add(new CardAction("Install NuGetForUnity", () => InstallNuGetForUnity(catalog), !busy, primary: true,
+                    model.AddAction(new CardAction("Install NuGetForUnity", () => InstallNuGetForUnity(catalog), !busy, primary: true,
                         tooltip: "NuGetForUnity installs the " + entry.nugetPackage + " NuGet package."));
                 }
                 else if (needsNuGetPackage)
                 {
-                    model.Actions.Add(new CardAction("Open NuGet window", () => OpenNuGetWindow(), !busy, primary: true,
+                    model.AddAction(new CardAction("Open NuGet window", () => OpenNuGetWindow(), !busy, primary: true,
                         tooltip: "Search " + entry.nugetPackage + " and press Install, then come back here."));
-                    model.Actions.Add(new CardAction("Install", null, false, tooltip: "Install the " + entry.nugetPackage + " NuGet package first."));
+                    model.AddAction(new CardAction("Install", null, false, tooltip: "Install the " + entry.nugetPackage + " NuGet package first."));
                 }
                 else
                 {
-                    model.Actions.Add(new CardAction("Install", () => PackageService.Install(new[] { entry }, catalog, "Installing " + model.Title), !busy, primary: true));
+                    model.AddAction(new CardAction("Install", () => PackageService.Install(new[] { entry }, catalog, "Installing " + model.Title), !busy, primary: true));
                 }
             }
             else
             {
                 if (SampleService.Find(info).Count > 0)
                 {
-                    model.Actions.Add(SampleService.CreateAction(info, busy));
+                    model.AddAction(SampleService.CreateAction(info, busy));
                 }
 
                 string dependent = InstalledDependent(entry, catalog);
-                model.Actions.Add(new CardAction("Uninstall", () => PackageService.Uninstall(entry.packageName, model.Title), !busy && dependent == null, danger: true,
+                model.AddAction(new CardAction("Uninstall", () => PackageService.Uninstall(entry.packageName, model.Title), !busy && dependent == null, danger: true,
                     tooltip: dependent == null ? null : "Required by " + dependent + "."));
             }
 
             if (!string.IsNullOrEmpty(entry.homepage))
             {
                 string url = entry.homepage;
-                model.Actions.Add(new CardAction("Open page", () => Application.OpenURL(url)));
+                model.AddAction(new CardAction("Open page", () => Application.OpenURL(url)));
             }
 
             return model;
@@ -168,9 +169,9 @@ namespace Pretzel.Setup.Addons.Tabs
             return field;
         }
 
-        private static void InstallNuGetForUnity(List<CatalogEntry> catalog)
+        private static void InstallNuGetForUnity(IReadOnlyList<CatalogEntry> catalog)
         {
-            CatalogEntry nuGet = catalog.FirstOrDefault(e => e.id == BuiltInCatalog.NuGetForUnityId);
+            CatalogEntry nuGet = catalog.FirstOrDefault(e => string.Equals(e.id, BuiltInCatalog.NuGetForUnityId, StringComparison.OrdinalIgnoreCase));
             if (nuGet != null)
             {
                 PackageService.Install(new[] { nuGet }, catalog, "Installing NuGetForUnity");
@@ -185,15 +186,15 @@ namespace Pretzel.Setup.Addons.Tabs
             }
         }
 
-        private static string InstalledDependent(CatalogEntry entry, List<CatalogEntry> catalog)
+        private static string InstalledDependent(CatalogEntry entry, IReadOnlyList<CatalogEntry> catalog)
         {
-            CatalogEntry dependent = catalog.FirstOrDefault(e => e.dependencies != null && e.dependencies.Contains(entry.id) && PackageService.IsInstalled(e.packageName));
+            CatalogEntry dependent = catalog.FirstOrDefault(e => e.dependencies != null && e.dependencies.Contains(entry.id, StringComparer.OrdinalIgnoreCase) && PackageService.IsInstalled(e.packageName));
             if (dependent != null)
             {
                 return dependent.displayName;
             }
 
-            ModuleInfo module = ModuleCatalog.All.FirstOrDefault(m => m.Packages.Contains(entry.packageName) && PackageService.IsInstalled(m.Name));
+            ModuleInfo module = ModuleCatalog.All.FirstOrDefault(m => m.Packages.Contains(entry.packageName, StringComparer.Ordinal) && PackageService.IsInstalled(m.Name));
             return module == null ? null : "Pretzel " + module.DisplayName;
         }
 

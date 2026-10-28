@@ -70,7 +70,7 @@ namespace Pretzel.Data
 
                 // keyId is only a fingerprint. A mismatch means the file was edited or half-copied.
                 string keyId = ReadString(config, "keyId");
-                if (keyId != null && keyId != EncryptionKeys.Fingerprint(keys.AesKey))
+                if (keyId != null && !string.Equals(keyId, EncryptionKeys.Fingerprint(keys.AesKey), StringComparison.OrdinalIgnoreCase))
                 {
                     throw new FormatException("The game key config keyId does not match its AES key. Export the key again.");
                 }

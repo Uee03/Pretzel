@@ -27,7 +27,7 @@ namespace Pretzel.Samples.Data
         {
             // Create each store once and keep it. A store snapshots its options when constructed.
             DataStoreOptions options = new();
-            options.Transforms.Add(new BinaryDataStrategy());
+            options.AddTransform(new BinaryDataStrategy());
             // Old files without a schema (0) and schema 1 files both used "name".
             options.AddMigration<PlayerProfile>(new DelegateMigration(0, 2, RenameNameToDisplayName));
             options.AddMigration<PlayerProfile>(new DelegateMigration(1, 2, RenameNameToDisplayName));

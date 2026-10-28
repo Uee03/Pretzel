@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
@@ -28,7 +29,7 @@ namespace Pretzel.Setup.Tests
         [Test]
         public void CatalogDependenciesPointToCatalogModules()
         {
-            HashSet<string> names = new(ModuleCatalog.All.Select(m => m.Name));
+            HashSet<string> names = new(ModuleCatalog.All.Select(m => m.Name), StringComparer.Ordinal);
             foreach (ModuleInfo module in ModuleCatalog.All)
             {
                 foreach (string dependency in module.Dependencies)
@@ -43,7 +44,7 @@ namespace Pretzel.Setup.Tests
         public void CatalogMatchesInstalledManifests()
         {
             Dictionary<string, PackageInfo> installed = PackageInfo.GetAllRegisteredPackages()
-                .Where(p => p.name.StartsWith(Prefix))
+                .Where(p => p.name.StartsWith(Prefix, StringComparison.Ordinal))
                 .ToDictionary(p => p.name);
 
             foreach (ModuleInfo module in ModuleCatalog.All)
@@ -53,8 +54,8 @@ namespace Pretzel.Setup.Tests
                     continue;
                 }
 
-                string[] manifestDependencies = package.dependencies.Select(d => d.name).Where(n => n.StartsWith(Prefix)).OrderBy(n => n).ToArray();
-                Assert.That(module.Dependencies.OrderBy(n => n).ToArray(), Is.EqualTo(manifestDependencies), module.Name);
+                string[] manifestDependencies = package.dependencies.Select(d => d.name).Where(n => n.StartsWith(Prefix, StringComparison.Ordinal)).OrderBy(n => n, StringComparer.Ordinal).ToArray();
+                Assert.That(module.Dependencies.OrderBy(n => n, StringComparer.Ordinal).ToArray(), Is.EqualTo(manifestDependencies), module.Name);
             }
         }
 

@@ -68,7 +68,7 @@ namespace Pretzel.DevConsole.Tests
             using LogBuffer buffer = new LogBuffer(10).Attach();
             Debug.Log("pretzel-console-probe");
             List<LogEntry> entries = new();
-            buffer.CopyTo(entries, e => e.Message == "pretzel-console-probe");
+            buffer.CopyTo(entries, e => string.Equals(e.Message, "pretzel-console-probe", StringComparison.Ordinal));
             Assert.That(entries, Has.Count.EqualTo(1));
         }
     }

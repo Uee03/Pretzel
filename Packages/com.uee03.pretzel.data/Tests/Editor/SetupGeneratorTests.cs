@@ -42,7 +42,7 @@ namespace Pretzel.Data.Tests
             {
                 foreach (string guid in AssetDatabase.FindAssets(name + " t:MonoScript"))
                 {
-                    if (Path.GetFileNameWithoutExtension(AssetDatabase.GUIDToAssetPath(guid)) == name)
+                    if (string.Equals(Path.GetFileNameWithoutExtension(AssetDatabase.GUIDToAssetPath(guid)), name, StringComparison.Ordinal))
                     {
                         Assert.Ignore($"This project already has {name}.cs; the test will not create a second copy.");
                     }
@@ -89,7 +89,7 @@ namespace Pretzel.Data.Tests
         {
             foreach (string guid in AssetDatabase.FindAssets("PretzelBinaryExample t:MonoScript"))
             {
-                if (Path.GetFileNameWithoutExtension(AssetDatabase.GUIDToAssetPath(guid)) == "PretzelBinaryExample")
+                if (string.Equals(Path.GetFileNameWithoutExtension(AssetDatabase.GUIDToAssetPath(guid)), "PretzelBinaryExample", StringComparison.Ordinal))
                 {
                     Assert.Ignore("The host already has this example; do not generate a duplicate class.");
                 }
@@ -298,7 +298,7 @@ namespace Pretzel.Data.Tests
             string folder = NewFolder();
             DataIOSetupGenerator.Write(folder, DataIOSetupGenerator.RenderPlain(DataFormat.PlainText));
 
-            List<string> created = DataIOSetupGenerator.CreateExamples(folder, false);
+            IReadOnlyList<string> created = DataIOSetupGenerator.CreateExamples(folder, false);
             Assert.That(created, Has.Count.EqualTo(6), "Five scripts and the guide.");
             foreach (string name in new[]
                      {
@@ -431,9 +431,9 @@ namespace Pretzel.Data.Tests
                 Assert.That(ShippingGenerator.Generate(folder, KeyDelivery.Embedded, config, keys, out string path), Is.Null);
                 string source = File.ReadAllText(path);
                 Assert.That(source, Does.Contain("OldPartsA"));
-                Assert.That(source, Does.Contain("keys.PreviousAesKeys.Add"));
+                Assert.That(source, Does.Contain("keys.AddPreviousAesKey"));
 
-                keys.PreviousAesKeys.Clear();
+                keys.ClearPreviousAesKeys();
                 Assert.That(ShippingGenerator.Generate(folder, KeyDelivery.Embedded, config, keys, out path), Is.Null);
                 Assert.That(File.ReadAllText(path), Does.Not.Contain("OldPartsA"), "No history, no extra arrays.");
             }

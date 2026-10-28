@@ -9,6 +9,7 @@ namespace Pretzel.Events.Tests
 {
     public sealed class EventTests
     {
+        // Value type: covers struct messages, the recommended message shape.
         private readonly struct Scored
         {
             public readonly int Points;

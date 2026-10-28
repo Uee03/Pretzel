@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Pretzel.Setup.Addons.Catalog;
@@ -16,7 +17,7 @@ namespace Pretzel.Setup.Addons.Tabs
     public sealed class StarterKitSection : IPretzelMainSection
     {
         // Catalog ids that need no manual NuGet step, so one click can install them.
-        private static readonly Dictionary<string, string[]> _recommended = new()
+        private static readonly Dictionary<string, string[]> _recommended = new(StringComparer.OrdinalIgnoreCase)
         {
             [FolderPreset.Game] = new[] { "litmotion", "unitask", "vcontainer" },
             [FolderPreset.Tool] = new[] { "unitask" },
@@ -51,15 +52,15 @@ namespace Pretzel.Setup.Addons.Tabs
             VisualElement addons = new();
             section.Add(addons);
 
-            Dictionary<string, Toggle> toggles = new();
+            Dictionary<string, Toggle> toggles = new(StringComparer.OrdinalIgnoreCase);
             void ShowAddons()
             {
                 addons.Clear();
                 toggles.Clear();
-                List<CatalogEntry> catalog = CatalogService.GetEntries();
+                IReadOnlyList<CatalogEntry> catalog = CatalogService.GetEntries();
                 foreach (string id in _recommended[kit.value])
                 {
-                    CatalogEntry entry = catalog.FirstOrDefault(e => e.id == id);
+                    CatalogEntry entry = catalog.FirstOrDefault(e => string.Equals(e.id, id, StringComparison.OrdinalIgnoreCase));
                     if (entry == null || PackageService.IsInstalled(entry.packageName))
                     {
                         continue;
@@ -107,10 +108,10 @@ namespace Pretzel.Setup.Addons.Tabs
             ProjectFolders.Create(context.Project.ActivePreset.folders);
             context.RaiseSettingsReset();
 
-            List<CatalogEntry> catalog = CatalogService.GetEntries();
+            IReadOnlyList<CatalogEntry> catalog = CatalogService.GetEntries();
             List<CatalogEntry> chosen = toggles
                 .Where(pair => pair.Value.value)
-                .Select(pair => catalog.FirstOrDefault(e => e.id == pair.Key))
+                .Select(pair => catalog.FirstOrDefault(e => string.Equals(e.id, pair.Key, StringComparison.OrdinalIgnoreCase)))
                 .Where(entry => entry != null)
                 .ToList();
 

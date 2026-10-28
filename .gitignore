@@ -44,6 +44,10 @@ crashlytics-build.properties
 *.DotSettings.user
 [Aa]ssets/Plugins/Editor/JetBrains*
 
+# Standards analyzer (a .NET tool, not a Unity project)
+!.github/skills/**/*.csproj
+.github/skills/**/[Bb]in/
+
 # Burst cache
 .bursted/
 

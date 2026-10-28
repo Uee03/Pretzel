@@ -250,7 +250,7 @@ namespace Pretzel.Data.Editor
             }
 
             EncryptionKeys keys = _state.Keys.Clone();
-            keys.PreviousAesKeys.Clear();
+            keys.ClearPreviousAesKeys();
             _state.SetKeys(keys, _state.KeysUnstored);
             if (EncryptionKeyFile.Exists && keys.HasAesKey)
             {

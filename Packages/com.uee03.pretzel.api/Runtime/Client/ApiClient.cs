@@ -342,14 +342,14 @@ namespace Pretzel.Api
 
             foreach (KeyValuePair<string, string> header in Defaults.Headers)
             {
-                merged.Headers[header.Key] = header.Value;
+                merged.SetHeader(header.Key, header.Value);
             }
 
             if (call != null)
             {
                 foreach (KeyValuePair<string, string> header in call.Headers)
                 {
-                    merged.Headers[header.Key] = header.Value;
+                    merged.SetHeader(header.Key, header.Value);
                 }
             }
 

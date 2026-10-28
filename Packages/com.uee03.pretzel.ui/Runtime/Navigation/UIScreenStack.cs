@@ -153,7 +153,7 @@ namespace Pretzel.UI
             }
         }
 
-        private readonly struct Entry
+        private sealed class Entry
         {
             public readonly VisualElement Screen;
             public readonly bool Modal;

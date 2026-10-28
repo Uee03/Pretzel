@@ -30,7 +30,11 @@ namespace Pretzel.Data
                 PrettyPrint = format == DataFormat.PlainText && prettyPrint,
                 KeepBackup = keepBackup
             };
-            options.Transforms.AddRange(CreateTransforms(format, keys, mode, base64));
+            foreach (IDataTransform transform in CreateTransforms(format, keys, mode, base64))
+            {
+                options.AddTransform(transform);
+            }
+
             configure?.Invoke(options);
 
             string fileExtension = string.IsNullOrWhiteSpace(extension) ? DataFormats.DefaultExtension(format) : extension;
@@ -38,7 +42,7 @@ namespace Pretzel.Data
         }
 
         /// <summary>The byte transforms a format uses, in the order they run on save.</summary>
-        public static List<IDataTransform> CreateTransforms(DataFormat format, EncryptionKeys keys, EncryptionMode mode, bool base64)
+        public static IReadOnlyList<IDataTransform> CreateTransforms(DataFormat format, EncryptionKeys keys, EncryptionMode mode, bool base64)
         {
             List<IDataTransform> transforms = new() { CreateStrategy(format, keys, mode) };
 
@@ -76,10 +80,10 @@ namespace Pretzel.Data
         {
             Guard.NotNull(strategy, nameof(strategy));
             DataStoreOptions options = new() { PrettyPrint = prettyPrint, KeepBackup = keepBackup };
-            options.Transforms.Add(strategy);
+            options.AddTransform(strategy);
             if (base64)
             {
-                options.Transforms.Add(new Base64Transform());
+                options.AddTransform(new Base64Transform());
             }
 
             configure?.Invoke(options);

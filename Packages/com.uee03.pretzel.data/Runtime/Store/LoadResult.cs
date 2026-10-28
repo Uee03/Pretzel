@@ -1,7 +1,7 @@
 namespace Pretzel.Data
 {
     /// <summary>Outcome of a load. A missing or corrupt file is a result, not an exception.</summary>
-    public readonly struct LoadResult<T>
+    public sealed class LoadResult<T>
     {
         public DataStatus Status { get; }
 

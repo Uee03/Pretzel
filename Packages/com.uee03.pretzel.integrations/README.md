@@ -34,10 +34,10 @@ Ease ease = EaseType.InOutCubic.ToLitMotionEase();
 using Cysharp.Threading.Tasks;
 using Pretzel.Integrations.UniTask;
 
-Response<Item> item = await client.GetJsonUniTask<Item>("items/1", cancellationToken: token);
+Response<Item> item = await client.GetJsonUniTaskAsync<Item>("items/1", cancellationToken: token);
 ```
 
-`ApiClient` extensions: `GetUniTask`, `PostUniTask`, `GetJsonUniTask`, `PostJsonUniTask`, `DownloadTextureUniTask` and `DownloadFileUniTask`. They take the same arguments as the `Async` methods. For other `Awaitable` values, UniTask already provides `AsUniTask()`.
+`ApiClient` extensions: `GetUniTaskAsync`, `PostUniTaskAsync`, `GetJsonUniTaskAsync`, `PostJsonUniTaskAsync`, `DownloadTextureUniTaskAsync` and `DownloadFileUniTaskAsync`. They take the same arguments as the `Async` methods. For other `Awaitable` values, UniTask already provides `AsUniTask()`.
 
 ## R3
 

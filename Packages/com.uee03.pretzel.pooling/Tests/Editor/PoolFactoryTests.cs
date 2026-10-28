@@ -37,8 +37,8 @@ namespace Pretzel.Pooling.Tests
         [Test]
         public void SpawnsByKeyAndGroupsIdleInstances()
         {
-            _factory.Entries.Add(new PoolFactoryEntry<Shot, PoolableProbe>(Shot.Bullet, _bullet.GetComponent<PoolableProbe>(), 3));
-            _factory.Entries.Add(new PoolFactoryEntry<Shot, PoolableProbe>(Shot.Rocket, _rocket.GetComponent<PoolableProbe>()));
+            _factory.AddEntry(Shot.Bullet, _bullet.GetComponent<PoolableProbe>(), 3);
+            _factory.AddEntry(Shot.Rocket, _rocket.GetComponent<PoolableProbe>());
             _factory.Initialize();
 
             Assert.That(_factory.GetPool(Shot.Bullet).CountInactive, Is.EqualTo(3));
@@ -56,13 +56,13 @@ namespace Pretzel.Pooling.Tests
         [Test]
         public void InvalidEntriesFailFast()
         {
-            _factory.Entries.Add(new PoolFactoryEntry<Shot, PoolableProbe>(Shot.Bullet, null));
+            _factory.AddEntry(Shot.Bullet, null);
             InvalidOperationException missing = Assert.Throws<InvalidOperationException>(() => _factory.Initialize());
             Assert.That(missing.Message, Does.Contain("entry 0"));
 
-            _factory.Entries.Clear();
-            _factory.Entries.Add(new PoolFactoryEntry<Shot, PoolableProbe>(Shot.Bullet, _bullet.GetComponent<PoolableProbe>()));
-            _factory.Entries.Add(new PoolFactoryEntry<Shot, PoolableProbe>(Shot.Bullet, _rocket.GetComponent<PoolableProbe>()));
+            _factory = new PoolFactory<Shot, PoolableProbe>();
+            _factory.AddEntry(Shot.Bullet, _bullet.GetComponent<PoolableProbe>());
+            _factory.AddEntry(Shot.Bullet, _rocket.GetComponent<PoolableProbe>());
             Assert.Throws<InvalidOperationException>(() => _factory.Initialize());
             Assert.That(_factory.IsInitialized, Is.False);
         }
@@ -84,7 +84,7 @@ namespace Pretzel.Pooling.Tests
         [Test]
         public void DisposeRemovesTheRoot()
         {
-            _factory.Entries.Add(new PoolFactoryEntry<Shot, PoolableProbe>(Shot.Bullet, _bullet.GetComponent<PoolableProbe>(), 2));
+            _factory.AddEntry(Shot.Bullet, _bullet.GetComponent<PoolableProbe>(), 2);
             _factory.Initialize();
             Transform root = _factory.GetPool(Shot.Bullet).Get().transform.parent.parent;
             _factory.Dispose();

@@ -1,4 +1,6 @@
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -133,7 +135,7 @@ namespace Pretzel.Data.Editor
                 _extension.choices = choices;
             }
 
-            if (!_extension.choices.Contains(config.fileExtension))
+            if (!_extension.choices.Contains(config.fileExtension, StringComparer.OrdinalIgnoreCase))
             {
                 _extension.choices = new List<string>(_extension.choices) { config.fileExtension };
             }

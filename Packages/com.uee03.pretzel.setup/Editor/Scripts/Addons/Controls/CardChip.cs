@@ -1,6 +1,6 @@
 namespace Pretzel.Setup.Addons.Controls
 {
-    public readonly struct CardChip
+    public sealed class CardChip
     {
         public readonly string Text;
         public readonly ChipKind Kind;

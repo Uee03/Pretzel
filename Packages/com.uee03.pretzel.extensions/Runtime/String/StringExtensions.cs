@@ -164,7 +164,7 @@ namespace Pretzel.Extensions
         /// </summary>
         public static bool IsValidUrl(this string url)
         {
-            return Uri.TryCreate(url, UriKind.Absolute, out Uri uri) && (uri.Scheme == Uri.UriSchemeHttp || uri.Scheme == Uri.UriSchemeHttps);
+            return Uri.TryCreate(url, UriKind.Absolute, out Uri uri) && (string.Equals(uri.Scheme, Uri.UriSchemeHttp, StringComparison.OrdinalIgnoreCase) || string.Equals(uri.Scheme, Uri.UriSchemeHttps, StringComparison.OrdinalIgnoreCase));
         }
 
         /// <summary>

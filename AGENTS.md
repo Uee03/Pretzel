@@ -62,6 +62,7 @@ customizations and user changes when importing or applying guidance.
 | [unity-shader-graph](./.github/skills/unity-shader-graph/SKILL.md) | Shader Graph, shader properties, pipeline compatibility, GPU cost |
 | [unity-vfx-graph](./.github/skills/unity-vfx-graph/SKILL.md) | VFX Graph events, properties, pooling and platform constraints |
 | [unity-common-types](./.github/skills/unity-common-types/SKILL.md) | Enums, constants, helpers, shared classes and API design |
+| [pretzel-code-standards](./.github/skills/pretzel-code-standards/SKILL.md) | **Every C# change**: NET-PROJECT-SETUP coding standard, naming, and the two checks that enforce it |
 | [unity-testing](./.github/skills/unity-testing/SKILL.md) | EditMode/PlayMode, package host tests, player builds |
 | [unity-code-review](./.github/skills/unity-code-review/SKILL.md) | Findings-first correctness and compatibility review |
 | [unity-adr](./.github/skills/unity-adr/SKILL.md) | Record an approved architecture decision when requested |
@@ -79,6 +80,11 @@ ASP.NET, desktop UI, and .NET solution-scaffolding requirements do not apply to 
 The .NET conventions instruction is on-demand and applies to separately requested .NET code only.
 
 ## Verification and asset safety
+
+Every C# change must pass both checks in
+[pretzel-code-standards](./.github/skills/pretzel-code-standards/SKILL.md) (`Test-CodeStandards.ps1` and the
+`StandardsAnalyzer` tool) with 0 errors. The `.githooks/pre-commit` hook runs the line checks on staged files once
+enabled with `git config core.hooksPath .githooks`.
 
 Use the matching Unity Editor for compile/import checks, EditMode and PlayMode tests, and relevant
 player builds. See [unity-testing](./.github/skills/unity-testing/SKILL.md) for batch commands.

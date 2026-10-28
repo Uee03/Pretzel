@@ -34,8 +34,20 @@ namespace Pretzel.Pooling
 
         public PoolSettings Settings => _settings;
 
-        /// <summary>Entries used by <see cref="Initialize"/>. Change them from code only before initializing.</summary>
-        public List<PoolFactoryEntry<TKey, T>> Entries => _entries;
+        /// <summary>Entries used by <see cref="Initialize"/>.</summary>
+        public IReadOnlyList<PoolFactoryEntry<TKey, T>> Entries => _entries;
+
+        /// <summary>Adds an entry from code. Only allowed before <see cref="Initialize"/>; use <see cref="Register"/> afterwards.</summary>
+        public PoolFactory<TKey, T> AddEntry(TKey key, T prefab, int prewarm = 0)
+        {
+            if (IsInitialized)
+            {
+                throw new InvalidOperationException("Entries cannot change after Initialize. Use Register to add a pool.");
+            }
+
+            _entries.Add(new PoolFactoryEntry<TKey, T>(key, prefab, prewarm));
+            return this;
+        }
 
         /// <summary>Validates the entries, creates one pool per key and prewarms them. Later calls do nothing.</summary>
         /// <param name="parent">Parent of the root object. Null keeps it at the root of the active scene.</param>

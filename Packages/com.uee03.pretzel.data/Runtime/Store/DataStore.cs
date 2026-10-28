@@ -66,7 +66,7 @@ namespace Pretzel.Data
                 throw new ArgumentException($"SlotPrefix: {slotError}", nameof(options));
             }
 
-            _transforms = options.Transforms.ToArray();
+            _transforms = new List<IDataTransform>(options.Transforms).ToArray();
             foreach (KeyValuePair<Type, List<IMigration>> pair in options.Migrations)
             {
                 _migrations[pair.Key] = pair.Value.ToArray();
@@ -162,7 +162,7 @@ namespace Pretzel.Data
             // Serialize on the main thread, because JsonUtility is main-thread only.
             string text = BuildText(value);
             long sequence = NextSequence();
-            await OnBackground(() =>
+            await OnBackgroundAsync(() =>
             {
                 WriteText(path, text, sequence);
                 return true;
@@ -172,7 +172,7 @@ namespace Pretzel.Data
         public async Awaitable<LoadResult<T>> LoadAsync<T>(DataKey key, CancellationToken cancellationToken = default)
         {
             string path = PathOf(key);
-            (RawRead main, RawRead? backup) = await OnBackground(() => ReadBoth(path), cancellationToken);
+            (RawRead main, RawRead backup) = await OnBackgroundAsync(() => ReadBoth(path), cancellationToken);
             return Resolve<T>(main, backup, path, default, false);
         }
 
@@ -180,36 +180,36 @@ namespace Pretzel.Data
         {
             Guard.NotNull(target, nameof(target));
             string path = PathOf(key);
-            (RawRead main, RawRead? backup) = await OnBackground(() => ReadBoth(path), cancellationToken);
+            (RawRead main, RawRead backup) = await OnBackgroundAsync(() => ReadBoth(path), cancellationToken);
             return Resolve(main, backup, path, target, true);
         }
 
         public Awaitable<bool> ExistsAsync(DataKey key, CancellationToken cancellationToken = default)
         {
             string path = PathOf(key);
-            return OnBackground(() => ExistsFile(path), cancellationToken);
+            return OnBackgroundAsync(() => ExistsFile(path), cancellationToken);
         }
 
         public Awaitable<bool> DeleteAsync(DataKey key, CancellationToken cancellationToken = default)
         {
             string path = PathOf(key);
             long sequence = NextSequence();
-            return OnBackground(() => DeleteFile(path, sequence), cancellationToken);
+            return OnBackgroundAsync(() => DeleteFile(path, sequence), cancellationToken);
         }
 
         public Awaitable<IReadOnlyList<DataKey>> ListAsync(string folder = null, int? slot = null, CancellationToken cancellationToken = default)
         {
             string directory = DirectoryOf(folder, slot);
-            return OnBackground(() => ListCore(directory, folder, slot), cancellationToken);
+            return OnBackgroundAsync(() => ListCore(directory, folder, slot), cancellationToken);
         }
 
         public Awaitable<IReadOnlyList<int>> ListSlotsAsync(string folder = null, CancellationToken cancellationToken = default)
         {
             string directory = DirectoryOf(folder, null);
-            return OnBackground(() => ListSlotsCore(directory), cancellationToken);
+            return OnBackgroundAsync(() => ListSlotsCore(directory), cancellationToken);
         }
 
-        private static async Awaitable<TResult> OnBackground<TResult>(Func<TResult> work, CancellationToken cancellationToken)
+        private static async Awaitable<TResult> OnBackgroundAsync<TResult>(Func<TResult> work, CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
             await Awaitable.BackgroundThreadAsync();
@@ -348,7 +348,7 @@ namespace Pretzel.Data
 
         #region READ
 
-        private readonly struct RawRead
+        private sealed class RawRead
         {
             public readonly bool Exists;
             public readonly string Text;
@@ -364,10 +364,10 @@ namespace Pretzel.Data
             }
         }
 
-        private (RawRead, RawRead?) ReadBoth(string path)
+        private (RawRead, RawRead) ReadBoth(string path)
         {
             RawRead main = ReadRaw(path);
-            RawRead? backup = _keepBackup ? ReadRaw(BackupPath(path)) : null;
+            RawRead backup = _keepBackup ? ReadRaw(BackupPath(path)) : null;
             return (main, backup);
         }
 
@@ -409,7 +409,7 @@ namespace Pretzel.Data
         }
 
         // Runs on the main thread, because JsonUtility needs it.
-        private LoadResult<T> Resolve<T>(RawRead main, RawRead? preReadBackup, string path, T target, bool populate)
+        private LoadResult<T> Resolve<T>(RawRead main, RawRead preReadBackup, string path, T target, bool populate)
         {
             string mainError = null;
             DataError mainCode = DataError.None;

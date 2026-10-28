@@ -119,7 +119,7 @@ namespace Pretzel.DevConsole
             }
 
             AddLine(LogType.Log, "> " + line);
-            if (_history.Count == 0 || _history[_history.Count - 1] != line)
+            if (_history.Count == 0 || !string.Equals(_history[_history.Count - 1], line, StringComparison.Ordinal))
             {
                 _history.Add(line);
             }

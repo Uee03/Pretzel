@@ -53,7 +53,7 @@ namespace Pretzel.Data.Tests
             // A raw transform shares the caller's keys, so removing the key afterwards is reported as MissingKey.
             EncryptionKeys shared = new() { AesKey = EncryptionKeys.GenerateAesKey() };
             DataStoreOptions options = new();
-            options.Transforms.Add(new EncryptionTransform(shared));
+            options.AddTransform(new EncryptionTransform(shared));
             DataStore revoked = new(DataRoots.Absolute(_folder), extension: "pretzel", options: options);
             shared.AesKey = null;
             Assert.That(revoked.Load<Profile>("profile").ErrorCode, Is.EqualTo(DataError.MissingKey));

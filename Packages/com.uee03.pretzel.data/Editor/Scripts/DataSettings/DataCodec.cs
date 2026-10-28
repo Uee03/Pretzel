@@ -6,7 +6,7 @@ using Newtonsoft.Json.Linq;
 
 namespace Pretzel.Data.Editor
 {
-    internal readonly struct CodecResult
+    internal sealed class CodecResult
     {
         public readonly bool Ok;
         public readonly string Text;

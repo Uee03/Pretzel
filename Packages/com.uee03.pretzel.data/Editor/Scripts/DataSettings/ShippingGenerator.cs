@@ -43,7 +43,7 @@ namespace Pretzel.Data.Editor
             return DataIOBuildValidator.Classify(existing) switch
             {
                 DeliveryScript.Embedded or DeliveryScript.Environment => true,
-                DeliveryScript.Token => existing.Contains(TokenStubMarker),
+                DeliveryScript.Token => existing.Contains(TokenStubMarker, StringComparison.Ordinal),
                 _ => false
             };
         }
@@ -71,8 +71,8 @@ namespace Pretzel.Data.Editor
         public static void ValidateFolder(string folder)
         {
             if (string.IsNullOrWhiteSpace(folder)
-                || (folder != "Assets" && !folder.StartsWith("Assets/", StringComparison.Ordinal))
-                || folder.Contains(".."))
+                || (!string.Equals(folder, "Assets", StringComparison.Ordinal) && !folder.StartsWith("Assets/", StringComparison.Ordinal))
+                || folder.Contains("..", StringComparison.Ordinal))
             {
                 throw new ArgumentException("The output folder must be inside Assets and cannot contain '..'.", nameof(folder));
             }
@@ -84,7 +84,7 @@ namespace Pretzel.Data.Editor
             foreach (string guid in AssetDatabase.FindAssets(Path.GetFileNameWithoutExtension(name) + " t:MonoScript"))
             {
                 string existing = AssetDatabase.GUIDToAssetPath(guid);
-                if (Path.GetFileName(existing) == name && !string.Equals(existing, destination, StringComparison.OrdinalIgnoreCase))
+                if (string.Equals(Path.GetFileName(existing), name, StringComparison.OrdinalIgnoreCase) && !string.Equals(existing, destination, StringComparison.OrdinalIgnoreCase))
                 {
                     throw new IOException($"'{name}' already exists at '{existing}'. Move that script and its .meta to "
                         + $"'{destination}' first, or use the existing folder, to avoid duplicate classes.");
@@ -102,12 +102,12 @@ namespace Pretzel.Data.Editor
                 return "Only AES encryption is supported.";
             }
 
-            if (folder != "Assets" && !folder.StartsWith("Assets/", StringComparison.Ordinal))
+            if (!string.Equals(folder, "Assets", StringComparison.Ordinal) && !folder.StartsWith("Assets/", StringComparison.Ordinal))
             {
                 return "The folder must be inside Assets, for example Assets/Pretzel/DataIO.";
             }
 
-            if (folder.Contains(".."))
+            if (folder.Contains("..", StringComparison.Ordinal))
             {
                 return "The folder cannot contain '..'.";
             }
@@ -214,7 +214,7 @@ namespace Pretzel.Data.Editor
                 code.Append("        EncryptionKeys keys = new() { AesKey = Combine(PartA, PartB) };\n");
                 if (history)
                 {
-                    code.Append("        for (int i = 0; i < OldPartsA.Length; i++)\n        {\n            keys.PreviousAesKeys.Add(Combine(OldPartsA[i], OldPartsB[i]));\n        }\n\n");
+                    code.Append("        for (int i = 0; i < OldPartsA.Length; i++)\n        {\n            keys.AddPreviousAesKey(Combine(OldPartsA[i], OldPartsB[i]));\n        }\n\n");
                 }
 
                 code.Append("        return keys;\n    }\n\n");

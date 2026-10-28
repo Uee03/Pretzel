@@ -3,6 +3,7 @@ using UnityEngine;
 namespace Pretzel.UI
 {
     /// <summary>Insets in panel units on each edge, for notches, rounded corners and system bars.</summary>
+    // Value type: four floats with value equality, recomputed on every layout change.
     public readonly struct SafeAreaInsets
     {
         public float Left { get; }

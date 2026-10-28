@@ -53,7 +53,8 @@ This description documents the format, not an independent cryptographic certific
 ### Changing a key
 
 If you deliberately need to change the key, advanced controls retain the old key in
-`PreviousAesKeys`. The store writes with the current key and tries current/history keys for reads.
+`PreviousAesKeys` (add one from code with `AddPreviousAesKey`). The store writes with the current key and tries
+current/history keys for reads.
 Re-export delivery files; old saves move to the new key when saved again.
 Do not clear history until all supported old saves have migrated. Offline players may skip releases,
 so retaining historical read keys is often simpler. Environment variables hold only the current key.

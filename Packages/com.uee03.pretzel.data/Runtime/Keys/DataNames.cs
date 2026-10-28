@@ -32,7 +32,7 @@ namespace Pretzel.Data
                 return $"Name cannot be longer than {MaxLength} characters.";
             }
 
-            if (name == "." || name == "..")
+            if (string.Equals(name, ".", StringComparison.Ordinal) || string.Equals(name, "..", StringComparison.Ordinal))
             {
                 return "Name cannot be '.' or '..'.";
             }

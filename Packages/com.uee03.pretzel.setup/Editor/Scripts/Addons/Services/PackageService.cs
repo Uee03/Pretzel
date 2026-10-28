@@ -99,7 +99,7 @@ namespace Pretzel.Setup.Addons.Services
 
         public static bool InstallIdentifiers(IEnumerable<string> identifiers, string label)
         {
-            string[] add = identifiers.Distinct().ToArray();
+            string[] add = identifiers.Distinct(StringComparer.Ordinal).ToArray();
             return add.Length > 0 && Run(label, add, null);
         }
 
@@ -157,7 +157,7 @@ namespace Pretzel.Setup.Addons.Services
             result.Add(entry);
             foreach (string id in entry.dependencies ?? new List<string>())
             {
-                CatalogEntry dependency = catalog.FirstOrDefault(e => e.id == id);
+                CatalogEntry dependency = catalog.FirstOrDefault(e => string.Equals(e.id, id, StringComparison.OrdinalIgnoreCase));
                 if (dependency != null)
                 {
                     Collect(dependency, catalog, result);

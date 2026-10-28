@@ -6,6 +6,7 @@ namespace Pretzel.Data
     /// Identifies one saved item: a name, an optional slot and an optional sub-folder.
     /// The constructor validates every part, so a key cannot point outside the store root.
     /// </summary>
+    // Value type: equality by name, slot and folder; used as a dictionary key.
     public readonly struct DataKey : IEquatable<DataKey>
     {
         public string Name { get; }

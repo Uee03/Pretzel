@@ -15,7 +15,7 @@ namespace Pretzel.Data.Editor
         Error
     }
 
-    internal readonly struct BuildIssue
+    internal sealed class BuildIssue
     {
         public BuildIssue(IssueSeverity severity, string message)
         {
@@ -49,7 +49,7 @@ namespace Pretzel.Data.Editor
         [MenuItem("Tools/Pretzel/DataIO/Check build setup")]
         private static void CheckFromMenu()
         {
-            List<BuildIssue> issues = Validate();
+            IReadOnlyList<BuildIssue> issues = Validate();
             if (issues.Count == 0)
             {
                 Debug.Log("[Pretzel.Data] No issues found by the limited key-delivery checks. Verify runtime startup and save/load in a player.");
@@ -70,7 +70,7 @@ namespace Pretzel.Data.Editor
             }
         }
 
-        public static List<BuildIssue> Validate()
+        public static IReadOnlyList<BuildIssue> Validate()
         {
             return Validate(DataIOConfigAsset.Load(), ReadDeliveryScript(), ReadBundledJson());
         }
@@ -78,7 +78,7 @@ namespace Pretzel.Data.Editor
         /// <param name="config">The settings asset, or null when there is none.</param>
         /// <param name="deliveryScript">The source of PretzelDataSetup.cs, or null when it does not exist.</param>
         /// <param name="keyJson">The bundled game key JSON, or null when it does not exist.</param>
-        public static List<BuildIssue> Validate(DataIOConfig config, string deliveryScript, string keyJson)
+        public static IReadOnlyList<BuildIssue> Validate(DataIOConfig config, string deliveryScript, string keyJson)
         {
             List<BuildIssue> issues = new();
             void Error(string message) => issues.Add(new BuildIssue(IssueSeverity.Error, message));
@@ -127,13 +127,13 @@ namespace Pretzel.Data.Editor
                 Error("The bundled key config is invalid and would throw at startup: " + jsonError);
             }
 
-            if (delivery == DeliveryScript.Token && deliveryScript.Contains(ShippingGenerator.TokenStubMarker)
+            if (delivery == DeliveryScript.Token && deliveryScript.Contains(ShippingGenerator.TokenStubMarker, StringComparison.Ordinal)
                 && source is KeySource.Automatic or KeySource.Provider)
             {
                 Error("PretzelDataSetup.RequestKeyAsync is still the generated stub, so the game can never fetch its key. Implement it before building.");
             }
 
-            if (delivery == DeliveryScript.Embedded && deliveryScript.Contains("RuntimeInitializeLoadType.BeforeSceneLoad"))
+            if (delivery == DeliveryScript.Embedded && deliveryScript.Contains("RuntimeInitializeLoadType.BeforeSceneLoad", StringComparison.Ordinal))
             {
                 Error("PretzelDataSetup registers its key at BeforeSceneLoad, the same time ProjectDataIO initializes, so the key may be missed. "
                       + "Export the embedded setup again on the Keys tab.");
@@ -210,17 +210,17 @@ namespace Pretzel.Data.Editor
                 return DeliveryScript.None;
             }
 
-            if (source.Contains("LoadKeysAsync"))
+            if (source.Contains("LoadKeysAsync", StringComparison.Ordinal))
             {
                 return DeliveryScript.Token;
             }
 
-            if (source.Contains("PartA"))
+            if (source.Contains("PartA", StringComparison.Ordinal))
             {
                 return DeliveryScript.Embedded;
             }
 
-            return source.Contains("EnvironmentPrefix") ? DeliveryScript.Environment : DeliveryScript.Custom;
+            return source.Contains("EnvironmentPrefix", StringComparison.Ordinal) ? DeliveryScript.Environment : DeliveryScript.Custom;
         }
 
         private static string ReadDeliveryScript()
@@ -228,7 +228,7 @@ namespace Pretzel.Data.Editor
             foreach (string guid in AssetDatabase.FindAssets("PretzelDataSetup t:MonoScript"))
             {
                 string path = AssetDatabase.GUIDToAssetPath(guid);
-                if (Path.GetFileName(path) == ShippingGenerator.ScriptName && File.Exists(path))
+                if (string.Equals(Path.GetFileName(path), ShippingGenerator.ScriptName, StringComparison.Ordinal) && File.Exists(path))
                 {
                     return File.ReadAllText(path);
                 }
