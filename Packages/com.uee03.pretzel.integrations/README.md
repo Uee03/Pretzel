@@ -9,6 +9,15 @@ Each library has its own assembly under `Runtime/`. An assembly compiles only wh
 | `Runtime/LitMotion` | `Pretzel.Integrations.LitMotion` | [LitMotion](https://github.com/annulusgames/LitMotion) v2.0.2 | `com.annulusgames.lit-motion` | `PRETZEL_LITMOTION` |
 | `Runtime/UniTask` | `Pretzel.Integrations.UniTask` | [UniTask](https://github.com/Cysharp/UniTask) 2.5.11 | `com.cysharp.unitask` | `PRETZEL_UNITASK` |
 | `Runtime/R3` | `Pretzel.Integrations.R3` | [R3](https://github.com/Cysharp/R3) 1.3.1 | `com.cysharp.r3` | `PRETZEL_R3` |
+| `Runtime/VContainer` | `Pretzel.Integrations.VContainer` | [VContainer](https://github.com/hadashiA/VContainer) 1.19.0 | `jp.hadashikick.vcontainer` | `PRETZEL_VCONTAINER` |
+
+## VContainer
+
+A composition root for your game: `PretzelLifetimeScope` (configured in the Inspector), `ScriptableInstaller` for
+project-wide registrations and `MonoInstaller` for scene objects. **Pretzel > Project Setup > VContainer** installs
+VContainer, generates the installer, services and flow class, and creates a root scope that VContainer starts before
+the first scene. Read the guide in [Documentation~/VContainer.md](Documentation~/VContainer.md): setup, scopes and
+lifetimes, MonoBehaviours, scene loading, testing, and the practices to avoid.
 
 ## LitMotion
 

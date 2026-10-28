@@ -9,5 +9,6 @@ First published release. Version 0.1.0 was internal and never tagged.
 ### Added
 
 - The Project Setup window: project info, folder presets, scene templates, first-run starter kit and the Addons and Addons Extra tabs.
+- The VContainer tab: installs VContainer, generates the composition root code and creates the root scope, installer and VContainerSettings assets.
 - The module catalog is generated from the module manifests (`.github/scripts/Update-ModuleCatalog.ps1`) into `Editor/Catalog/modules.json`, so Addons tab dependencies can no longer drift from `package.json`.
 - EditMode tests that check the catalog against the installed manifests.

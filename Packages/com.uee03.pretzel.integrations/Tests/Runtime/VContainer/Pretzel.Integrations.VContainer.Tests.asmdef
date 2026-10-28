@@ -1,0 +1,17 @@
+{
+  "name": "Pretzel.Integrations.VContainer.Tests",
+  "rootNamespace": "Pretzel.Integrations.VContainer.Tests",
+  "references": ["Pretzel.Integrations.VContainer", "VContainer", "UnityEngine.TestRunner", "UnityEditor.TestRunner"],
+  "includePlatforms": [],
+  "overrideReferences": true,
+  "precompiledReferences": ["nunit.framework.dll"],
+  "autoReferenced": false,
+  "defineConstraints": ["UNITY_INCLUDE_TESTS", "PRETZEL_VCONTAINER"],
+  "versionDefines": [
+    {
+      "name": "jp.hadashikick.vcontainer",
+      "expression": "",
+      "define": "PRETZEL_VCONTAINER"
+    }
+  ]
+}

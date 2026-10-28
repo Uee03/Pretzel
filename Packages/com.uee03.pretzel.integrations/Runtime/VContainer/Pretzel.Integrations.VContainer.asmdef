@@ -1,0 +1,24 @@
+{
+  "name": "Pretzel.Integrations.VContainer",
+  "rootNamespace": "Pretzel.Integrations.VContainer",
+  "references": [
+    "VContainer"
+  ],
+  "includePlatforms": [],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": true,
+  "defineConstraints": [
+    "PRETZEL_VCONTAINER"
+  ],
+  "versionDefines": [
+    {
+      "name": "jp.hadashikick.vcontainer",
+      "expression": "",
+      "define": "PRETZEL_VCONTAINER"
+    }
+  ],
+  "noEngineReferences": false
+}

@@ -130,11 +130,11 @@
     {
       "name": "com.uee03.pretzel.integrations",
       "displayName": "Integrations",
-      "description": "Optional adapters between Pretzel and LitMotion, UniTask and R3. Each adapter assembly compiles only when its library is installed.",
+      "description": "Optional adapters between Pretzel and LitMotion, UniTask, R3 and VContainer. Each adapter assembly compiles only when its library is installed.",
       "version": "0.2.0",
       "dependencies": ["com.uee03.pretzel.core", "com.uee03.pretzel.tween", "com.uee03.pretzel.api", "com.uee03.pretzel.ui"],
       "packages": [],
-      "optionalLibraries": [{ "displayName": "LitMotion", "packageName": "com.annulusgames.lit-motion" }, { "displayName": "R3", "packageName": "com.cysharp.r3" }, { "displayName": "UniTask", "packageName": "com.cysharp.unitask" }]
+      "optionalLibraries": [{ "displayName": "LitMotion", "packageName": "com.annulusgames.lit-motion" }, { "displayName": "R3", "packageName": "com.cysharp.r3" }, { "displayName": "UniTask", "packageName": "com.cysharp.unitask" }, { "displayName": "VContainer", "packageName": "jp.hadashikick.vcontainer" }]
     },
     {
       "name": "com.uee03.pretzel.editor",

@@ -7,8 +7,14 @@ Open it from `Pretzel > Project Setup` (Shift + Alt + P). It opens once by itsel
 ## Tabs
 
 - **Main**: company, product, version, icon and cursor, a folder structure preset (Game, Tool, System or Custom) with a Create Folders button, and a picker for the 2D and 3D scene templates in this package. On first run it also offers a starter kit: a preset that creates its folders and installs the recommended addons in one step.
-- **Addons**: one card per Pretzel module, with its installed version, dependencies and Install, Uninstall or Update. Modules already in the project show as Local. Embedded modules (inside this project's `Packages` folder) show a disabled Uninstall, since removing them would delete the folder. The integrations module shows a chip for each third-party library it adapts (LitMotion, UniTask, R3) and which of them are installed.
+- **Addons**: one card per Pretzel module, with its installed version, dependencies and Install, Uninstall or Update. Modules already in the project show as Local. Embedded modules (inside this project's `Packages` folder) show a disabled Uninstall, since removing them would delete the folder. The integrations module shows a chip for each third-party library it adapts (LitMotion, UniTask, R3, VContainer) and which of them are installed.
 - **Addons Extra**: a curated catalog of third-party packages with search, a pinned version, installed state and notes.
+- **VContainer**: sets up dependency injection. Installs VContainer, generates an installer (`GameInstaller`), the
+  services and managers you list (interface, lifetime, `IStartable`/`ITickable`), a `GameFlow` entry point and the
+  registrations for the Pretzel services you tick. After compilation it creates the root scope prefab and
+  `VContainerSettings`, and adds the settings to the preloaded assets, so the root scope exists before the first scene
+  loads. Generated registrations live in `GameInstaller.Generated.cs`; every other file is created once and is yours.
+  It can also add a scope to the open scene. Needs Pretzel Integrations; see its `Documentation~/VContainer.md`.
 - **Settings**: folder presets, the settings folder, catalog sources, per-user paths and an About section, with a shortcut to the Data Format window when `pretzel.data` is installed. Each section has a reset.
 
 Changes are saved a moment after you stop typing and when the window closes.

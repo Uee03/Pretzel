@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Pretzel.Setup.Composition;
 
 namespace Pretzel.Setup.Settings
 {
@@ -19,6 +20,8 @@ namespace Pretzel.Setup.Settings
         // Where Pretzel modules are installed from, for example https://github.com/owner/Pretzel.git. Empty disables install.
         public string moduleSourceUrl = string.Empty;
         public string moduleSourceVersion = string.Empty;
+
+        public CompositionSettings composition = new();
 
         public FolderPreset ActivePreset
         {
@@ -63,6 +66,8 @@ namespace Pretzel.Setup.Settings
             settingsFolder ??= string.Empty;
             moduleSourceUrl ??= string.Empty;
             moduleSourceVersion ??= string.Empty;
+            composition ??= new CompositionSettings();
+            composition.Normalize();
         }
     }
 
