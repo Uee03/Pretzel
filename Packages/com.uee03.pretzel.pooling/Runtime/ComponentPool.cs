@@ -13,7 +13,7 @@ namespace Pretzel.Pooling
     /// instance is first taken. Taken objects are positioned before they are activated, so OnEnable sees the final position.
     /// Every <see cref="IPoolable"/> in the instance's hierarchy is notified. Dispose it to destroy idle instances.
     /// </summary>
-    public sealed class ComponentPool<T> : IDisposable where T : Component
+    public sealed class ComponentPool<T> : IComponentPool<T> where T : Component
     {
         private readonly T _prefab;
         private readonly Transform _parent;

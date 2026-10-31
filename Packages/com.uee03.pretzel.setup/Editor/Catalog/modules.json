@@ -94,7 +94,7 @@
     {
       "name": "com.uee03.pretzel.audio",
       "displayName": "Audio",
-      "description": "An audio manager with pooled AudioSources, AudioCue assets, per-channel volume through an AudioMixer or directly, and crossfading music.",
+      "description": "An audio service with pooled AudioSources, AudioCue assets, per-channel volume through an AudioMixer or directly, and crossfading music.",
       "version": "0.2.0",
       "dependencies": ["com.uee03.pretzel.core"],
       "packages": [],
@@ -119,12 +119,21 @@
       "optionalLibraries": []
     },
     {
-      "name": "com.uee03.pretzel.templates",
-      "displayName": "Templates",
-      "description": "Script templates for Pretzel types (MonoBehaviour, UI controller, singleton) and a UI Toolkit theme template.",
+      "name": "com.uee03.pretzel.cloud",
+      "displayName": "Cloud",
+      "description": "Unity Gaming Services for Pretzel: Authentication, Cloud Save, Cloud Code and Remote Config behind SDK-free interfaces, plus an offline-first cloud save store for Pretzel Data with retry, a persistent upload queue and conflict resolution. Each adapter assembly compiles only when its Unity package is installed.",
       "version": "0.2.0",
-      "dependencies": ["com.uee03.pretzel.core", "com.uee03.pretzel.ui"],
+      "dependencies": ["com.uee03.pretzel.core", "com.uee03.pretzel.data"],
       "packages": [],
+      "optionalLibraries": [{ "displayName": "Authentication", "packageName": "com.unity.services.authentication" }, { "displayName": "CloudCode", "packageName": "com.unity.services.cloudcode" }, { "displayName": "CloudSave", "packageName": "com.unity.services.cloudsave" }, { "displayName": "RemoteConfig", "packageName": "com.unity.remote-config" }]
+    },
+    {
+      "name": "com.uee03.pretzel.multiplayer",
+      "displayName": "Multiplayer",
+      "description": "A session facade over Netcode for GameObjects and Unity Multiplayer Services (Sessions + Relay): local couch co-op, online host/join/quick-join, cross-play tagging, rejoin with backoff, a pooled network spawn handler, a drop-in UI Toolkit menu and a two-cube sample.",
+      "version": "0.2.0",
+      "dependencies": ["com.uee03.pretzel.core", "com.uee03.pretzel.pooling", "com.uee03.pretzel.ui"],
+      "packages": ["com.unity.netcode.gameobjects", "com.unity.services.multiplayer", "com.unity.services.authentication", "com.unity.services.core"],
       "optionalLibraries": []
     },
     {

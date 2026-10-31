@@ -1,0 +1,25 @@
+.pretzel-tables__table {
+    flex-grow: 1;
+    margin: var(--pretzel-sample-gap);
+}
+
+.pretzel-tables__cell {
+    -unity-text-align: middle-left;
+    padding: 0 4px;
+}
+
+.pretzel-tables__cell--number {
+    -unity-text-align: middle-right;
+}
+
+.pretzel-tables__cell--muted {
+    color: var(--pretzel-sample-muted);
+}
+
+.pretzel-tables__ping {
+    margin: 1px 2px;
+}
+
+.pretzel-tables__search {
+    width: 180px;
+}

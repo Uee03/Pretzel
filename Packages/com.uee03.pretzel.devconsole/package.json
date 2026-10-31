@@ -13,7 +13,7 @@
   "samples": [
     {
       "displayName": "Dev Console Usage",
-      "description": "Registers gameplay commands such as timescale and god mode on a DeveloperConsole.",
+      "description": "A playable arena where console commands (god, heal, spawn, gold, tp, set/get tuning, timescale) change real game state.",
       "path": "Samples~/DevConsoleUsage"
     }
   ]

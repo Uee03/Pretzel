@@ -1,0 +1,28 @@
+<engine:UXML xmlns:engine="UnityEngine.UIElements" xmlns:editor="UnityEditor.UIElements">
+    <engine:ScrollView name="dashboard__scroll" class="pretzel-sample__body">
+        <engine:Label text="Project Dashboard" class="pretzel-sample__title" />
+        <engine:Label text="UXML for the layout, C# for behaviour. The scan runs in small steps on a scheduled item, so the window stays responsive." class="pretzel-sample__caption" />
+
+        <engine:VisualElement name="dashboard__stats" class="pretzel-dashboard__stats" />
+
+        <engine:ProgressBar name="dashboard__progress" title="Idle" value="0" class="pretzel-dashboard__progress" />
+
+        <engine:VisualElement class="pretzel-sample__row">
+            <engine:Button name="dashboard__scan" text="Scan Project" class="pretzel-dashboard__button pretzel-dashboard__button--primary" />
+            <engine:Button name="dashboard__cancel" text="Cancel" class="pretzel-dashboard__button" />
+        </engine:VisualElement>
+
+        <engine:GroupBox text="Actions" class="pretzel-sample__panel">
+            <engine:VisualElement class="pretzel-sample__row">
+                <engine:Button name="dashboard__largest" text="Select Largest Asset" tooltip="Available after a scan." />
+                <engine:Button name="dashboard__refresh" text="Refresh Assets" />
+            </engine:VisualElement>
+            <engine:VisualElement class="pretzel-sample__row">
+                <engine:Button name="dashboard__reveal" text="Reveal Assets Folder" />
+                <engine:Button name="dashboard__settings" text="Player Settings" />
+            </engine:VisualElement>
+        </engine:GroupBox>
+
+        <engine:Label name="dashboard__status" class="pretzel-sample__status" />
+    </engine:ScrollView>
+</engine:UXML>

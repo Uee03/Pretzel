@@ -14,7 +14,7 @@ namespace Pretzel.Api
     /// HTTP client on <see cref="UnityWebRequest"/> and <see cref="Awaitable"/>. Call it from the main thread.
     /// Every method takes a <see cref="CancellationToken"/>. Cancelling aborts the request and throws <see cref="OperationCanceledException"/>.
     /// </summary>
-    public sealed class ApiClient
+    public sealed class ApiClient : IApiClient
     {
         private const string JsonContentType = "application/json";
 

@@ -53,6 +53,8 @@ applyTo: "**/*.cs"
   and prefab override support when tools modify assets or objects. Preserve `.meta` files.
 - Use verified APIs for the installed Unity and package versions. Do not invent graph-editor,
   Addressables, netcode, R3, or LitMotion calls, or hand-edit graph/scene YAML as a shortcut.
+- Pretzel supports Unity 6000.0 and newer only. Guard an API that exists only from a later release (or must be avoided
+  there) with its version define, such as `UNITY_6000_2_OR_NEWER`, and keep the code compiling on 6000.0.
 - Write comments only for non-obvious intent or constraints, in one short line. Address the user
   as an experienced software engineer; explain trade-offs rather than introductory C# concepts.
 - Before finishing any C# change, run the checks in

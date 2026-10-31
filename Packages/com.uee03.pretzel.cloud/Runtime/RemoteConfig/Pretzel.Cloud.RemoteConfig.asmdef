@@ -1,0 +1,27 @@
+{
+  "name": "Pretzel.Cloud.RemoteConfig",
+  "rootNamespace": "Pretzel.Cloud.RemoteConfig",
+  "references": [
+    "Pretzel.Core",
+    "Pretzel.Data",
+    "Pretzel.Cloud",
+    "Unity.Services.RemoteConfig"
+  ],
+  "includePlatforms": [],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": true,
+  "defineConstraints": [
+    "PRETZEL_UGS_REMOTECONFIG"
+  ],
+  "versionDefines": [
+    {
+      "name": "com.unity.remote-config",
+      "expression": "4.2.5",
+      "define": "PRETZEL_UGS_REMOTECONFIG"
+    }
+  ],
+  "noEngineReferences": false
+}

@@ -1,0 +1,31 @@
+{
+  "name": "Pretzel.Integrations.Samples.VContainer",
+  "rootNamespace": "Pretzel.Samples.VContainerExample",
+  "references": [
+    "VContainer",
+    "Pretzel.Integrations.VContainer",
+    "UniTask"
+  ],
+  "includePlatforms": [],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": true,
+  "defineConstraints": [
+    "PRETZEL_VCONTAINER"
+  ],
+  "versionDefines": [
+    {
+      "name": "jp.hadashikick.vcontainer",
+      "expression": "",
+      "define": "PRETZEL_VCONTAINER"
+    },
+    {
+      "name": "com.cysharp.unitask",
+      "expression": "",
+      "define": "VCONTAINER_UNITASK_INTEGRATION"
+    }
+  ],
+  "noEngineReferences": false
+}

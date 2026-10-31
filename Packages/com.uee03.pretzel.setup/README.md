@@ -11,7 +11,9 @@ Open it from `Pretzel > Project Setup` (Shift + Alt + P). It opens once by itsel
 - **Addons Extra**: a curated catalog of third-party packages with search, a pinned version, installed state and notes.
 - **VContainer**: sets up dependency injection. Installs VContainer, generates an installer (`GameInstaller`), the
   services and managers you list (interface, lifetime, `IStartable`/`ITickable`), a `GameFlow` entry point and the
-  registrations for the Pretzel services you tick. After compilation it creates the root scope prefab and
+  registrations for the Pretzel services you tick. Starter services add a complete `ISaveService`/`SaveService` (on
+  Pretzel Data) and `IGameService`/`GameService` (states, score, pause, saved high score), plus an optional
+  `GameServicesExample` that shows how to use them. After compilation it creates the root scope prefab and
   `VContainerSettings`, and adds the settings to the preloaded assets, so the root scope exists before the first scene
   loads. Generated registrations live in `GameInstaller.Generated.cs`; every other file is created once and is yours.
   It can also add a scope to the open scene. Needs Pretzel Integrations; see its `Documentation~/VContainer.md`.

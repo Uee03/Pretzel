@@ -1,0 +1,106 @@
+{
+  "schemaVersion": 1,
+  "data": {
+    "folderPresets": [
+      {
+        "name": "Game",
+        "folders": [
+          "_Scripts/Editor",
+          "_Scripts/Runtime",
+          "_Project/Animations",
+          "_Project/Art/Materials",
+          "_Project/Art/Models",
+          "_Project/Art/Shaders",
+          "_Project/Art/Sprites",
+          "_Project/Art/Textures",
+          "_Project/Audio/BGM",
+          "_Project/Audio/SFX",
+          "_Project/Prefabs",
+          "_Project/Scenes",
+          "_Project/ScriptableObjects",
+          "_Project/Settings",
+          "_Project/UI/Fonts",
+          "_Project/UI/Icons"
+        ]
+      },
+      {
+        "name": "Tool",
+        "folders": [
+          "_Scripts/Editor",
+          "_Scripts/Runtime",
+          "_Project/Documentation",
+          "_Project/Prefabs",
+          "_Project/Samples",
+          "_Project/Scenes",
+          "_Project/ScriptableObjects",
+          "_Project/Settings",
+          "_Project/UI/Icons",
+          "_Project/UI/Layouts",
+          "_Project/UI/Styles"
+        ]
+      },
+      {
+        "name": "System",
+        "folders": [
+          "_Scripts/Editor",
+          "_Scripts/Runtime",
+          "_Project/Documentation",
+          "_Project/Prefabs",
+          "_Project/Samples",
+          "_Project/Scenes",
+          "_Project/ScriptableObjects",
+          "_Project/Settings"
+        ]
+      },
+      {
+        "name": "Custom",
+        "folders": [
+          "_Scripts/Editor",
+          "_Scripts/Runtime",
+          "_Project/Prefabs",
+          "_Project/Scenes",
+          "_Project/ScriptableObjects"
+        ]
+      }
+    ],
+    "activeFolderPreset": "Game",
+    "settingsFolder": "Settings",
+    "catalogSources": [],
+    "pinnedVersions": [],
+    "moduleSourceUrl": "",
+    "moduleSourceVersion": "",
+    "composition": {
+      "namespaceName": "TestPretzel",
+      "scopeName": "Game",
+      "codeFolder": "Assets/_Scripts/Runtime/Composition",
+      "assetFolder": "Assets/_Project/Settings/Composition",
+      "createFlow": true,
+      "apiBaseUrl": "",
+      "pretzelServices": [
+        "data"
+      ],
+      "services": []
+    },
+    "ActivePreset": {
+      "name": "Game",
+      "folders": [
+        "_Scripts/Editor",
+        "_Scripts/Runtime",
+        "_Project/Animations",
+        "_Project/Art/Materials",
+        "_Project/Art/Models",
+        "_Project/Art/Shaders",
+        "_Project/Art/Sprites",
+        "_Project/Art/Textures",
+        "_Project/Audio/BGM",
+        "_Project/Audio/SFX",
+        "_Project/Prefabs",
+        "_Project/Scenes",
+        "_Project/ScriptableObjects",
+        "_Project/Settings",
+        "_Project/UI/Fonts",
+        "_Project/UI/Icons"
+      ]
+    }
+  }
+}

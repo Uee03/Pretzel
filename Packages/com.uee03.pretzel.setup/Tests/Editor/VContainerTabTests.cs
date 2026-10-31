@@ -21,6 +21,8 @@ namespace Pretzel.Setup.Tests
             string[] buttons = view.Query<Button>().ToList().Select(b => b.text).ToArray();
             Assert.That(buttons, Does.Contain("Generate and set up"));
             Assert.That(buttons, Does.Contain("Add service"));
+            Assert.That(buttons, Does.Contain("Open the diagnostics window"));
+            Assert.That(buttons, Does.Contain("Open the official VContainer documentation"));
             Assert.That(view.Query<Toggle>().ToList().Count, Is.GreaterThanOrEqualTo(7));
         }
     }

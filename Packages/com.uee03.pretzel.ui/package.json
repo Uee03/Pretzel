@@ -26,6 +26,21 @@
       "displayName": "Editor UI Helpers",
       "description": "An editor window and a custom inspector built with EditorUI and InspectorBase.",
       "path": "Samples~/EditorUIHelpers"
+    },
+    {
+      "displayName": "Editor Windows",
+      "description": "UI Toolkit EditorWindows by topic: basics, group boxes, lists, tabs, tables with data and a combined dashboard.",
+      "path": "Samples~/EditorWindows"
+    },
+    {
+      "displayName": "Custom Inspectors",
+      "description": "Custom editors with CreateInspectorGUI: the default layout plus extra buttons, fully custom layouts, components, ScriptableObjects and multi-object editing.",
+      "path": "Samples~/CustomInspectors"
+    },
+    {
+      "displayName": "Property Drawers",
+      "description": "Property drawers in three levels of complexity: basic, intermediate (rows, min/max, ShowIf) and advanced (lists, data-source dropdowns, SerializeReference).",
+      "path": "Samples~/PropertyDrawers"
     }
   ]
 }

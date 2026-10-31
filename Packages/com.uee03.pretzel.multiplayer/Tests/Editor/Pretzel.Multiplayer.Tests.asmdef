@@ -1,0 +1,19 @@
+{
+  "name": "Pretzel.Multiplayer.Tests",
+  "rootNamespace": "Pretzel.Multiplayer.Tests",
+  "references": [
+    "Pretzel.Core",
+    "Pretzel.UI",
+    "Pretzel.Multiplayer",
+    "Pretzel.Multiplayer.Editor",
+    "Unity.Netcode.Runtime",
+    "Unity.Services.Multiplayer",
+    "UnityEngine.TestRunner",
+    "UnityEditor.TestRunner"
+  ],
+  "includePlatforms": ["Editor"],
+  "overrideReferences": true,
+  "precompiledReferences": ["nunit.framework.dll"],
+  "autoReferenced": false,
+  "defineConstraints": ["UNITY_INCLUDE_TESTS"]
+}

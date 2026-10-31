@@ -28,6 +28,18 @@ preferences.Modify(p => p.graphics.vSyncCount = 0, save: true);
 - Pass your own `IDataStore` and `DataKey` to keep preferences apart from save games, for example as plain JSON while
   saves are encrypted.
 
-## Sample
+## Your own service
 
-`Samples~/PreferencesUsage`: async load, graphics apply and mixer volumes.
+`IPreferencesService` is the contract (`Current`, `Changed`, `Load`/`LoadAsync`, `Save`/`SaveAsync`, `Modify`,
+`ResetToDefaults`, `ApplyGraphics`). `PreferencesService` implements it on Pretzel Data. Depend on the interface in your
+menus and bridges, and implement it yourself to store preferences in PlayerPrefs, a platform service or a cloud profile:
+
+```csharp
+IPreferencesService preferences = new PreferencesService();   // or new MyCloudPreferencesService()
+```
+
+## Samples
+
+- `Samples~/PreferencesUsage`: async load, graphics apply and mixer volumes.
+- `Samples~/CustomPreferencesService`: `IPreferencesService` on PlayerPrefs and in memory, chosen in one composition root.
+- `Samples~/OptionsMenu`: a runtime UI Toolkit options screen with Apply/Revert and appliers for audio, graphics and language.

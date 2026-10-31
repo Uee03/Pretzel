@@ -1,0 +1,34 @@
+{
+  "name": "Pretzel.Cloud.Samples.CloudSaveUsage",
+  "rootNamespace": "Pretzel.Samples.Cloud.SaveUsage",
+  "references": [
+    "Pretzel.Core",
+    "Pretzel.Data",
+    "Pretzel.Cloud",
+    "Pretzel.Cloud.Authentication",
+    "Pretzel.Cloud.CloudSave"
+  ],
+  "includePlatforms": [],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": true,
+  "defineConstraints": [
+    "PRETZEL_UGS_AUTHENTICATION",
+    "PRETZEL_UGS_CLOUDSAVE"
+  ],
+  "versionDefines": [
+    {
+      "name": "com.unity.services.authentication",
+      "expression": "3.8.0",
+      "define": "PRETZEL_UGS_AUTHENTICATION"
+    },
+    {
+      "name": "com.unity.services.cloudsave",
+      "expression": "3.4.2",
+      "define": "PRETZEL_UGS_CLOUDSAVE"
+    }
+  ],
+  "noEngineReferences": false
+}

@@ -1,0 +1,11 @@
+# Impact: kick and snare together on the drum synth, through a plate reverb.
+# Run:  soundcraft-cli script impact-drums.txt --bounce impact.wav --start 0 --end 1.2
+# Then: soundcraft-cli convert impact.wav impact16.wav --bit-depth 16 --normalize   (the raw bounce peaks near -11 dBFS)
+session.new {"name":"impact","sample_rate":44100,"bit_depth":16}
+track.new {"kind":"instrument","name":"Drums","instrument":"drum_synth","format":"stereo"}
+mix.instrument {"track":1,"plugin":"drum_synth","params":{"kick_decay":300,"kick_tune":-4,"snare_snappy":80,"snare_decay":350}}
+mix.insert {"track":1,"slot":"a","plugin":"plate_reverb"}
+midi.new_clip {"track":1}
+# General MIDI drum notes: 36 kick, 38 snare (both produced sound here). Other drum_synth voices: hats, toms, cymbal.
+midi.note_add {"clip":2,"pitch":36,"start_ticks":0,"length_ticks":120,"velocity":127}
+midi.note_add {"clip":2,"pitch":38,"start_ticks":0,"length_ticks":120,"velocity":120}

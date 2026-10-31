@@ -1,0 +1,11 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" editor-extension-mode="False">
+    <ui:Style src="TwoCubesHud.uss" />
+    <ui:VisualElement name="twocubes-root" class="pretzel-twocubes">
+        <ui:VisualElement name="twocubes-bar" class="pretzel-twocubes__bar">
+            <ui:Button name="spawn-item" text="Spawn Item" class="pretzel-twocubes__button" />
+            <ui:Button name="delete-items" text="Delete Items" class="pretzel-twocubes__button pretzel-twocubes__button--danger" />
+            <ui:Label name="item-count" text="Items: 0" class="pretzel-twocubes__count" />
+        </ui:VisualElement>
+        <ui:Label name="controls-hint" class="pretzel-twocubes__hint" text="Player 1: WASD + Space    Player 2: Arrows + Right Ctrl / Enter" />
+    </ui:VisualElement>
+</ui:UXML>

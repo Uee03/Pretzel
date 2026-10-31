@@ -12,11 +12,29 @@
       "depth": 0,
       "source": "local",
       "dependencies": {
-        "com.uee03.pretzel.core": "0.1.0",
-        "com.uee03.pretzel.data": "0.1.0",
+        "com.uee03.pretzel.core": "0.2.0",
+        "com.uee03.pretzel.data": "0.2.0",
         "com.unity.modules.unitywebrequest": "1.0.0",
         "com.unity.modules.unitywebrequesttexture": "1.0.0",
         "com.unity.modules.unitywebrequestaudio": "1.0.0"
+      }
+    },
+    "com.uee03.pretzel.audio": {
+      "version": "file:../../Packages/com.uee03.pretzel.audio",
+      "depth": 0,
+      "source": "local",
+      "dependencies": {
+        "com.uee03.pretzel.core": "0.2.0",
+        "com.unity.modules.audio": "1.0.0"
+      }
+    },
+    "com.uee03.pretzel.cloud": {
+      "version": "file:../../Packages/com.uee03.pretzel.cloud",
+      "depth": 0,
+      "source": "local",
+      "dependencies": {
+        "com.uee03.pretzel.core": "0.2.0",
+        "com.uee03.pretzel.data": "0.2.0"
       }
     },
     "com.uee03.pretzel.core": {
@@ -30,9 +48,18 @@
       "depth": 0,
       "source": "local",
       "dependencies": {
-        "com.uee03.pretzel.core": "0.1.0",
+        "com.uee03.pretzel.core": "0.2.0",
         "com.unity.modules.jsonserialize": "1.0.0",
         "com.unity.nuget.newtonsoft-json": "3.2.2"
+      }
+    },
+    "com.uee03.pretzel.devconsole": {
+      "version": "file:../../Packages/com.uee03.pretzel.devconsole",
+      "depth": 0,
+      "source": "local",
+      "dependencies": {
+        "com.uee03.pretzel.core": "0.2.0",
+        "com.unity.modules.uielements": "1.0.0"
       }
     },
     "com.uee03.pretzel.editor": {
@@ -41,12 +68,20 @@
       "source": "local",
       "dependencies": {}
     },
+    "com.uee03.pretzel.events": {
+      "version": "file:../../Packages/com.uee03.pretzel.events",
+      "depth": 0,
+      "source": "local",
+      "dependencies": {
+        "com.uee03.pretzel.core": "0.2.0"
+      }
+    },
     "com.uee03.pretzel.extensions": {
       "version": "file:../../Packages/com.uee03.pretzel.extensions",
       "depth": 0,
       "source": "local",
       "dependencies": {
-        "com.uee03.pretzel.core": "0.1.0",
+        "com.uee03.pretzel.core": "0.2.0",
         "com.unity.modules.imageconversion": "1.0.0",
         "com.unity.modules.physics": "1.0.0"
       }
@@ -56,10 +91,53 @@
       "depth": 0,
       "source": "local",
       "dependencies": {
-        "com.uee03.pretzel.core": "0.1.0",
-        "com.uee03.pretzel.tween": "0.1.0",
-        "com.uee03.pretzel.api": "0.1.0",
-        "com.uee03.pretzel.ui": "0.1.0"
+        "com.uee03.pretzel.core": "0.2.0",
+        "com.uee03.pretzel.tween": "0.2.0",
+        "com.uee03.pretzel.api": "0.2.0",
+        "com.uee03.pretzel.ui": "0.2.0"
+      }
+    },
+    "com.uee03.pretzel.multiplayer": {
+      "version": "file:../../Packages/com.uee03.pretzel.multiplayer",
+      "depth": 0,
+      "source": "local",
+      "dependencies": {
+        "com.uee03.pretzel.core": "0.2.0",
+        "com.uee03.pretzel.pooling": "0.2.0",
+        "com.uee03.pretzel.ui": "0.2.0",
+        "com.unity.netcode.gameobjects": "2.13.3",
+        "com.unity.services.multiplayer": "2.4.1",
+        "com.unity.services.authentication": "3.8.0",
+        "com.unity.services.core": "1.18.0",
+        "com.unity.modules.jsonserialize": "1.0.0",
+        "com.unity.modules.uielements": "1.0.0"
+      }
+    },
+    "com.uee03.pretzel.pooling": {
+      "version": "file:../../Packages/com.uee03.pretzel.pooling",
+      "depth": 0,
+      "source": "local",
+      "dependencies": {
+        "com.uee03.pretzel.core": "0.2.0"
+      }
+    },
+    "com.uee03.pretzel.preferences": {
+      "version": "file:../../Packages/com.uee03.pretzel.preferences",
+      "depth": 0,
+      "source": "local",
+      "dependencies": {
+        "com.uee03.pretzel.core": "0.2.0",
+        "com.uee03.pretzel.data": "0.2.0"
+      }
+    },
+    "com.uee03.pretzel.scenes": {
+      "version": "file:../../Packages/com.uee03.pretzel.scenes",
+      "depth": 0,
+      "source": "local",
+      "dependencies": {
+        "com.uee03.pretzel.core": "0.2.0",
+        "com.uee03.pretzel.tween": "0.2.0",
+        "com.uee03.pretzel.ui": "0.2.0"
       }
     },
     "com.uee03.pretzel.setup": {
@@ -70,21 +148,12 @@
         "com.unity.nuget.newtonsoft-json": "3.2.2"
       }
     },
-    "com.uee03.pretzel.templates": {
-      "version": "file:../../Packages/com.uee03.pretzel.templates",
-      "depth": 0,
-      "source": "local",
-      "dependencies": {
-        "com.uee03.pretzel.core": "0.1.0",
-        "com.uee03.pretzel.ui": "0.1.0"
-      }
-    },
     "com.uee03.pretzel.tween": {
       "version": "file:../../Packages/com.uee03.pretzel.tween",
       "depth": 0,
       "source": "local",
       "dependencies": {
-        "com.uee03.pretzel.core": "0.1.0"
+        "com.uee03.pretzel.core": "0.2.0"
       }
     },
     "com.uee03.pretzel.ui": {
@@ -92,8 +161,8 @@
       "depth": 0,
       "source": "local",
       "dependencies": {
-        "com.uee03.pretzel.core": "0.1.0",
-        "com.uee03.pretzel.tween": "0.1.0",
+        "com.uee03.pretzel.core": "0.2.0",
+        "com.uee03.pretzel.tween": "0.2.0",
         "com.unity.modules.uielements": "1.0.0"
       }
     },
@@ -102,9 +171,9 @@
       "depth": 0,
       "source": "local",
       "dependencies": {
-        "com.uee03.pretzel.core": "0.1.0",
-        "com.uee03.pretzel.ui": "0.1.0",
-        "com.uee03.pretzel.tween": "0.1.0",
+        "com.uee03.pretzel.core": "0.2.0",
+        "com.uee03.pretzel.ui": "0.2.0",
+        "com.uee03.pretzel.tween": "0.2.0",
         "com.unity.ugui": "2.0.0"
       }
     },
@@ -306,6 +375,45 @@
       "source": "builtin",
       "dependencies": {}
     },
+    "com.unity.multiplayer.center": {
+      "version": "2.0.1",
+      "depth": 0,
+      "source": "builtin",
+      "dependencies": {
+        "com.unity.modules.uielements": "1.0.0"
+      }
+    },
+    "com.unity.multiplayer.playmode": {
+      "version": "3.0.0",
+      "depth": 0,
+      "source": "builtin",
+      "dependencies": {}
+    },
+    "com.unity.multiplayer.tools": {
+      "version": "2.2.12",
+      "depth": 0,
+      "source": "registry",
+      "dependencies": {
+        "com.unity.burst": "1.8.18",
+        "com.unity.collections": "2.5.1",
+        "com.unity.mathematics": "1.3.2",
+        "com.unity.profiling.core": "1.0.2",
+        "com.unity.nuget.mono-cecil": "1.11.4",
+        "com.unity.modules.uielements": "1.0.0",
+        "com.unity.nuget.newtonsoft-json": "3.2.1"
+      },
+      "url": "https://packages.unity.com"
+    },
+    "com.unity.netcode.gameobjects": {
+      "version": "2.13.3",
+      "depth": 1,
+      "source": "registry",
+      "dependencies": {
+        "com.unity.transport": "2.6.0",
+        "com.unity.nuget.mono-cecil": "1.11.4"
+      },
+      "url": "https://packages.unity.com"
+    },
     "com.unity.nuget.mono-cecil": {
       "version": "1.11.6",
       "depth": 1,
@@ -336,7 +444,7 @@
     },
     "com.unity.profiling.core": {
       "version": "1.0.3",
-      "depth": 2,
+      "depth": 1,
       "source": "registry",
       "dependencies": {},
       "url": "https://packages.unity.com"
@@ -375,6 +483,120 @@
       "depth": 2,
       "source": "registry",
       "dependencies": {},
+      "url": "https://packages.unity.com"
+    },
+    "com.unity.services.apis": {
+      "version": "1.1.1",
+      "depth": 0,
+      "source": "registry",
+      "dependencies": {
+        "com.unity.nuget.newtonsoft-json": "3.2.1",
+        "com.unity.modules.unitywebrequest": "1.0.0"
+      },
+      "url": "https://packages.unity.com"
+    },
+    "com.unity.services.authentication": {
+      "version": "3.8.0",
+      "depth": 1,
+      "source": "registry",
+      "dependencies": {
+        "com.unity.ugui": "1.0.0",
+        "com.unity.services.core": "1.18.0",
+        "com.unity.nuget.newtonsoft-json": "3.2.2",
+        "com.unity.modules.unitywebrequest": "1.0.0"
+      },
+      "url": "https://packages.unity.com"
+    },
+    "com.unity.services.cloudcode": {
+      "version": "2.10.4",
+      "depth": 0,
+      "source": "registry",
+      "dependencies": {
+        "com.unity.services.core": "1.15.1",
+        "com.unity.services.wire": "1.2.3",
+        "com.unity.nuget.newtonsoft-json": "3.0.2",
+        "com.unity.modules.unitywebrequest": "1.0.0",
+        "com.unity.services.authentication": "3.5.1"
+      },
+      "url": "https://packages.unity.com"
+    },
+    "com.unity.services.cloudsave": {
+      "version": "3.4.2",
+      "depth": 0,
+      "source": "registry",
+      "dependencies": {
+        "com.unity.services.core": "1.12.5",
+        "com.unity.services.authentication": "3.3.1"
+      },
+      "url": "https://packages.unity.com"
+    },
+    "com.unity.services.core": {
+      "version": "1.18.0",
+      "depth": 1,
+      "source": "registry",
+      "dependencies": {
+        "com.unity.modules.androidjni": "1.0.0",
+        "com.unity.nuget.newtonsoft-json": "3.2.2",
+        "com.unity.modules.unitywebrequest": "1.0.0"
+      },
+      "url": "https://packages.unity.com"
+    },
+    "com.unity.services.deployment": {
+      "version": "1.7.2",
+      "depth": 1,
+      "source": "registry",
+      "dependencies": {
+        "com.unity.services.core": "1.15.1",
+        "com.unity.services.deployment.api": "1.1.2"
+      },
+      "url": "https://packages.unity.com"
+    },
+    "com.unity.services.deployment.api": {
+      "version": "1.1.3",
+      "depth": 2,
+      "source": "registry",
+      "dependencies": {},
+      "url": "https://packages.unity.com"
+    },
+    "com.unity.services.multiplayer": {
+      "version": "2.4.1",
+      "depth": 0,
+      "source": "registry",
+      "dependencies": {
+        "com.unity.transport": "2.7.4",
+        "com.unity.collections": "2.6.8",
+        "com.unity.services.qos": "1.5.1",
+        "com.unity.services.core": "1.18.0",
+        "com.unity.services.wire": "1.5.1",
+        "com.unity.services.deployment": "1.7.2",
+        "com.unity.nuget.newtonsoft-json": "3.2.2",
+        "com.unity.modules.unitywebrequest": "1.0.0",
+        "com.unity.services.authentication": "3.8.0"
+      },
+      "url": "https://packages.unity.com"
+    },
+    "com.unity.services.qos": {
+      "version": "1.5.1",
+      "depth": 1,
+      "source": "registry",
+      "dependencies": {
+        "com.unity.collections": "1.2.4",
+        "com.unity.services.core": "1.12.5",
+        "com.unity.nuget.newtonsoft-json": "3.0.2",
+        "com.unity.modules.unitywebrequest": "1.0.0",
+        "com.unity.services.authentication": "3.5.2"
+      },
+      "url": "https://packages.unity.com"
+    },
+    "com.unity.services.wire": {
+      "version": "1.6.0",
+      "depth": 1,
+      "source": "registry",
+      "dependencies": {
+        "com.unity.services.core": "1.12.5",
+        "com.unity.nuget.newtonsoft-json": "3.2.1",
+        "com.unity.services.authentication": "2.7.4"
+      },
       "url": "https://packages.unity.com"
     },
     "com.unity.shadergraph": {
@@ -417,6 +639,16 @@
         "com.unity.modules.particlesystem": "1.0.0"
       }
     },
+    "com.unity.transport": {
+      "version": "6.6.0",
+      "depth": 1,
+      "source": "builtin",
+      "dependencies": {
+        "com.unity.collections": "6.5.0",
+        "com.unity.burst": "1.8.24",
+        "com.unity.mathematics": "1.4.0"
+      }
+    },
     "com.unity.ugui": {
       "version": "2.6.0",
       "depth": 0,
@@ -428,6 +660,13 @@
         "com.unity.modules.physics2d": "1.0.0",
         "com.unity.modules.physics": "1.0.0"
       }
+    },
+    "jp.hadashikick.vcontainer": {
+      "version": "https://github.com/hadashiA/VContainer.git?path=VContainer/Assets/VContainer#1.19.0",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {},
+      "hash": "5401e5a7ebc4980a2b82141ffc26391a6547edd7"
     },
     "com.unity.modules.accessibility": {
       "version": "1.0.0",

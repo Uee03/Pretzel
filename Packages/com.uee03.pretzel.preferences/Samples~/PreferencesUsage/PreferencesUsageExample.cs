@@ -17,7 +17,7 @@ namespace Pretzel.Samples.Preferences
         [SerializeField] private string _musicParameter = "MusicVolume";
         [SerializeField] private string _sfxParameter = "SfxVolume";
 
-        public PreferencesService Service { get; } = new();
+        public IPreferencesService Service { get; } = new PreferencesService();
 
         private void Awake()
         {

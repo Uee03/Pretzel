@@ -1,0 +1,30 @@
+{
+  "name": "com.uee03.pretzel.cloud",
+  "displayName": "Pretzel Cloud",
+  "version": "0.2.0",
+  "unity": "6000.0",
+  "description": "Unity Gaming Services for Pretzel: Authentication, Cloud Save, Cloud Code and Remote Config behind SDK-free interfaces, plus an offline-first cloud save store for Pretzel Data with retry, a persistent upload queue and conflict resolution. Each adapter assembly compiles only when its Unity package is installed.",
+  "author": { "name": "Uee03" },
+  "license": "MIT",
+  "dependencies": {
+    "com.uee03.pretzel.core": "0.2.0",
+    "com.uee03.pretzel.data": "0.2.0"
+  },
+  "samples": [
+    {
+      "displayName": "Cloud Save Usage",
+      "description": "Signs in anonymously and saves and loads a profile through the offline-first synced store, with a sync status label. Needs the Authentication and Cloud Save packages.",
+      "path": "Samples~/CloudSaveUsage"
+    },
+    {
+      "displayName": "Cloud Code And Remote Config",
+      "description": "Calls a Cloud Code module endpoint and reads Remote Config values with typed defaults. Needs the Authentication, Cloud Code and Remote Config packages.",
+      "path": "Samples~/CloudCodeAndRemoteConfig"
+    },
+    {
+      "displayName": "Manual Wiring With Fakes",
+      "description": "Uses the cloud interfaces with in-memory fakes and a temp-folder local store, so a game runs and tests offline without any Unity Gaming Services package.",
+      "path": "Samples~/ManualWiringWithFakes"
+    }
+  ]
+}

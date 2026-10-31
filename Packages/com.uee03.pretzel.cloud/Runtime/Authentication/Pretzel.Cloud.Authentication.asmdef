@@ -1,0 +1,28 @@
+{
+  "name": "Pretzel.Cloud.Authentication",
+  "rootNamespace": "Pretzel.Cloud.Authentication",
+  "references": [
+    "Pretzel.Core",
+    "Pretzel.Cloud",
+    "Unity.Services.Core",
+    "Unity.Services.Core.Environments",
+    "Unity.Services.Authentication"
+  ],
+  "includePlatforms": [],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": true,
+  "defineConstraints": [
+    "PRETZEL_UGS_AUTHENTICATION"
+  ],
+  "versionDefines": [
+    {
+      "name": "com.unity.services.authentication",
+      "expression": "3.8.0",
+      "define": "PRETZEL_UGS_AUTHENTICATION"
+    }
+  ],
+  "noEngineReferences": false
+}

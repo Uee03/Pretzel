@@ -1,0 +1,3 @@
+[
+  {"command": "node.create", "params": {"type": "text", "text": "PLAY", "parent": 2, "props": {"fill": "#ffffff", "fontSize": 28}}}
+]

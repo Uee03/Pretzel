@@ -1,0 +1,27 @@
+{
+  "name": "com.uee03.pretzel.multiplayer",
+  "displayName": "Pretzel Multiplayer",
+  "version": "0.2.0",
+  "unity": "6000.0",
+  "description": "A session facade over Netcode for GameObjects and Unity Multiplayer Services (Sessions + Relay): local couch co-op, online host/join/quick-join, cross-play tagging, rejoin with backoff, a pooled network spawn handler, a drop-in UI Toolkit menu and a two-cube sample.",
+  "author": { "name": "Uee03" },
+  "license": "MIT",
+  "dependencies": {
+    "com.uee03.pretzel.core": "0.2.0",
+    "com.uee03.pretzel.pooling": "0.2.0",
+    "com.uee03.pretzel.ui": "0.2.0",
+    "com.unity.netcode.gameobjects": "2.13.3",
+    "com.unity.services.multiplayer": "2.4.1",
+    "com.unity.services.authentication": "3.8.0",
+    "com.unity.services.core": "1.18.0",
+    "com.unity.modules.jsonserialize": "1.0.0",
+    "com.unity.modules.uielements": "1.0.0"
+  },
+  "samples": [
+    {
+      "displayName": "Two Cubes",
+      "description": "Two networked cubes that can only move, jump and turn, plus Spawn Item and Delete Items buttons that use the pooled spawn handler. Works in local co-op, online host/join and quick-join through the drop-in menu. Create the scene with Pretzel > Samples > Multiplayer.",
+      "path": "Samples~/TwoCubes"
+    }
+  ]
+}

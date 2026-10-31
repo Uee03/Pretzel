@@ -18,7 +18,7 @@ namespace Pretzel.Setup.Composition
         private const string ScopeTypeName = "Pretzel.Integrations.VContainer.PretzelLifetimeScope, Pretzel.Integrations.VContainer";
         private const string InstallerBaseTypeName = "Pretzel.Integrations.VContainer.ScriptableInstaller, Pretzel.Integrations.VContainer";
         private const string SettingsTypeName = "VContainer.Unity.VContainerSettings, VContainer";
-        private const string AudioManagerTypeName = "Pretzel.Audio.AudioManager, Pretzel.Audio";
+        private const string AudioServiceTypeName = "Pretzel.Audio.AudioService, Pretzel.Audio";
 
         public static Type ScopeType => Type.GetType(ScopeTypeName);
 
@@ -54,6 +54,19 @@ namespace Pretzel.Setup.Composition
         public static Object RootScopeOf(Object vcontainerSettings)
         {
             return vcontainerSettings == null ? null : new SerializedObject(vcontainerSettings).FindProperty("RootLifetimeScope").objectReferenceValue;
+        }
+
+        public static bool IsDiagnosticsEnabled(Object vcontainerSettings)
+        {
+            return vcontainerSettings != null && new SerializedObject(vcontainerSettings).FindProperty("EnableDiagnostics").boolValue;
+        }
+
+        public static void SetDiagnostics(Object vcontainerSettings, bool enabled)
+        {
+            SerializedObject serialized = new(vcontainerSettings);
+            serialized.FindProperty("EnableDiagnostics").boolValue = enabled;
+            serialized.ApplyModifiedProperties();
+            AssetDatabase.SaveAssetIfDirty(vcontainerSettings);
         }
 
         /// <summary>Creates or repairs every asset. Returns one line per action for the tab.</summary>
@@ -103,7 +116,7 @@ namespace Pretzel.Setup.Composition
                     log.Add($"Added {settings.InstallerName} to {settings.ScopePrefabName}");
                 }
 
-                AddAudioManager(settings, root, log);
+                AddAudioService(settings, root, log);
                 PrefabUtility.SaveAsPrefabAsset(root, path);
                 if (!exists)
                 {
@@ -125,19 +138,19 @@ namespace Pretzel.Setup.Composition
             return AssetDatabase.LoadAssetAtPath<GameObject>(path).GetComponent(scopeType);
         }
 
-        private static void AddAudioManager(CompositionSettings settings, GameObject root, List<string> log)
+        private static void AddAudioService(CompositionSettings settings, GameObject root, List<string> log)
         {
-            Type audioType = Type.GetType(AudioManagerTypeName);
+            Type audioType = Type.GetType(AudioServiceTypeName);
             bool wanted = settings.pretzelServices.Contains(PretzelServiceCatalog.Audio, StringComparer.OrdinalIgnoreCase);
             if (!wanted || audioType == null || root.GetComponentInChildren(audioType, true) != null)
             {
                 return;
             }
 
-            GameObject child = new("AudioManager");
+            GameObject child = new("AudioService");
             child.transform.SetParent(root.transform, false);
             child.AddComponent(audioType);
-            log.Add("Added an AudioManager child to " + settings.ScopePrefabName);
+            log.Add("Added an AudioService child to " + settings.ScopePrefabName);
         }
 
         private static void EnsureVContainerSettings(CompositionSettings settings, Component scope, List<string> log)

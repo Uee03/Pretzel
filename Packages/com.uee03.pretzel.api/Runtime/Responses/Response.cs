@@ -36,7 +36,17 @@ namespace Pretzel.Api
 
         private static readonly IReadOnlyDictionary<string, string> _emptyHeaders = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
 
-        internal static Response<T> Failure(string error) => new(false, 0, default, error, null, false, null);
+        /// <summary>Creates a successful response, for example in a fake <see cref="IApiClient"/>.</summary>
+        public static Response<T> Success(T data, long statusCode = 200, IReadOnlyDictionary<string, string> headers = null)
+        {
+            return new Response<T>(true, statusCode, data, null, null, false, headers);
+        }
+
+        /// <summary>Creates a failed response, for example in a fake <see cref="IApiClient"/>.</summary>
+        public static Response<T> Failure(string error, long statusCode = 0, string errorBody = null, bool timedOut = false)
+        {
+            return new Response<T>(false, statusCode, default, error, errorBody, timedOut, null);
+        }
 
         public override string ToString() => Ok ? $"{StatusCode} OK" : $"{StatusCode} {Error}";
     }

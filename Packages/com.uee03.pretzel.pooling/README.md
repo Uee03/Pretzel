@@ -52,8 +52,17 @@ _projectiles.Release(rocket);
 - Any type Unity can serialize works as the key. Derive a named class (`class ProjectileFactory : PoolFactory<...>`)
   only if you prefer a named type in the Inspector.
 
+## Interfaces
+
+Spawners and gameplay code can depend on **IComponentPool&lt;T&gt;** (`ComponentPool<T>`), **IPoolRegistry** (`PoolRegistry`) and **IPoolFactory&lt;TKey, T&gt;** (`PoolFactory<TKey, T>`) instead of the concrete types, so a test can count spawns with a fake and never instantiate a prefab. `GetPool` and `Register` on the interfaces return `IComponentPool<T>`; the concrete classes still return `ComponentPool<T>`.
+
 For non-GameObject objects use `UnityEngine.Pool.ObjectPool<T>`, `ListPool<T>` and friends directly.
 
-## Sample
+## Samples
 
-`Samples~/PoolingUsage`: an enum-keyed projectile factory with prewarming and self-releasing projectiles.
+- `Samples~/PoolingUsage`: an enum-keyed projectile factory with prewarming and self-releasing projectiles.
+- `Samples~/EnemyWaves`: a wave spawner on `PoolFactory` with prewarm sizing, a live cap, return callbacks and pool metrics.
+- `Samples~/BulletsAndImpacts`: pooled bullets that spawn pooled impact effects through an interface (`PoolRegistry` and `ComponentPool<T>`).
+- `Samples~/FloatingText`: pooled UI Toolkit labels for damage numbers with `UnityEngine.Pool.ObjectPool<T>`.
+
+The last three build their scenes in code, so they run without prefabs: add the main component to an empty GameObject.

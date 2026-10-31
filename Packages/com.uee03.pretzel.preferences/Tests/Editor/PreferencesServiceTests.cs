@@ -76,6 +76,20 @@ namespace Pretzel.Preferences.Tests
         }
 
         [Test]
+        public void WorksThroughTheInterface()
+        {
+            IPreferencesService service = new PreferencesService(_store);
+            int changed = 0;
+            service.Changed += _ => changed++;
+            service.Modify(p => p.audio.sfx = 0.5f, save: true);
+
+            IPreferencesService reloaded = new PreferencesService(_store);
+            Assert.That(reloaded.Load().Ok, Is.True);
+            Assert.That(reloaded.Current.audio.sfx, Is.EqualTo(0.5f));
+            Assert.That(changed, Is.EqualTo(1));
+        }
+
+        [Test]
         public void ResetToDefaultsReplacesCurrent()
         {
             PreferencesService service = new(_store);

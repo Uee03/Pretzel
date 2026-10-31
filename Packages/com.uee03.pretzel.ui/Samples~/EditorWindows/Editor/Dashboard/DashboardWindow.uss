@@ -1,0 +1,44 @@
+.pretzel-dashboard__stats {
+    flex-direction: row;
+    flex-wrap: wrap;
+    margin-bottom: var(--pretzel-sample-gap);
+}
+
+.pretzel-dashboard__card {
+    width: 31%;
+    min-width: 90px;
+    margin: 0 var(--pretzel-sample-gap) var(--pretzel-sample-gap) 0;
+    padding: var(--pretzel-sample-gap);
+    background-color: var(--pretzel-sample-surface);
+    border-width: 1px;
+    border-color: var(--pretzel-sample-border);
+    border-radius: var(--pretzel-sample-radius);
+    transition-property: background-color;
+    transition-duration: 0.15s;
+}
+
+.pretzel-dashboard__card:hover {
+    background-color: var(--pretzel-sample-surface-hover);
+}
+
+.pretzel-dashboard__card-value {
+    -unity-font-style: bold;
+    font-size: 18px;
+}
+
+.pretzel-dashboard__card-caption {
+    color: var(--pretzel-sample-muted);
+}
+
+.pretzel-dashboard__progress {
+    margin-bottom: var(--pretzel-sample-gap);
+}
+
+.pretzel-dashboard__button {
+    flex-grow: 1;
+    flex-basis: 0;
+}
+
+.pretzel-dashboard__button--primary {
+    border-color: var(--pretzel-sample-accent);
+}

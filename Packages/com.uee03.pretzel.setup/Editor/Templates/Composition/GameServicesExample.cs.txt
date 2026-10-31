@@ -1,0 +1,77 @@
+using System;
+using System.IO;
+using System.Threading;
+using Pretzel.Data;
+using UnityEngine;
+using VContainer.Unity;
+
+namespace #NAMESPACE#
+{
+    /// <summary>
+    /// How a class uses the services: ask for the interfaces in the constructor, load before use, subscribe to events,
+    /// call methods, and clean up in Dispose. It plays one short session on every start, so untick "Usage example" in
+    /// Pretzel > Project Setup > VContainer and delete this file when you no longer need it.
+    /// </summary>
+    public sealed class GameServicesExample : IStartable, IDisposable
+    {
+        private readonly IGameService _game;
+        private readonly ISaveService _save;
+        private readonly CancellationTokenSource _cancellation = new();
+
+        public GameServicesExample(IGameService game, ISaveService save)
+        {
+            _game = game;
+            _save = save;
+        }
+
+        public void Start()
+        {
+            _game.StateChanged += OnStateChanged;
+            _game.ScoreChanged += OnScoreChanged;
+            RunAsync(_cancellation.Token);
+        }
+
+        public void Dispose()
+        {
+            _cancellation.Cancel();
+            _cancellation.Dispose();
+            _game.StateChanged -= OnStateChanged;
+            _game.ScoreChanged -= OnScoreChanged;
+        }
+
+        // async void is the entry from a synchronous Start, so every exception is handled here.
+        private async void RunAsync(CancellationToken cancellationToken)
+        {
+            try
+            {
+                bool hasSave = await _save.ExistsAsync(new DataKey(GameService.ProgressName, null, GameService.SaveFolder), cancellationToken);
+                await _game.LoadProgressAsync(cancellationToken);
+                Debug.Log($"Progress loaded (save file: {hasSave}): high score {_game.HighScore}, {_game.GamesPlayed} games played");
+            }
+            catch (OperationCanceledException)
+            {
+                return;
+            }
+            catch (InvalidDataException ex)
+            {
+                Debug.LogError("Progress could not be loaded and was left untouched: " + ex.Message);
+                return;
+            }
+
+            _game.StartGame();
+            _game.AddScore(100);
+            _game.Pause();
+            _game.AddScore(1000);
+            _game.Resume();
+            _game.AddScore(50);
+            _game.EndGame();
+
+            Debug.Log($"Game recorded: high score {_game.HighScore}, {_game.GamesPlayed} games played");
+            _game.ReturnToMenu();
+        }
+
+        private void OnStateChanged(GameState state) => Debug.Log("Game state: " + state);
+
+        private void OnScoreChanged(int score) => Debug.Log("Score: " + score);
+    }
+}

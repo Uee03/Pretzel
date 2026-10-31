@@ -8,17 +8,17 @@ dependencies. Do not run a second Editor against an open or locked project.
 
 | Gate | Scope | Evidence / required follow-up |
 |---|---|---|
-| Unity 6000.6.5f1, Windows Editor | Seventeen first-party packages, EditMode suites of thirteen packages, DataIO samples | Local validation; results below |
+| Unity 6000.6.5f1, Windows Editor | Eighteen first-party packages, EditMode suites of fifteen packages, DataIO samples | Local validation; results below |
+| Cloud and Multiplayer packages | Unity Gaming Services adapters (Authentication 3.8.0, Cloud Save 3.4.2, Cloud Code 2.10.4, Remote Config 4.2.5) and Netcode for GameObjects 2.13.3 + Multiplayer Services 2.4.1 | Compile and fake-backed tests (2026-10-29), plus 4 live PlayMode smoke tests in `TestPretzel/Assets/_Project/Tests/LiveServices` (category `LiveServices`: anonymous sign-in, Cloud Save round trip, Cloud Code missing-module failure, Relay session host/find/ready/start/leave) passed against a linked project (2026-10-31). Remote Config, account linking, two real devices, multi-platform and performance were not run |
 | Scene loading, PlayMode | `SceneLoader` pipeline, policies, groups, preload, cancellation, failure cleanup and fallback with generated test scenes | 17 PlayMode tests passed twice in a clean host, 6000.6.5f1 (2026-10-27) |
 | Package samples | Every `Samples~` folder imported into one host | Compiled with zero C# errors and warnings (integration samples are skipped by their define constraints) |
 | Generated examples | Plain, binary and AES use cases and the profile service and startup | Separate compile gate; generation tests also inspect source |
-| UI Toolkit theme template | `PretzelTheme.tss` imported as a theme | Imported without errors |
-| Unity 6000.0 minimum | Clean consumer tests and generated examples | Not executed. World-space helpers compile only on 6000.2 or newer by design |
+| Unity 6000.0.85f1, Windows Editor | The same clean host as 6000.6 below, with registry package versions for 6000.0 (Test Framework 1.4.5, UGUI 2.0.0) | 705 of 705 EditMode and 27 of 27 PlayMode tests passed, zero compiler errors or warnings (2026-10-31) |
 | Player persistence | Save, quit, relaunch, load; previous-release saves | Required per shipping platform; not proven by EditMode |
 | IL2CPP / stripping, Windows x64 | Generated AES startup and profile service; plain, binary (async) and encrypted round trips | One local smoke player, 6000.6.5f1, Managed Stripping High, passed (2026-10-24). Audio, scenes, pooling and the console were not part of it |
 | IL2CPP on other platforms, consoles, mobile | Actual player and backend | Not certified |
 | Runtime behaviour in a player | Scene transitions in a player, audio mixing, safe area on notched devices, world-space panels, console input | Manual checks; scene loading is covered in the Editor by PlayMode tests only |
-| R3, UniTask, LitMotion adapters | Third-party packages present | Optional assemblies are absent from clean hosts unless those packages are installed. `Pretzel.Integrations.R3` compiled against R3 1.3.0 on 6000.6.5f1 (2026-10-27); R3's own Editor tree view does not compile on 6000.6 (obsolete `TreeView` API) |
+| R3, UniTask, LitMotion adapters | Third-party packages present | Optional assemblies are absent from clean hosts unless those packages are installed. `Pretzel.Integrations.R3` and `Pretzel.Integrations.R3.Events` compiled against R3 1.3.0 and tested on 6000.0.85f1 and 6000.6.5f1 (2026-10-31); `Pretzel.Integrations.UniTask` compiled against UniTask 2.5.10 on both. R3's and UniTask's own Editor tree views do not compile on 6000.6 (obsolete `TreeView` API), so a 6000.6 host embeds them without their `Editor` folders; 6000.0 compiles them as they are |
 | Performance and size | Representative target-player payloads | No speed, size or allocation claim |
 
 ## Reproduce a clean local run
@@ -47,7 +47,8 @@ if ([int]$results.'test-run'.total -lt 1 -or
 ```
 
 The script copies every first-party package as an embedded, testable package, pins the test, Newtonsoft and UGUI
-dependencies and imports the DataIO usage samples. `-UseInstalledPackages` uses the matching packages already in
+dependencies and imports the DataIO usage samples. For the 6000.0 gate, omit `-UseInstalledPackages` and pass
+`-UnityVersion 6000.0.85f1`: the defaults are the 6000.0 versions. `-UseInstalledPackages` uses the matching packages already in
 `TestPretzel/Library/PackageCache` for offline runs and fails if an expected cache entry is missing or ambiguous.
 The script never overwrites or deletes a destination.
 
@@ -101,13 +102,31 @@ validation. They do not replace a shipped-player upgrade exercise.
    files, and the actual backend, stripping level and platform settings.
 6. Retain AES keys needed by supported saves. A new release does not require key rotation.
 7. If a gate cannot run, record the missing Editor, platform or device and do not advertise that target as certified.
+8. Pretzel targets Unity 6000.0 and newer only. When an API exists only from a later release (or must be avoided from a
+   later release), guard it with the version define, for example `#if UNITY_6000_2_OR_NEWER`, and keep the code
+   compiling on 6000.0. Today the only guarded code is the world-space UI helpers (`UNITY_6000_2_OR_NEWER`); the whole
+   repository compiles without warnings on both 6000.0.85f1 and 6000.6.5f1. Validate on the oldest and the newest
+   installed Editor before a release.
+
+### Local results after 0.2.0 (unreleased changes, 2026-10-31)
+
+- Unity 6000.0.85f1 and 6000.6.5f1 / Windows, clean hosts with every package, all 32 samples and the Unity Gaming
+  Services, Netcode, Input System, R3, UniTask and VContainer packages installed: **705 of 705 EditMode and 27 of 27
+  PlayMode tests passed on each Editor, zero skipped, zero compiler errors or warnings**.
+
+### Local results after 0.2.0 (unreleased changes, 2026-10-29)
+
+- Unity 6000.6.5f1 / Windows, clean host with every package, all 32 samples and the Unity Gaming Services, Netcode and
+  Input System packages installed: **688 of 688 EditMode tests passed, zero skipped, zero compiler errors or warnings**.
+  Multiplayer additionally passed its PlayMode tests (local loopback host, two players, pooled spawn) in a package host.
+- `Update-ModuleCatalog.ps1 -Check` and `Update-SampleCatalog.ps1 -Check` pass (17 modules, 32 samples).
 
 ### Local results for v0.2.0
 
 - Unity 6000.6.5f1 / Windows, clean host with seventeen embedded packages: **269 of 269 EditMode tests passed, zero
   skipped**, across core, extensions, tween, api, data, events, pooling, scenes, ui, audio, preferences, devconsole and
   setup.
-- Every package sample compiled in one host with zero C# errors and warnings; the theme template imported cleanly.
+- Every package sample compiled in one host with zero C# errors and warnings.
 - The generated DataIO examples (AES startup) compiled with zero C# errors and warnings.
 - `Update-ModuleCatalog.ps1 -Check` passed with sixteen modules.
-- Unity 6000.0, Linux, player, IL2CPP for the new modules, and visual and interaction checks remain unrun.
+- Linux, player and IL2CPP builds for the new modules, and visual and interaction checks remain unrun.

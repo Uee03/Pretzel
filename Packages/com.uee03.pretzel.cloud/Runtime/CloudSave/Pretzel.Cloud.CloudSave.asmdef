@@ -1,0 +1,27 @@
+{
+  "name": "Pretzel.Cloud.CloudSave",
+  "rootNamespace": "Pretzel.Cloud.CloudSave",
+  "references": [
+    "Pretzel.Core",
+    "Pretzel.Cloud",
+    "Unity.Services.Core",
+    "Unity.Services.CloudSave"
+  ],
+  "includePlatforms": [],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": true,
+  "defineConstraints": [
+    "PRETZEL_UGS_CLOUDSAVE"
+  ],
+  "versionDefines": [
+    {
+      "name": "com.unity.services.cloudsave",
+      "expression": "3.4.2",
+      "define": "PRETZEL_UGS_CLOUDSAVE"
+    }
+  ],
+  "noEngineReferences": false
+}

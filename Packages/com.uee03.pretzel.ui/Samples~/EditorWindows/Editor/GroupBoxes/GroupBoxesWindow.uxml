@@ -1,0 +1,40 @@
+<engine:UXML xmlns:engine="UnityEngine.UIElements" xmlns:editor="UnityEditor.UIElements">
+    <engine:ScrollView name="groupboxes__scroll" class="pretzel-sample__body">
+        <engine:Label text="GroupBox, Foldout and ScrollView" class="pretzel-sample__title" />
+        <engine:Label text="This layout is UXML. GroupBoxesWindow.uss styles it and GroupBoxesWindow.cs only wires up behaviour." class="pretzel-sample__caption" />
+
+        <engine:GroupBox name="groupboxes__quality" text="Quality: radio buttons in a GroupBox" class="pretzel-groupboxes__section pretzel-groupboxes__section--accent">
+            <engine:RadioButton name="groupboxes__quality-low" label="Low" />
+            <engine:RadioButton name="groupboxes__quality-medium" label="Medium" value="true" />
+            <engine:RadioButton name="groupboxes__quality-high" label="High" />
+        </engine:GroupBox>
+
+        <engine:GroupBox name="groupboxes__options" text="Options: a RadioButtonGroup" class="pretzel-groupboxes__section">
+            <engine:RadioButtonGroup name="groupboxes__detail" label="Detail" choices="Coarse,Normal,Fine" value="1" />
+            <engine:Toggle name="groupboxes__shadows" label="Shadows" value="true" />
+        </engine:GroupBox>
+
+        <engine:VisualElement class="pretzel-groupboxes__toolbar">
+            <engine:Button name="groupboxes__expand" text="Expand All" />
+            <engine:Button name="groupboxes__collapse" text="Collapse All" />
+        </engine:VisualElement>
+
+        <engine:Foldout name="groupboxes__advanced" text="Advanced" value="true" class="pretzel-groupboxes__section pretzel-groupboxes__section--warning">
+            <engine:Label text="Foldouts nest. Their open state is kept per window through view data." class="pretzel-sample__caption" />
+            <engine:Foldout name="groupboxes__nested-a" text="Nested A" value="false">
+                <engine:IntegerField label="Samples" value="4" />
+                <engine:Slider label="Strength" low-value="0" high-value="1" value="0.5" />
+            </engine:Foldout>
+            <engine:Foldout name="groupboxes__nested-b" text="Nested B" value="false">
+                <engine:TextField label="Tag" value="Untagged" />
+                <editor:ColorField label="Tint" />
+            </engine:Foldout>
+        </engine:Foldout>
+
+        <engine:GroupBox text="ScrollView with a fixed height" class="pretzel-groupboxes__section">
+            <engine:ScrollView name="groupboxes__log" class="pretzel-groupboxes__log" />
+        </engine:GroupBox>
+
+        <engine:Label name="groupboxes__status" class="pretzel-sample__status" />
+    </engine:ScrollView>
+</engine:UXML>

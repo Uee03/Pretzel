@@ -58,8 +58,9 @@ protected override void OnUnbind(VisualElement root) => _bindings.ForEach(b => b
 
 ## Themes
 
-Create a runtime theme with **Assets > Create > Pretzel > UI Toolkit Theme** (Pretzel Templates) and assign it to
-PanelSettings > Theme Style Sheet. It imports Unity's default runtime theme and overrides it through variables.
+Create a runtime theme with **Assets > Create > UI Toolkit > TSS Theme File**, import Unity's default runtime theme in
+it (`@import url("unity-theme://default");`), override it through variables, and assign it to
+PanelSettings > Theme Style Sheet.
 
 ## Editor helpers
 
@@ -76,3 +77,9 @@ windows:
 - `Samples~/UIUsage`: a controller that builds a panel and fades it with the extension methods.
 - `Samples~/GameUIHelpers`: a menu with an options screen, a modal dialog, toasts, a safe-area root and a name tag.
 - `Samples~/EditorUIHelpers`: an editor window and a custom inspector built with `EditorUI` and `InspectorBase`.
+- `Samples~/EditorWindows`: UI Toolkit editor windows by topic: basics, group boxes, lists, tabs, tables and a dashboard.
+- `Samples~/CustomInspectors`: `CreateInspectorGUI` editors: default layout plus extras, fully custom, components, ScriptableObjects, multi-object.
+- `Samples~/PropertyDrawers`: drawers in three levels (basic, intermediate, advanced) with a demo component for each.
+
+Import a sample from `Window > Package Manager > Pretzel UI > Samples > Import`. The editor-tool samples add menu
+items under `Pretzel > Samples`.

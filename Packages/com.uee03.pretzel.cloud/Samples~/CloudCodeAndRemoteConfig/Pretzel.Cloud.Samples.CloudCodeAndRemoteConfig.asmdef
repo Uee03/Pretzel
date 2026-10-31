@@ -1,0 +1,41 @@
+{
+  "name": "Pretzel.Cloud.Samples.CloudCodeAndRemoteConfig",
+  "rootNamespace": "Pretzel.Samples.Cloud.CodeAndConfig",
+  "references": [
+    "Pretzel.Core",
+    "Pretzel.Data",
+    "Pretzel.Cloud",
+    "Pretzel.Cloud.Authentication",
+    "Pretzel.Cloud.CloudCode",
+    "Pretzel.Cloud.RemoteConfig"
+  ],
+  "includePlatforms": [],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": true,
+  "defineConstraints": [
+    "PRETZEL_UGS_AUTHENTICATION",
+    "PRETZEL_UGS_CLOUDCODE",
+    "PRETZEL_UGS_REMOTECONFIG"
+  ],
+  "versionDefines": [
+    {
+      "name": "com.unity.services.authentication",
+      "expression": "3.8.0",
+      "define": "PRETZEL_UGS_AUTHENTICATION"
+    },
+    {
+      "name": "com.unity.services.cloudcode",
+      "expression": "[2.10.4,3.0.0)",
+      "define": "PRETZEL_UGS_CLOUDCODE"
+    },
+    {
+      "name": "com.unity.remote-config",
+      "expression": "4.2.5",
+      "define": "PRETZEL_UGS_REMOTECONFIG"
+    }
+  ],
+  "noEngineReferences": false
+}

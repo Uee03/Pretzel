@@ -1,0 +1,22 @@
+{
+  "name": "Pretzel.Integrations.R3.Events.Tests",
+  "rootNamespace": "Pretzel.Integrations.Tests",
+  "references": ["Pretzel.Integrations.R3.Events", "Pretzel.Events", "R3.Unity", "UnityEngine.TestRunner", "UnityEditor.TestRunner"],
+  "includePlatforms": ["Editor"],
+  "overrideReferences": true,
+  "precompiledReferences": ["nunit.framework.dll", "R3.dll"],
+  "autoReferenced": false,
+  "defineConstraints": ["UNITY_INCLUDE_TESTS", "PRETZEL_R3", "PRETZEL_EVENTS"],
+  "versionDefines": [
+    {
+      "name": "com.cysharp.r3",
+      "expression": "",
+      "define": "PRETZEL_R3"
+    },
+    {
+      "name": "com.uee03.pretzel.events",
+      "expression": "",
+      "define": "PRETZEL_EVENTS"
+    }
+  ]
+}

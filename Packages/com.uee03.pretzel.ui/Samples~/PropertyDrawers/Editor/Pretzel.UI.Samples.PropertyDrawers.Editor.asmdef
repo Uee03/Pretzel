@@ -1,0 +1,19 @@
+{
+  "name": "Pretzel.UI.Samples.PropertyDrawers.Editor",
+  "rootNamespace": "Pretzel.Samples.UI.PropertyDrawers.Editors",
+  "references": [
+    "Pretzel.UI.Editor",
+    "Pretzel.UI.Samples.PropertyDrawers.Runtime"
+  ],
+  "includePlatforms": [
+    "Editor"
+  ],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": false,
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": false
+}

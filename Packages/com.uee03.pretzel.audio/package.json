@@ -3,7 +3,7 @@
   "displayName": "Pretzel Audio",
   "version": "0.2.0",
   "unity": "6000.0",
-  "description": "An audio manager with pooled AudioSources, AudioCue assets, per-channel volume through an AudioMixer or directly, and crossfading music.",
+  "description": "An audio service with pooled AudioSources, AudioCue assets, per-channel volume through an AudioMixer or directly, and crossfading music.",
   "author": { "name": "Uee03" },
   "license": "MIT",
   "dependencies": {

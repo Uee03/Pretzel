@@ -1,0 +1,43 @@
+using System;
+using System.Threading;
+using UnityEngine;
+
+namespace #NAMESPACE#
+{
+    /// <summary>The state of the current session and the progress kept between sessions. Calls that do not fit the current state are ignored.</summary>
+    public interface IGameService
+    {
+        event Action<GameState> StateChanged;
+
+        event Action<int> ScoreChanged;
+
+        GameState State { get; }
+
+        int Score { get; }
+
+        int HighScore { get; }
+
+        int GamesPlayed { get; }
+
+        /// <summary>False until <see cref="LoadProgressAsync"/> succeeds. Progress is only saved once it was loaded.</summary>
+        bool IsLoaded { get; }
+
+        /// <summary>Call once at startup. Throws <see cref="System.IO.InvalidDataException"/> when the saved progress is corrupt.</summary>
+        Awaitable LoadProgressAsync(CancellationToken cancellationToken = default);
+
+        /// <summary>From Menu or GameOver: resets the score and starts playing.</summary>
+        void StartGame();
+
+        void AddScore(int points);
+
+        void Pause();
+
+        void Resume();
+
+        /// <summary>From Playing or Paused: records the result and saves progress.</summary>
+        void EndGame();
+
+        /// <summary>Back to the menu. A running game is abandoned without being recorded.</summary>
+        void ReturnToMenu();
+    }
+}

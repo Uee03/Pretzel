@@ -1,0 +1,68 @@
+/* Shared by every window in this sample. Window specific rules live next to each window. */
+
+.pretzel-sample {
+    --pretzel-sample-gap: 6px;
+    --pretzel-sample-radius: 3px;
+    --pretzel-sample-surface: rgba(128, 128, 128, 0.12);
+    --pretzel-sample-surface-hover: rgba(128, 128, 128, 0.22);
+    --pretzel-sample-border: var(--unity-colors-default-border);
+    --pretzel-sample-accent: var(--unity-colors-highlight-background);
+    --pretzel-sample-muted: rgba(128, 128, 128, 1);
+
+    flex-grow: 1;
+}
+
+.pretzel-sample__body {
+    flex-grow: 1;
+    padding: var(--pretzel-sample-gap);
+}
+
+.pretzel-sample__title {
+    -unity-font-style: bold;
+    font-size: 14px;
+    margin-bottom: var(--pretzel-sample-gap);
+}
+
+.pretzel-sample__caption {
+    color: var(--pretzel-sample-muted);
+    margin-bottom: var(--pretzel-sample-gap);
+    white-space: normal;
+}
+
+.pretzel-sample__row {
+    flex-direction: row;
+    align-items: center;
+    margin-bottom: var(--pretzel-sample-gap);
+}
+
+.pretzel-sample__row > Button {
+    flex-grow: 1;
+    flex-basis: 0;
+}
+
+.pretzel-sample__panel {
+    background-color: var(--pretzel-sample-surface);
+    border-width: 1px;
+    border-color: var(--pretzel-sample-border);
+    border-radius: var(--pretzel-sample-radius);
+    padding: var(--pretzel-sample-gap);
+    margin-bottom: var(--pretzel-sample-gap);
+}
+
+.pretzel-sample__status {
+    color: var(--pretzel-sample-muted);
+    padding: 2px var(--pretzel-sample-gap);
+}
+
+/* EditorUI blocks used by the Basics window */
+.pretzel-editor__section {
+    margin-bottom: var(--pretzel-sample-gap);
+}
+
+.pretzel-editor__help {
+    margin-bottom: var(--pretzel-sample-gap);
+}
+
+.pretzel-editor__row > .unity-base-field {
+    flex-grow: 1;
+}

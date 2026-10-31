@@ -1,0 +1,34 @@
+{
+  "name": "Pretzel.Integrations.R3.Events",
+  "rootNamespace": "Pretzel.Integrations.R3",
+  "references": [
+    "Pretzel.Core",
+    "Pretzel.Events",
+    "R3.Unity"
+  ],
+  "includePlatforms": [],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": true,
+  "precompiledReferences": [
+    "R3.dll"
+  ],
+  "autoReferenced": true,
+  "defineConstraints": [
+    "PRETZEL_R3",
+    "PRETZEL_EVENTS"
+  ],
+  "versionDefines": [
+    {
+      "name": "com.cysharp.r3",
+      "expression": "",
+      "define": "PRETZEL_R3"
+    },
+    {
+      "name": "com.uee03.pretzel.events",
+      "expression": "",
+      "define": "PRETZEL_EVENTS"
+    }
+  ],
+  "noEngineReferences": false
+}

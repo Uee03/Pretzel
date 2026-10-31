@@ -48,7 +48,7 @@ namespace Pretzel.Integrations.VContainer
 
         private InvalidOperationException EmptySlot(string list, int index)
         {
-            return new InvalidOperationException($"{name}: {list} element {index} is empty. Assign it or remove the slot.");
+            return new InvalidOperationException($"{name}: {list} element {index} is empty, or its asset's script is missing. Assign it, restore the script or remove the slot.");
         }
     }
 }

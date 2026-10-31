@@ -30,4 +30,6 @@ in handlers are shown as text, not thrown. `help` and `clear` are built in.
 
 ## Sample
 
-`Samples~/DevConsoleUsage`: timescale, god mode and fps commands.
+`Samples~/DevConsoleUsage`: a small playable arena. The commands change real game state (health and god mode, enemies,
+gold, position, live tuning values and time scale), so you can see how to connect commands to a game, not only how to
+register them.

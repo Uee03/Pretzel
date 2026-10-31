@@ -1,0 +1,36 @@
+.pretzel-groupboxes__section {
+    background-color: var(--pretzel-sample-surface);
+    border-width: 1px 1px 1px 4px;
+    border-color: var(--pretzel-sample-border);
+    border-radius: var(--pretzel-sample-radius);
+    padding: var(--pretzel-sample-gap);
+    margin-bottom: var(--pretzel-sample-gap);
+}
+
+.pretzel-groupboxes__section--accent {
+    border-left-color: var(--pretzel-sample-accent);
+}
+
+.pretzel-groupboxes__section--warning {
+    border-left-color: rgb(214, 160, 40);
+}
+
+.pretzel-groupboxes__toolbar {
+    flex-direction: row;
+    margin-bottom: var(--pretzel-sample-gap);
+}
+
+.pretzel-groupboxes__toolbar > Button {
+    flex-grow: 1;
+    flex-basis: 0;
+}
+
+.pretzel-groupboxes__log {
+    height: 90px;
+    border-width: 1px;
+    border-color: var(--pretzel-sample-border);
+}
+
+.pretzel-groupboxes__log-line {
+    padding: 1px 4px;
+}

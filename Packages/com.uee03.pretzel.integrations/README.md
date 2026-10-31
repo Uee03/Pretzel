@@ -9,6 +9,7 @@ Each library has its own assembly under `Runtime/`. An assembly compiles only wh
 | `Runtime/LitMotion` | `Pretzel.Integrations.LitMotion` | [LitMotion](https://github.com/annulusgames/LitMotion) v2.0.2 | `com.annulusgames.lit-motion` | `PRETZEL_LITMOTION` |
 | `Runtime/UniTask` | `Pretzel.Integrations.UniTask` | [UniTask](https://github.com/Cysharp/UniTask) 2.5.11 | `com.cysharp.unitask` | `PRETZEL_UNITASK` |
 | `Runtime/R3` | `Pretzel.Integrations.R3` | [R3](https://github.com/Cysharp/R3) 1.3.1 | `com.cysharp.r3` | `PRETZEL_R3` |
+| `Runtime/R3Events` | `Pretzel.Integrations.R3.Events` | R3 and `pretzel.events` | `com.cysharp.r3` and `com.uee03.pretzel.events` | `PRETZEL_R3` and `PRETZEL_EVENTS` |
 | `Runtime/VContainer` | `Pretzel.Integrations.VContainer` | [VContainer](https://github.com/hadashiA/VContainer) 1.19.0 | `jp.hadashikick.vcontainer` | `PRETZEL_VCONTAINER` |
 
 ## VContainer
@@ -45,7 +46,7 @@ using Pretzel.Integrations.UniTask;
 Response<Item> item = await client.GetJsonUniTaskAsync<Item>("items/1", cancellationToken: token);
 ```
 
-`ApiClient` extensions: `GetUniTaskAsync`, `PostUniTaskAsync`, `GetJsonUniTaskAsync`, `PostJsonUniTaskAsync`, `DownloadTextureUniTaskAsync` and `DownloadFileUniTaskAsync`. They take the same arguments as the `Async` methods. For other `Awaitable` values, UniTask already provides `AsUniTask()`.
+`ApiClient` extensions: `GetUniTaskAsync`, `PostUniTaskAsync`, `GetJsonUniTaskAsync`, `PostJsonUniTaskAsync`, `DownloadTextureUniTaskAsync` and `DownloadFileUniTaskAsync`. They extend `IApiClient`, so they work on a fake client in tests too, and take the same arguments as the `Async` methods. For other `Awaitable` values, UniTask already provides `AsUniTask()`.
 
 ## R3
 
@@ -64,7 +65,36 @@ client.GetJsonAsObservable<Item>("items/1").Subscribe(response => { });
 ```
 
 - `VisualElement.EventAsObservable<TEvent>()` and `Button.ClickedAsObservable()` unregister their callbacks when disposed.
-- `ApiClient.GetAsObservable`, `GetJsonAsObservable` and `PostJsonAsObservable`.
+- `IApiClient.GetAsObservable`, `GetJsonAsObservable` and `PostJsonAsObservable`.
+
+### R3 and Pretzel Events
+
+An optional second assembly, `Pretzel.Integrations.R3.Events`, compiles only when both R3 and `pretzel.events` are installed.
+It turns the bus and the ScriptableObject channels into R3 streams, and streams back into events:
+
+```csharp
+using Pretzel.Integrations.R3;
+using R3;
+
+// EventBus
+bus.AsObservable<EnemyDefeated>()
+    .Scan(0, (total, e) => total + e.Points)
+    .Subscribe(total => scoreLabel.text = "Score: " + total)
+    .AddTo(this);
+
+// Channels (assets): the payload stream, and a void channel that emits Unit
+intChannel.AsObservable().Where(hp => hp < 20).Subscribe(_ => ShowWarning()).AddTo(this);
+quitChannel.AsObservable().Subscribe(_ => Quit()).AddTo(this);
+
+// A stream publishes on the bus, or raises a channel
+button.ClickedAsObservable().Select(_ => new MenuOpened()).PublishTo(bus).AddTo(this);
+damage.RaiseOn(damageChannel).AddTo(this);
+```
+
+- `IEventBus.AsObservable<T>()`, `EventChannel<T>.AsObservable()` and `VoidEventChannel.AsObservable()`: subscribing to the stream subscribes to the source, disposing unsubscribes.
+- `Observable<T>.PublishTo(IEventBus)` and `Observable<T>.RaiseOn(EventChannel<T>)` (`Observable<Unit>.RaiseOn(VoidEventChannel)`): the reverse direction.
+- Use it for what R3 is good at: operators (`Where`, `Select`, `Scan`, `Debounce`, `CombineLatest`), time and frame control, and lifetime through `AddTo`. The bus itself stays allocation-free for plain subscribers; each R3 operator in a chain allocates when the chain is built and when it emits through closures, so keep hot per-frame paths on `Subscribe<T>` directly.
+- Both sources are main-thread only, so the streams emit on the main thread.
 
 ## Sample
 

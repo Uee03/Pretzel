@@ -7,6 +7,7 @@ One MonoBehaviour per library, plus one that uses all three. Each folder has its
 | `LitMotion` | `LitMotionDemo` | LitMotion | A tween whose ease is picked from Pretzel's `EaseType`, with `WithEase(EaseType)` and `ToLitMotionEase()` |
 | `UniTask` | `UniTaskDemo` | UniTask | Every `ApiClient` UniTask adapter: parallel GETs with `UniTask.WhenAll`, POSTs, a file download, an optional texture download, and cancellation |
 | `R3` | `R3Demo` | R3 (and its NuGet package) | Click counter, debounced text field, a request that switches on each click, and zipped GET and POST streams |
+| `R3Events` | `R3EventsDemo` | R3 and Pretzel Events | An `EventBus` as a stream: running score, a combo that ends after a pause, and a stream that raises a ScriptableObject channel |
 | `Combined` | `CombinedDemo` | all three | A click starts a request and the result slides in |
 
 ## Run a demo

@@ -1,0 +1,85 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:pretzel="Pretzel.UI" editor-extension-mode="False">
+    <ui:Style src="../Styles/MultiplayerMenu.uss" />
+    <ui:VisualElement name="multiplayer-root" class="pretzel-multiplayer">
+        <pretzel:SafeAreaElement name="safe-area" class="pretzel-multiplayer__safe-area">
+
+            <ui:VisualElement name="screen-mode" class="pretzel-multiplayer__screen">
+                <ui:VisualElement class="pretzel-multiplayer__panel">
+                    <ui:Label text="Multiplayer" class="pretzel-multiplayer__title" />
+                    <ui:TextField name="display-name" label="Display name" max-length="24" class="pretzel-multiplayer__field" />
+                    <ui:SliderInt name="local-players" label="Local players" low-value="1" high-value="4" value="2" show-input-field="true" class="pretzel-multiplayer__field" />
+                    <ui:Toggle name="cross-play" label="Cross-play" value="true" class="pretzel-multiplayer__field" />
+                    <ui:Label name="cross-play-hint" class="pretzel-multiplayer__hint" />
+                    <ui:Button name="mode-local" text="Local co-op" class="pretzel-multiplayer__button pretzel-multiplayer__button--primary" />
+                    <ui:Button name="mode-host" text="Host online" class="pretzel-multiplayer__button" />
+                    <ui:Button name="mode-join" text="Join with code" class="pretzel-multiplayer__button" />
+                    <ui:Button name="mode-quick" text="Quick join" class="pretzel-multiplayer__button" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+
+            <ui:VisualElement name="screen-host" class="pretzel-multiplayer__screen">
+                <ui:VisualElement class="pretzel-multiplayer__panel">
+                    <ui:Label text="Host online" class="pretzel-multiplayer__title" />
+                    <ui:TextField name="session-name" label="Session name" max-length="64" class="pretzel-multiplayer__field" />
+                    <ui:SliderInt name="max-players" label="Max players" low-value="2" high-value="8" value="4" show-input-field="true" class="pretzel-multiplayer__field" />
+                    <ui:Toggle name="private-session" label="Private (join code only)" class="pretzel-multiplayer__field" />
+                    <ui:Button name="host-create" text="Create session" class="pretzel-multiplayer__button pretzel-multiplayer__button--primary" />
+                    <ui:Button name="host-back" text="Back" class="pretzel-multiplayer__button" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+
+            <ui:VisualElement name="screen-join" class="pretzel-multiplayer__screen">
+                <ui:VisualElement class="pretzel-multiplayer__panel pretzel-multiplayer__panel--wide">
+                    <ui:Label text="Join a session" class="pretzel-multiplayer__title" />
+                    <ui:VisualElement class="pretzel-multiplayer__row">
+                        <ui:TextField name="join-code" label="Join code" max-length="32" class="pretzel-multiplayer__field pretzel-multiplayer__field--grow" />
+                        <ui:Button name="join-submit" text="Join" class="pretzel-multiplayer__button pretzel-multiplayer__button--primary" />
+                    </ui:VisualElement>
+                    <ui:Label text="Public sessions" class="pretzel-multiplayer__subtitle" />
+                    <ui:ListView name="session-list" class="pretzel-multiplayer__list" />
+                    <ui:Label name="session-list-empty" text="No sessions found." class="pretzel-multiplayer__hint" />
+                    <ui:VisualElement class="pretzel-multiplayer__row">
+                        <ui:Button name="join-refresh" text="Refresh" class="pretzel-multiplayer__button" />
+                        <ui:Button name="join-back" text="Back" class="pretzel-multiplayer__button" />
+                    </ui:VisualElement>
+                </ui:VisualElement>
+            </ui:VisualElement>
+
+            <ui:VisualElement name="screen-lobby" class="pretzel-multiplayer__screen">
+                <ui:VisualElement class="pretzel-multiplayer__panel pretzel-multiplayer__panel--wide">
+                    <ui:Label name="lobby-title" class="pretzel-multiplayer__title" />
+                    <ui:Label name="lobby-code" class="pretzel-multiplayer__code" />
+                    <ui:Label name="lobby-info" class="pretzel-multiplayer__hint" />
+                    <ui:ListView name="player-list" class="pretzel-multiplayer__list" />
+                    <ui:Button name="lobby-ready" text="Ready" class="pretzel-multiplayer__button" />
+                    <ui:Button name="lobby-start" text="Start match" class="pretzel-multiplayer__button pretzel-multiplayer__button--primary" />
+                    <ui:Button name="lobby-leave" text="Leave" class="pretzel-multiplayer__button pretzel-multiplayer__button--danger" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+
+            <ui:VisualElement name="screen-busy" class="pretzel-multiplayer__screen">
+                <ui:VisualElement class="pretzel-multiplayer__panel">
+                    <ui:Label name="busy-message" class="pretzel-multiplayer__title" />
+                    <ui:ProgressBar name="busy-progress" class="pretzel-multiplayer__progress" />
+                    <ui:Button name="busy-cancel" text="Cancel" class="pretzel-multiplayer__button" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+
+            <ui:VisualElement name="screen-rejoin" class="pretzel-multiplayer__screen pretzel-multiplayer__screen--modal">
+                <ui:VisualElement class="pretzel-multiplayer__panel">
+                    <ui:Label text="Connection lost" class="pretzel-multiplayer__title" />
+                    <ui:Label name="rejoin-message" class="pretzel-multiplayer__hint" />
+                    <ui:Button name="rejoin-accept" text="Rejoin match" class="pretzel-multiplayer__button pretzel-multiplayer__button--primary" />
+                    <ui:Button name="rejoin-decline" text="Return to lobby" class="pretzel-multiplayer__button" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+
+            <ui:VisualElement name="hud" class="pretzel-multiplayer__hud">
+                <ui:Label name="hud-status" class="pretzel-multiplayer__hud-status" />
+                <ui:Button name="hud-leave" text="Leave" class="pretzel-multiplayer__button pretzel-multiplayer__button--danger pretzel-multiplayer__button--small" />
+            </ui:VisualElement>
+
+            <ui:VisualElement name="toasts" picking-mode="Ignore" class="pretzel-multiplayer__toasts" />
+        </pretzel:SafeAreaElement>
+    </ui:VisualElement>
+</ui:UXML>

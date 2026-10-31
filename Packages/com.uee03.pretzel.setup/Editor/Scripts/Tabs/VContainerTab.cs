@@ -17,6 +17,8 @@ namespace Pretzel.Setup.Tabs
     public sealed class VContainerTab : IPretzelTab
     {
         private const string GuidePath = "Packages/com.uee03.pretzel.integrations/Documentation~/VContainer.md";
+        private const string DiagnosticsMenu = "Window/VContainer Diagnostics";
+        private const string OfficialDocsUrl = "https://vcontainer.hadashikick.jp/";
 
         private PretzelTabContext _context;
         private Label _vcontainerStatus;
@@ -27,6 +29,11 @@ namespace Pretzel.Setup.Tabs
         private TextField _apiUrl;
         private VisualElement _serviceRows;
         private Label _result;
+        private Toggle _starter;
+        private Toggle _starterExample;
+        private Label _starterHint;
+        private Toggle _diagnostics;
+        private HelpBox _diagnosticsWarning;
         private readonly Dictionary<string, Toggle> _pretzelToggles = new(StringComparer.OrdinalIgnoreCase);
 
         public string Title => "VContainer";
@@ -42,9 +49,11 @@ namespace Pretzel.Setup.Tabs
             view.AddToClassList("pretzel-tab");
             view.Add(CreateStatusSection());
             view.Add(CreateProjectSection());
+            view.Add(CreateStarterSection());
             view.Add(CreatePretzelSection());
             view.Add(CreateServicesSection());
             view.Add(CreateActionsSection());
+            view.Add(CreateDiagnosticsSection());
 
             _context.SettingsReset += Rebuild;
             view.RegisterCallback<AttachToPanelEvent>(_ =>
@@ -74,6 +83,7 @@ namespace Pretzel.Setup.Tabs
 
             _install = Action(section, "Install VContainer", InstallVContainer, primary: true);
             Action(section, "Open the VContainer guide", OpenGuide);
+            Action(section, "Open the official VContainer documentation", () => Application.OpenURL(OfficialDocsUrl));
             return section;
         }
 
@@ -98,6 +108,30 @@ namespace Pretzel.Setup.Tabs
 
             _assemblyWarning = new HelpBox(string.Empty, HelpBoxMessageType.Warning);
             section.Add(_assemblyWarning);
+            return section;
+        }
+
+        private VisualElement CreateStarterSection()
+        {
+            VisualElement section = Section("Starter services");
+            _starterHint = Hint(section);
+
+            _starter = new Toggle("SaveService and GameService");
+            _starter.RegisterValueChangedCallback(evt =>
+            {
+                Settings.starterServices = evt.newValue;
+                _context.MarkProjectDirty();
+                Refresh();
+            });
+            section.Add(_starter);
+
+            _starterExample = new Toggle("Usage example (GameServicesExample)");
+            _starterExample.RegisterValueChangedCallback(evt =>
+            {
+                Settings.starterExample = evt.newValue;
+                _context.MarkProjectDirty();
+            });
+            section.Add(_starterExample);
             return section;
         }
 
@@ -151,6 +185,32 @@ namespace Pretzel.Setup.Tabs
             return section;
         }
 
+        private VisualElement CreateDiagnosticsSection()
+        {
+            VisualElement section = Section("Diagnostics");
+            Hint(section).text = "Records every scope, registration and resolve for the VContainer Diagnostics window. " +
+                                 "Collection also runs in player builds and costs performance, so turn it off before a release build.";
+
+            _diagnostics = new Toggle("Enable diagnostics");
+            _diagnostics.RegisterValueChangedCallback(evt =>
+            {
+                UnityEngine.Object settings = CompositionAssets.PreloadedSettings();
+                if (settings != null)
+                {
+                    CompositionAssets.SetDiagnostics(settings, evt.newValue);
+                }
+
+                Refresh();
+            });
+            section.Add(_diagnostics);
+
+            _diagnosticsWarning = new HelpBox("Diagnostics are on. Player builds will collect them too.", HelpBoxMessageType.Warning);
+            section.Add(_diagnosticsWarning);
+
+            Action(section, "Open the diagnostics window", () => EditorApplication.ExecuteMenuItem(DiagnosticsMenu));
+            return section;
+        }
+
         #endregion
 
         #region ACTIONS
@@ -168,7 +228,7 @@ namespace Pretzel.Setup.Tabs
             {
                 written = CompositionGenerator.Generate(Settings);
             }
-            catch (ArgumentException ex)
+            catch (Exception ex) when (ex is ArgumentException || ex is InvalidOperationException || ex is IOException)
             {
                 _result.text = ex.Message;
                 return;
@@ -226,7 +286,7 @@ namespace Pretzel.Setup.Tabs
             }
             else
             {
-                Application.OpenURL("https://vcontainer.hadashikick.jp");
+                Application.OpenURL(OfficialDocsUrl);
             }
         }
 
@@ -257,11 +317,18 @@ namespace Pretzel.Setup.Tabs
             _integrationStatus.text = integration
                 ? "Pretzel Integrations: PretzelLifetimeScope, ScriptableInstaller and MonoInstaller are available."
                 : "Pretzel Integrations is not installed, or VContainer is missing. Install the module from the Addons tab.";
-            UnityEngine.Object root = CompositionAssets.RootScopeOf(CompositionAssets.PreloadedSettings());
+            UnityEngine.Object vcontainerSettings = CompositionAssets.PreloadedSettings();
+            UnityEngine.Object root = CompositionAssets.RootScopeOf(vcontainerSettings);
             _rootStatus.text = root != null
                 ? $"Root scope: {root.name}, created before the first scene loads."
                 : "No root scope yet. Use Generate and set up.";
             _install.style.display = vcontainer ? DisplayStyle.None : DisplayStyle.Flex;
+
+            bool diagnostics = CompositionAssets.IsDiagnosticsEnabled(vcontainerSettings);
+            _diagnostics.SetEnabled(vcontainerSettings != null);
+            _diagnostics.label = vcontainerSettings != null ? "Enable diagnostics" : "Enable diagnostics (generate first)";
+            _diagnostics.SetValueWithoutNotify(diagnostics);
+            _diagnosticsWarning.style.display = diagnostics ? DisplayStyle.Flex : DisplayStyle.None;
 
             foreach (PretzelServiceOption option in PretzelServiceCatalog.All)
             {
@@ -270,6 +337,16 @@ namespace Pretzel.Setup.Tabs
                 toggle.label = option.IsInstalled ? option.Label : option.Label + " (module not installed)";
                 toggle.SetValueWithoutNotify(Settings.pretzelServices.Contains(option.Id, StringComparer.OrdinalIgnoreCase));
             }
+
+            bool data = PretzelServiceCatalog.Find(PretzelServiceCatalog.Data).IsInstalled;
+            _starter.SetEnabled(data || Settings.starterServices);
+            _starter.SetValueWithoutNotify(Settings.starterServices);
+            _starterExample.SetEnabled(Settings.starterServices);
+            _starterExample.SetValueWithoutNotify(Settings.starterExample);
+            _starterHint.text = data
+                ? "Ready-to-use ISaveService (Pretzel Data: any type by DataKey, slots, async, corrupt files kept) and IGameService (menu, play, pause, " +
+                  "game over, score and saved high score), registered in the root scope. The example loads progress and plays one short session on start."
+                : "SaveService needs the Pretzel Data module. Install it from the Addons tab, or untick this.";
 
             ShowApiUrl();
             ShowAssemblyWarning();

@@ -1,0 +1,10 @@
+# Two-note coin pickup: a square-wave synth, B5 then E6.
+# Run:  soundcraft-cli script coin-pickup.txt --bounce coin.wav --start 0 --end 0.7
+# Then: soundcraft-cli convert coin.wav coin16.wav --bit-depth 16 --normalize
+session.new {"name":"coin","sample_rate":44100,"bit_depth":16}
+track.new {"kind":"instrument","name":"Coin","instrument":"subtractive_synth","format":"mono"}
+mix.instrument {"track":1,"plugin":"subtractive_synth","params":{"osc1_wave":1,"osc2_wave":1,"osc_mix":0,"cutoff":9000,"resonance":10,"filter_env_amount":0,"amp_attack":1,"amp_decay":120,"amp_sustain":60,"amp_release":150,"velocity":100,"level":-6}}
+midi.new_clip {"track":1}
+# Ids: track 1, the clip is 2 (midi.new_clip prints it). 480 ticks = one quarter note = 0.5 s at 120 BPM.
+midi.note_add {"clip":2,"pitch":83,"start_ticks":0,"length_ticks":100,"velocity":110}
+midi.note_add {"clip":2,"pitch":88,"start_ticks":100,"length_ticks":300,"velocity":110}

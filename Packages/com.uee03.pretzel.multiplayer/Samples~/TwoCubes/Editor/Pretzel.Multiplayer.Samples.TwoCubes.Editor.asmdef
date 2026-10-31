@@ -1,0 +1,21 @@
+{
+  "name": "Pretzel.Multiplayer.Samples.TwoCubes.Editor",
+  "rootNamespace": "Pretzel.Multiplayer.Samples.TwoCubes.Editor",
+  "references": [
+    "Pretzel.Multiplayer",
+    "Pretzel.Multiplayer.Editor",
+    "Pretzel.Multiplayer.Samples.TwoCubes",
+    "Unity.Netcode.Runtime"
+  ],
+  "includePlatforms": [
+    "Editor"
+  ],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": false,
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": false
+}

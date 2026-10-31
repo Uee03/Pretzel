@@ -1,0 +1,17 @@
+{
+  "name": "Pretzel.Cloud.Authentication.Tests",
+  "rootNamespace": "Pretzel.Cloud.Authentication.Tests",
+  "references": ["Pretzel.Cloud", "Pretzel.Cloud.Authentication", "Unity.Services.Core", "Unity.Services.Authentication", "UnityEngine.TestRunner", "UnityEditor.TestRunner"],
+  "includePlatforms": ["Editor"],
+  "overrideReferences": true,
+  "precompiledReferences": ["nunit.framework.dll"],
+  "autoReferenced": false,
+  "defineConstraints": ["UNITY_INCLUDE_TESTS", "PRETZEL_UGS_AUTHENTICATION"],
+  "versionDefines": [
+    {
+      "name": "com.unity.services.authentication",
+      "expression": "3.8.0",
+      "define": "PRETZEL_UGS_AUTHENTICATION"
+    }
+  ]
+}

@@ -1,0 +1,6 @@
+.floating-text {
+    font-size: 22px;
+    -unity-font-style: bold;
+    -unity-text-outline-width: 1px;
+    -unity-text-outline-color: rgba(0, 0, 0, 0.8);
+}

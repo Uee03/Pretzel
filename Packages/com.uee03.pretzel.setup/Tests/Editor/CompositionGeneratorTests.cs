@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using NUnit.Framework;
 using Pretzel.Setup.Composition;
 
@@ -8,7 +9,7 @@ namespace Pretzel.Setup.Tests
     {
         private static CompositionSettings Settings()
         {
-            CompositionSettings settings = new() { namespaceName = "MyGame.Composition", scopeName = "Game" };
+            CompositionSettings settings = new() { namespaceName = "MyGame.Composition", scopeName = "Game", starterServices = false };
             settings.Normalize();
             return settings;
         }
@@ -87,6 +88,52 @@ namespace Pretzel.Setup.Tests
             Assert.Throws<ArgumentException>(() => CompositionGenerator.Validate(folder));
 
             Assert.DoesNotThrow(() => CompositionGenerator.Validate(Settings()));
+        }
+
+        [Test]
+        public void StarterServices_RegisterSaveGameExampleAndDataStore()
+        {
+            CompositionSettings settings = Settings();
+            settings.starterServices = true;
+
+            string source = CompositionGenerator.RegistrationsSource(settings);
+
+            Assert.That(source, Does.Contain("builder.Register<ISaveService, SaveService>(Lifetime.Singleton);"));
+            Assert.That(source, Does.Contain("builder.Register<IGameService, GameService>(Lifetime.Singleton);"));
+            Assert.That(source, Does.Contain("builder.RegisterEntryPoint<GameServicesExample>();"));
+            if (PretzelServiceCatalog.Find(PretzelServiceCatalog.Data).IsInstalled)
+            {
+                Assert.That(source, Does.Contain("builder.Register<IDataStore>(_ => DataIO.Default, Lifetime.Singleton);"));
+            }
+
+            settings.starterExample = false;
+            Assert.That(CompositionGenerator.RegistrationsSource(settings), Does.Not.Contain("GameServicesExample"));
+        }
+
+        [Test]
+        public void StarterServices_ReserveTheirNames()
+        {
+            Assume.That(PretzelServiceCatalog.Find(PretzelServiceCatalog.Data).IsInstalled, Is.True, "data module is not installed.");
+            CompositionSettings settings = Settings();
+            settings.starterServices = true;
+            settings.services.Add(new ServiceDefinition { name = "SaveService" });
+
+            Assert.Throws<ArgumentException>(() => CompositionGenerator.Validate(settings));
+        }
+
+        [Test]
+        public void StarterTemplates_AreFilledInWithTheNamespace()
+        {
+            CompositionSettings settings = Settings();
+            foreach (string template in CompositionGenerator.StarterTemplates.Append(CompositionGenerator.ExampleTemplate))
+            {
+                string source = CompositionTemplates.Render(template, settings);
+
+                Assert.That(source, Does.Contain("namespace MyGame.Composition"), template);
+                Assert.That(source, Does.Contain(" " + template), template);
+                Assert.That(source, Does.Not.Contain("#NAMESPACE#"), template);
+                Assert.That(source, Does.Not.Contain("\r"), template);
+            }
         }
     }
 }

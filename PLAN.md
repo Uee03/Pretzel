@@ -1,7 +1,7 @@
 # Pretzel Plan
 
 Living plan for Pretzel, a modular UPM successor to LazyJedi (`c:\Projects\Git\Unity\lazyjedi`).
-Update the status boxes and the Decisions section as work happens. Last updated: 2026-10-27.
+Update the status boxes and the Decisions section as work happens. Last updated: 2026-10-31.
 
 Status key: `[x]` done, `[ ]` not started, `[~]` partly done.
 
@@ -30,7 +30,7 @@ Status key: `[x]` done, `[ ]` not started, `[~]` partly done.
 | `pretzel.ui.ugui` | UGUI `UIFader`, `OnMouseHoverFade`, `UIFaderEditor`, `UGUIExtensions` | Extras `UIFader` set, `UIExtensions` | `[x]` |
 | `pretzel.editor` | Standalone editor utilities that work in any project (`GroupHierarchyObjects`). No dependencies | Core Editor folder | `[x]` |
 | `pretzel.setup` | Project Setup window shell, Main, Addons, Addons Extra and Settings tabs, settings store, folders, first run, starter kit, catalogs, 2D/3D scene templates. Needs only Newtonsoft.Json | Core Editor folder, `CustomPackages` (expanded) | `[x]` |
-| `pretzel.templates` | Script templates | `ScriptTemplates`, Examples | `[x]` |
+| `pretzel.templates` | Script templates (removed after 0.2.0; scene templates stay in `pretzel.setup`) | `ScriptTemplates`, Examples | `[-]` |
 | `pretzel.integrations` | Optional R3, LitMotion and UniTask adapters, one asmdef each under `Runtime/<Library>`, via `versionDefines`. Split into separate packages if it grows | New | `[x]` |
 
 Dependency direction: `ui.ugui` depends on core, ui, tween and `com.unity.ugui`. `ui` depends on core and tween. `integrations` depends on core, tween, api and ui. `api` depends on core and data. `setup` depends on no Pretzel module. `editor` depends on nothing. Editors that belong to one module live in that module (`data/Editor`, `ui.ugui/Editor`).
@@ -252,3 +252,22 @@ A missing or corrupt file falls back to defaults. One `PretzelSettings` accessor
 - [x] 30. Code style follows `Claude/AgenticAssisstance/templates/dotnet/.editorconfig` through the root `.editorconfig`: LF, final newline, no trailing whitespace, System usings first, `_camelCase` private and static fields, PascalCase constants, `Async` suffix, simple using statements. Exceptions: block-scoped namespaces (Unity compiles C# 9) and usings inside the integration namespaces named after their library.
 - [x] 31. Scene setup phase: `SceneLoadOptions.SetupAsync` runs after activation behind the transition (spawning, pool prewarm, warm-up) with one weighted, never-decreasing progress value, `SubProgress`, status lines (`ISceneStatusDisplay`), `SettleFrames` and `FrameBudget` in core. Level Loading sample: bootstrap scene, additive levels, pooled enemies from `SpawnMarker`s.
 - [x] 32. Production scene loading: `RequestPolicy` (queue, ignore, throw), observable `State`/`Progress` with start and finish events, `SceneLoadReport` telemetry, `SceneGroup` assets, background `PreloadAsync` with a separate activate step, `LoadingPriority`, `FallbackScene` with `SceneLoadException`, cleanup of additive scenes on any failure, and PlayMode tests with generated test scenes.
+
+## Phase 9: after 0.2.0 (unreleased, 2026-10-31)
+
+- [x] 33. `pretzel.templates` removed (script templates); scene templates stay in `pretzel.setup`.
+- [x] 34. Interfaces for composition: `IApiClient`, `IAudioService` (`AudioManager` renamed `AudioService`, same `.meta` GUID), `IComponentPool<T>`, `IPoolRegistry`, `IPoolFactory<TKey, T>`, `IPreferencesService`.
+- [x] 35. VContainer composition root (`PretzelLifetimeScope`) and the Setup VContainer tab with generated installers; R3 event adapters (`Pretzel.Integrations.R3.Events`).
+- [x] 36. New packages `cloud` (UGS Authentication, Cloud Save, Cloud Code, Remote Config, offline-first synced store) and `multiplayer` (Netcode for GameObjects + Multiplayer Services).
+- [x] 37. Generated sample list in the root README (`Update-SampleCatalog.ps1`), more samples (32 in 18 packages), Unity Cloud link stripped from `ProjectSettings.asset` by a git clean filter.
+- [x] 38. Fixes from the 2026-10-31 review: `AudioService` music crossfade orphaned the outgoing track on `StopMusic`; `PlayMusic` with the current clip ignored `volume`; `PoolRegistry` cast failure for one prefab under two component types.
+- Verified 2026-10-31 (6000.6.5f1 clean host with UGS, Netcode, Input System and VContainer): 700/700 EditMode, 27/27 PlayMode, 0 compiler warnings; both standards checks, module and sample catalog checks pass.
+
+## Outstanding
+
+- [ ] Release: every package is still `0.2.0` while the `[Unreleased]` changelog sections contain breaking changes (`AudioManager` -> `AudioService`, templates removed) and `cloud`/`multiplayer` are not in the `v0.2.0` tag. Bump to `0.3.0`, update the README install tag, run `Update-ModuleCatalog.ps1`, tag.
+- [ ] Audio has no component tests: the crossfade fixes above are not covered by automation (needs a PlayMode test that stops music mid-fade).
+- [ ] `CompositionGenerator` skips writing the starter `ISaveService`/`SaveService` when any file with that name exists under `Assets`, without checking the type, both files or asmdef reachability.
+- [ ] `ComponentPool.CountActive` drifts upward when idle instances are destroyed externally (for example a root-less `PoolRegistry` across scene loads); spawn caps based on it can stall.
+- [ ] Not run: player save/quit/relaunch, IL2CPP for the modules added after the 2026-10-24 smoke, Linux/mobile/console players, Remote Config and account linking against live UGS, multiplayer on two real devices, performance and allocation budgets (see COMPATIBILITY.md).
+- [ ] New clones must run `git config core.hooksPath .githooks` and set the `unity-cloud-link` filter (see `.gitattributes`).

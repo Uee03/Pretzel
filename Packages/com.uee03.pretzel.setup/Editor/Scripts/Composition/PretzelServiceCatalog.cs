@@ -19,17 +19,17 @@ namespace Pretzel.Setup.Composition
             new PretzelServiceOption(Data, "Data store (IDataStore, DataIO.Default)", "Pretzel.Data.DataIO, Pretzel.Data", "Pretzel.Data",
                 _ => "builder.Register<IDataStore>(_ => DataIO.Default, Lifetime.Singleton);"),
             new PretzelServiceOption("preferences", "Preferences service", "Pretzel.Preferences.PreferencesService, Pretzel.Preferences", "Pretzel.Preferences",
-                settings => settings.pretzelServices.Contains(Data, StringComparer.OrdinalIgnoreCase)
-                    ? "builder.Register(resolver => new PreferencesService(resolver.Resolve<IDataStore>()), Lifetime.Singleton);"
-                    : "builder.Register(_ => new PreferencesService(), Lifetime.Singleton);"),
+                settings => settings.UsesDataStore
+                    ? "builder.Register(resolver => new PreferencesService(resolver.Resolve<IDataStore>()), Lifetime.Singleton).As<IPreferencesService>().AsSelf();"
+                    : "builder.Register(_ => new PreferencesService(), Lifetime.Singleton).As<IPreferencesService>().AsSelf();"),
             new PretzelServiceOption(Api, "API client", "Pretzel.Api.ApiClient, Pretzel.Api", "Pretzel.Api",
                 settings => string.IsNullOrWhiteSpace(settings.apiBaseUrl)
-                    ? "builder.Register(_ => new ApiClient(), Lifetime.Singleton);"
-                    : $"builder.Register(_ => new ApiClient({Literal(settings.apiBaseUrl.Trim())}), Lifetime.Singleton);"),
+                    ? "builder.Register(_ => new ApiClient(), Lifetime.Singleton).As<IApiClient>().AsSelf();"
+                    : $"builder.Register(_ => new ApiClient({Literal(settings.apiBaseUrl.Trim())}), Lifetime.Singleton).As<IApiClient>().AsSelf();"),
             new PretzelServiceOption("pooling", "Pool registry", "Pretzel.Pooling.PoolRegistry, Pretzel.Pooling", "Pretzel.Pooling",
-                _ => "builder.Register(_ => new PoolRegistry(), Lifetime.Singleton);"),
-            new PretzelServiceOption(Audio, "Audio manager (child of the root scope)", "Pretzel.Audio.AudioManager, Pretzel.Audio", "Pretzel.Audio",
-                _ => "builder.RegisterComponentInHierarchy<AudioManager>();"),
+                _ => "builder.Register(_ => new PoolRegistry(), Lifetime.Singleton).As<IPoolRegistry>().AsSelf();"),
+            new PretzelServiceOption(Audio, "Audio service (child of the root scope)", "Pretzel.Audio.AudioService, Pretzel.Audio", "Pretzel.Audio",
+                _ => "builder.RegisterComponentInHierarchy<AudioService>().As<IAudioService>().AsSelf();"),
         };
 
         public static PretzelServiceOption Find(string id)

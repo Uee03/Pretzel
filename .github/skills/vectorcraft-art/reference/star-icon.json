@@ -1,0 +1,13 @@
+[
+  {"command": "file.new", "params": {"name": "Icon", "width": 256, "height": 256, "units": "Pixels", "backgroundContents": "transparent"}},
+  {"command": "shape.rectangle", "params": {"x": 16, "y": 16, "width": 224, "height": 224, "radius": 40}},
+  {"command": "paint.setFill", "params": {"gradient": {"kind": "linear", "angle": 90, "stops": [{"offset": 0, "color": "#ffd34d"}, {"offset": 1, "color": "#e8573f"}]}}},
+  {"command": "paint.setStroke", "params": {"color": "#5b1d12"}},
+  {"command": "stroke.set", "params": {"weight": 6}},
+  {"command": "shape.star", "params": {"cx": 128, "cy": 120, "radius1": 70, "radius2": 30, "points": 5}},
+  {"command": "paint.setFill", "params": {"color": "#fff7d6"}},
+  {"command": "paint.setStroke", "params": {"color": "#5b1d12"}},
+  {"command": "stroke.set", "params": {"weight": 4}},
+  {"command": "text.create", "params": {"x": 128, "y": 205, "text": "STAR", "size": 28, "color": "#5b1d12", "justify": "center"}},
+  {"command": "select.set", "params": {"ids": ["$1.id"]}}
+]

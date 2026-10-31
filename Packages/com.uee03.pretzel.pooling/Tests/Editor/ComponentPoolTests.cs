@@ -107,5 +107,15 @@ namespace Pretzel.Pooling.Tests
             Assert.That(b, Is.SameAs(a));
             Assert.That(registry.GetPool(prefab).CountAll, Is.EqualTo(1));
         }
+
+        [Test]
+        public void RegistryAllowsOnePrefabUnderTwoComponentTypes()
+        {
+            using PoolRegistry registry = new(_root.transform);
+            GameObject spawned = registry.Spawn(_prefab, Vector3.zero, Quaternion.identity);
+            Assert.DoesNotThrow(() => registry.GetPool<Component>(_prefab.transform));
+            Assert.That(registry.GetPool(_prefab.transform).CountActive, Is.EqualTo(1));
+            PoolRegistry.Despawn(spawned);
+        }
     }
 }

@@ -1,0 +1,17 @@
+{
+  "name": "Pretzel.Cloud.CloudCode.Tests",
+  "rootNamespace": "Pretzel.Cloud.CloudCode.Tests",
+  "references": ["Pretzel.Cloud", "Pretzel.Cloud.CloudCode", "Pretzel.Data", "Unity.Services.Core", "Unity.Services.CloudCode", "UnityEngine.TestRunner", "UnityEditor.TestRunner"],
+  "includePlatforms": ["Editor"],
+  "overrideReferences": true,
+  "precompiledReferences": ["nunit.framework.dll"],
+  "autoReferenced": false,
+  "defineConstraints": ["UNITY_INCLUDE_TESTS", "PRETZEL_UGS_CLOUDCODE"],
+  "versionDefines": [
+    {
+      "name": "com.unity.services.cloudcode",
+      "expression": "[2.10.4,3.0.0)",
+      "define": "PRETZEL_UGS_CLOUDCODE"
+    }
+  ]
+}

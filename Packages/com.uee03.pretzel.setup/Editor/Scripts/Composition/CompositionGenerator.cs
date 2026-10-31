@@ -15,6 +15,14 @@ namespace Pretzel.Setup.Composition
     {
         private static readonly Regex _identifier = new("^[A-Za-z_][A-Za-z0-9_]*$");
 
+        /// <summary>Ready-to-use files written with the starter services, in dependency order.</summary>
+        public static IReadOnlyList<string> StarterTemplates { get; } = new[]
+        {
+            "ISaveService", "SaveService", "GameState", "GameProgress", "IGameService", "GameService"
+        };
+
+        public const string ExampleTemplate = "GameServicesExample";
+
         public static string GeneratedFileName(CompositionSettings settings) => settings.InstallerName + ".Generated.cs";
 
         /// <summary>Returns the paths of the files that were written. Throws <see cref="ArgumentException"/> for invalid settings.</summary>
@@ -29,6 +37,22 @@ namespace Pretzel.Setup.Composition
             if (settings.createFlow)
             {
                 WriteIfMissing(written, settings, settings.FlowName + ".cs", FlowSource(settings));
+            }
+
+            if (settings.starterServices)
+            {
+                foreach (string template in StarterTemplates)
+                {
+                    if (!ExistsElsewhere(settings, template))
+                    {
+                        WriteIfMissing(written, settings, template + ".cs", CompositionTemplates.Render(template, settings));
+                    }
+                }
+
+                if (settings.starterExample)
+                {
+                    WriteIfMissing(written, settings, ExampleTemplate + ".cs", CompositionTemplates.Render(ExampleTemplate, settings));
+                }
             }
 
             foreach (ServiceDefinition service in settings.services)
@@ -65,6 +89,17 @@ namespace Pretzel.Setup.Composition
             }
 
             HashSet<string> names = new(StringComparer.Ordinal) { settings.InstallerName, settings.FlowName };
+            if (settings.starterServices)
+            {
+                if (!PretzelServiceCatalog.Find(PretzelServiceCatalog.Data).IsInstalled)
+                {
+                    throw new ArgumentException("SaveService stores data with the Pretzel Data module. Install it from the Addons tab, or untick the starter services.");
+                }
+
+                names.UnionWith(StarterTemplates);
+                names.Add(ExampleTemplate);
+            }
+
             foreach (ServiceDefinition service in settings.services)
             {
                 if (!_identifier.IsMatch(service.name ?? string.Empty))
@@ -74,7 +109,7 @@ namespace Pretzel.Setup.Composition
 
                 if (!names.Add(service.name))
                 {
-                    throw new ArgumentException($"'{service.name}' is used twice.");
+                    throw new ArgumentException($"'{service.name}' is used twice, or by a starter service.");
                 }
             }
         }
@@ -82,7 +117,8 @@ namespace Pretzel.Setup.Composition
         public static IReadOnlyList<PretzelServiceOption> SelectedPretzelServices(CompositionSettings settings)
         {
             return PretzelServiceCatalog.All
-                .Where(option => option.IsInstalled && settings.pretzelServices.Contains(option.Id, StringComparer.OrdinalIgnoreCase))
+                .Where(option => option.IsInstalled && (settings.pretzelServices.Contains(option.Id, StringComparer.OrdinalIgnoreCase)
+                                                        || (settings.starterServices && string.Equals(option.Id, PretzelServiceCatalog.Data, StringComparison.Ordinal))))
                 .ToList();
         }
 
@@ -104,6 +140,16 @@ namespace Pretzel.Setup.Composition
             foreach (ServiceDefinition service in settings.services)
             {
                 body.Append("            ").Append(Registration(service)).Append('\n');
+            }
+
+            if (settings.starterServices)
+            {
+                body.Append("            builder.Register<ISaveService, SaveService>(Lifetime.Singleton);\n");
+                body.Append("            builder.Register<IGameService, GameService>(Lifetime.Singleton);\n");
+                if (settings.starterExample)
+                {
+                    body.Append("            builder.RegisterEntryPoint<").Append(ExampleTemplate).Append(">();\n");
+                }
             }
 
             if (settings.createFlow)
@@ -234,6 +280,22 @@ namespace Pretzel.Setup.Composition
 
             source.Append(string.Join("\n", members)).Append("    }\n").Append("}\n");
             return source.ToString();
+        }
+
+        /// <summary>
+        /// The Pretzel Data examples create the same ISaveService and SaveService (same API, global namespace). When the
+        /// project already has one outside the code folder, the generated GameService uses it instead of a second copy.
+        /// </summary>
+        private static bool ExistsElsewhere(CompositionSettings settings, string template)
+        {
+            if (!string.Equals(template, "ISaveService", StringComparison.Ordinal) && !string.Equals(template, "SaveService", StringComparison.Ordinal))
+            {
+                return false;
+            }
+
+            string own = Path.GetFullPath(Path.Combine(settings.codeFolder, template + ".cs"));
+            return Directory.GetFiles("Assets", template + ".cs", SearchOption.AllDirectories)
+                .Any(path => !string.Equals(Path.GetFullPath(path), own, StringComparison.OrdinalIgnoreCase));
         }
 
         private static void WriteIfMissing(List<string> written, CompositionSettings settings, string fileName, string content)

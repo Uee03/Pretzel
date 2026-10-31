@@ -9,9 +9,9 @@ namespace Pretzel.Pooling
     /// One <see cref="ComponentPool{T}"/> per prefab, created on first spawn. Use it when many prefabs share one spawner.
     /// Release spawned objects with <see cref="Despawn"/> or <see cref="PooledObject.Release"/>.
     /// </summary>
-    public sealed class PoolRegistry : IDisposable
+    public sealed class PoolRegistry : IPoolRegistry
     {
-        private readonly Dictionary<Component, IDisposable> _pools = new();
+        private readonly Dictionary<(Component Prefab, Type ComponentType), IDisposable> _pools = new();
         private readonly Transform _root;
         private readonly int _defaultCapacity;
         private readonly int _maxSize;
@@ -27,15 +27,18 @@ namespace Pretzel.Pooling
         public ComponentPool<T> GetPool<T>(T prefab) where T : Component
         {
             Guard.NotDestroyed(prefab, nameof(prefab));
-            if (_pools.TryGetValue(prefab, out IDisposable existing))
+            (Component, Type) key = (prefab, typeof(T));
+            if (_pools.TryGetValue(key, out IDisposable existing))
             {
                 return (ComponentPool<T>)existing;
             }
 
             ComponentPool<T> pool = new(prefab, _root, _defaultCapacity, _maxSize);
-            _pools.Add(prefab, pool);
+            _pools.Add(key, pool);
             return pool;
         }
+
+        IComponentPool<T> IPoolRegistry.GetPool<T>(T prefab) => GetPool(prefab);
 
         public T Spawn<T>(T prefab) where T : Component => GetPool(prefab).Get();
 

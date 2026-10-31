@@ -1,0 +1,252 @@
+/* Pretzel Multiplayer menu. BEM block: pretzel-multiplayer. Tokens live on the block so a project can override them on any ancestor. */
+
+.pretzel-multiplayer {
+    --pretzel-multiplayer-scrim: rgba(10, 12, 18, 0.72);
+    --pretzel-multiplayer-surface: rgb(32, 36, 46);
+    --pretzel-multiplayer-surface-raised: rgb(46, 52, 66);
+    --pretzel-multiplayer-border: rgb(72, 80, 100);
+    --pretzel-multiplayer-text: rgb(236, 239, 244);
+    --pretzel-multiplayer-text-muted: rgb(160, 168, 184);
+    --pretzel-multiplayer-accent: rgb(66, 133, 244);
+    --pretzel-multiplayer-accent-hover: rgb(96, 154, 250);
+    --pretzel-multiplayer-danger: rgb(214, 80, 80);
+    --pretzel-multiplayer-success: rgb(70, 170, 110);
+    --pretzel-multiplayer-warning: rgb(224, 160, 60);
+    --pretzel-multiplayer-radius: 8px;
+    --pretzel-multiplayer-gap: 10px;
+
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    color: var(--pretzel-multiplayer-text);
+}
+
+.pretzel-multiplayer__safe-area {
+    flex-grow: 1;
+}
+
+/* Screens */
+
+.pretzel-multiplayer__screen {
+    display: none;
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--pretzel-multiplayer-scrim);
+}
+
+.pretzel-multiplayer__screen--modal {
+    background-color: rgba(0, 0, 0, 0.82);
+}
+
+.pretzel-multiplayer__panel {
+    width: 420px;
+    max-width: 92%;
+    padding: 20px;
+    background-color: var(--pretzel-multiplayer-surface);
+    border-color: var(--pretzel-multiplayer-border);
+    border-width: 1px;
+    border-radius: var(--pretzel-multiplayer-radius);
+}
+
+.pretzel-multiplayer__panel--wide {
+    width: 560px;
+}
+
+.pretzel-multiplayer__title {
+    font-size: 22px;
+    -unity-font-style: bold;
+    margin-bottom: var(--pretzel-multiplayer-gap);
+    white-space: normal;
+}
+
+.pretzel-multiplayer__subtitle {
+    font-size: 14px;
+    -unity-font-style: bold;
+    color: var(--pretzel-multiplayer-text-muted);
+    margin-top: var(--pretzel-multiplayer-gap);
+    margin-bottom: 4px;
+}
+
+.pretzel-multiplayer__hint {
+    color: var(--pretzel-multiplayer-text-muted);
+    white-space: normal;
+    margin-bottom: var(--pretzel-multiplayer-gap);
+}
+
+.pretzel-multiplayer__code {
+    font-size: 26px;
+    -unity-font-style: bold;
+    letter-spacing: 4px;
+    color: var(--pretzel-multiplayer-accent);
+    margin-bottom: 4px;
+}
+
+.pretzel-multiplayer__row {
+    flex-direction: row;
+    align-items: flex-end;
+}
+
+.pretzel-multiplayer__field {
+    margin-bottom: 6px;
+}
+
+.pretzel-multiplayer__field--grow {
+    flex-grow: 1;
+}
+
+.pretzel-multiplayer__progress {
+    margin-bottom: var(--pretzel-multiplayer-gap);
+}
+
+/* Buttons */
+
+.pretzel-multiplayer__button {
+    margin: 4px 0;
+    padding: 8px 14px;
+    color: var(--pretzel-multiplayer-text);
+    background-color: var(--pretzel-multiplayer-surface-raised);
+    border-color: var(--pretzel-multiplayer-border);
+    border-radius: 6px;
+    transition-property: background-color;
+    transition-duration: 0.12s;
+}
+
+.pretzel-multiplayer__button:hover {
+    background-color: var(--pretzel-multiplayer-border);
+}
+
+.pretzel-multiplayer__button:focus {
+    border-color: var(--pretzel-multiplayer-accent);
+}
+
+.pretzel-multiplayer__button:disabled {
+    opacity: 0.45;
+}
+
+.pretzel-multiplayer__button--primary {
+    background-color: var(--pretzel-multiplayer-accent);
+    border-color: var(--pretzel-multiplayer-accent);
+}
+
+.pretzel-multiplayer__button--primary:hover {
+    background-color: var(--pretzel-multiplayer-accent-hover);
+}
+
+.pretzel-multiplayer__button--danger {
+    background-color: var(--pretzel-multiplayer-danger);
+    border-color: var(--pretzel-multiplayer-danger);
+}
+
+.pretzel-multiplayer__button--small {
+    margin: 0 0 0 10px;
+    padding: 4px 10px;
+}
+
+.pretzel-multiplayer__button--active {
+    background-color: var(--pretzel-multiplayer-success);
+    border-color: var(--pretzel-multiplayer-success);
+}
+
+/* Lists */
+
+.pretzel-multiplayer__list {
+    height: 180px;
+    background-color: var(--pretzel-multiplayer-surface-raised);
+    border-radius: 6px;
+    margin-bottom: var(--pretzel-multiplayer-gap);
+}
+
+.pretzel-multiplayer__item {
+    flex-direction: row;
+    align-items: center;
+    padding: 0 10px;
+    height: 100%;
+}
+
+.pretzel-multiplayer__item-name {
+    flex-grow: 1;
+    flex-shrink: 1;
+    overflow: hidden;
+    -unity-text-align: middle-left;
+}
+
+.pretzel-multiplayer__item-detail {
+    width: 84px;
+    color: var(--pretzel-multiplayer-text-muted);
+    -unity-text-align: middle-left;
+}
+
+.pretzel-multiplayer__item-status {
+    width: 84px;
+    -unity-text-align: middle-left;
+}
+
+.pretzel-multiplayer__item--local .pretzel-multiplayer__item-name {
+    color: var(--pretzel-multiplayer-accent-hover);
+}
+
+.pretzel-multiplayer__item--ready .pretzel-multiplayer__item-status {
+    color: var(--pretzel-multiplayer-success);
+}
+
+.pretzel-multiplayer__item--host .pretzel-multiplayer__item-status {
+    color: var(--pretzel-multiplayer-warning);
+}
+
+/* In-match overlay */
+
+.pretzel-multiplayer__hud {
+    display: none;
+    position: absolute;
+    left: 12px;
+    top: 12px;
+    flex-direction: row;
+    align-items: center;
+    padding: 6px 10px;
+    background-color: var(--pretzel-multiplayer-scrim);
+    border-radius: var(--pretzel-multiplayer-radius);
+}
+
+.pretzel-multiplayer__hud-status {
+    color: var(--pretzel-multiplayer-text);
+}
+
+/* Toasts (Pretzel.UI.ToastService adds pretzel-toast and a --kind modifier) */
+
+.pretzel-multiplayer__toasts {
+    position: absolute;
+    right: 16px;
+    bottom: 16px;
+    align-items: flex-end;
+}
+
+.pretzel-multiplayer .pretzel-toast {
+    margin-top: 6px;
+    padding: 8px 14px;
+    max-width: 360px;
+    white-space: normal;
+    color: var(--pretzel-multiplayer-text);
+    background-color: var(--pretzel-multiplayer-surface-raised);
+    border-left-width: 4px;
+    border-left-color: var(--pretzel-multiplayer-accent);
+    border-radius: 6px;
+}
+
+.pretzel-multiplayer .pretzel-toast--success {
+    border-left-color: var(--pretzel-multiplayer-success);
+}
+
+.pretzel-multiplayer .pretzel-toast--warning {
+    border-left-color: var(--pretzel-multiplayer-warning);
+}
+
+.pretzel-multiplayer .pretzel-toast--error {
+    border-left-color: var(--pretzel-multiplayer-danger);
+}

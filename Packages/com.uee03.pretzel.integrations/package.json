@@ -15,8 +15,13 @@
   "samples": [
     {
       "displayName": "Integrations Example",
-      "description": "One demo per library (LitMotion, UniTask, R3) and one that combines all three.",
+      "description": "One demo per library (LitMotion, UniTask, R3), one for R3 with Pretzel Events, and one that combines LitMotion, UniTask and R3.",
       "path": "Samples~/IntegrationsExample"
+    },
+    {
+      "displayName": "VContainer Example",
+      "description": "Every VContainer feature in one scene with one LifetimeScope, one folder per feature: registration, lifetimes, injection, entry points, tickable timers and bullets, factories, components, collections, keys, open generics, settings, installers, callbacks and child scopes.",
+      "path": "Samples~/VContainerExample"
     }
   ]
 }

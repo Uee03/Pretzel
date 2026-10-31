@@ -1,0 +1,17 @@
+{
+  "name": "Pretzel.Cloud.CloudSave.Tests",
+  "rootNamespace": "Pretzel.Cloud.CloudSave.Tests",
+  "references": ["Pretzel.Cloud", "Pretzel.Cloud.CloudSave", "Pretzel.Data", "Unity.Services.Core", "Unity.Services.CloudSave", "UnityEngine.TestRunner", "UnityEditor.TestRunner"],
+  "includePlatforms": ["Editor"],
+  "overrideReferences": true,
+  "precompiledReferences": ["nunit.framework.dll"],
+  "autoReferenced": false,
+  "defineConstraints": ["UNITY_INCLUDE_TESTS", "PRETZEL_UGS_CLOUDSAVE"],
+  "versionDefines": [
+    {
+      "name": "com.unity.services.cloudsave",
+      "expression": "3.4.2",
+      "define": "PRETZEL_UGS_CLOUDSAVE"
+    }
+  ]
+}

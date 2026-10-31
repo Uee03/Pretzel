@@ -14,6 +14,21 @@
       "displayName": "Pooling Usage",
       "description": "An enum-keyed projectile factory configured in the Inspector, with prewarming and projectiles that release themselves after a delay.",
       "path": "Samples~/PoolingUsage"
+    },
+    {
+      "displayName": "Enemy Waves",
+      "description": "A wave spawner on a keyed PoolFactory: prewarm sizing, a cap on live enemies, return callbacks and live pool metrics.",
+      "path": "Samples~/EnemyWaves"
+    },
+    {
+      "displayName": "Bullets And Impacts",
+      "description": "A turret with pooled bullets that spawn pooled impact effects through a small interface, on PoolRegistry and ComponentPool.",
+      "path": "Samples~/BulletsAndImpacts"
+    },
+    {
+      "displayName": "Floating Text",
+      "description": "Pooled UI Toolkit labels for damage numbers using UnityEngine.Pool.ObjectPool, animated without layout passes.",
+      "path": "Samples~/FloatingText"
     }
   ]
 }

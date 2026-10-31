@@ -11,7 +11,9 @@ gives you three runtime types and a setup tool, so a new game starts with a work
 | `MonoInstaller` | Pretzel Integrations | Base class for registrations that need scene references (per scene). |
 | VContainer tab | Pretzel > Project Setup | Installs VContainer, generates the installer, services and flow, and creates the root scope. |
 
-The runtime types compile only when VContainer (`jp.hadashikick.vcontainer`) is installed.
+The runtime types compile only when VContainer (`jp.hadashikick.vcontainer`) is installed. The **VContainer Example**
+sample (Package Manager > Pretzel Integrations > Samples) shows every VContainer feature in one scene, one folder per
+feature.
 
 ## From GameManager and ScriptableObject containers to a composition root
 
@@ -47,12 +49,14 @@ Objects read ManagerContainer.Audio      Objects receive IAudioService in their 
 
 1. Open **Pretzel > Project Setup > VContainer**. Click **Install VContainer** if it is missing, and install
    **Pretzel Integrations** from the Addons tab.
-2. Check the namespace, scope name and folders. Tick the Pretzel services you use.
+2. Check the namespace, scope name and folders. Keep **Starter services** ticked for a ready-to-use save and game
+   service. Tick the Pretzel services you use.
 3. Add your own services and managers. Choose a lifetime, whether they get an interface, and whether they run
    `Start` (`IStartable`) or `Tick` (`ITickable`).
 4. Click **Generate and set up**. After compilation the tool creates `GameInstaller.asset`,
    `GameLifetimeScope.prefab` and `VContainerSettings.asset`, and adds the settings to the preloaded assets.
-5. Press Play in any scene. The root scope appears under DontDestroyOnLoad and `GameFlow.Start` runs.
+5. Press Play in any scene. The root scope appears under DontDestroyOnLoad and `GameFlow.Start` runs. With the usage
+   example ticked, the Console shows one short game being played, scored and saved.
 
 Generated files:
 
@@ -60,7 +64,41 @@ Generated files:
 |------|-------|-----------|
 | `GameInstaller.Generated.cs` | The tool | On every run. Do not edit. |
 | `GameInstaller.cs` | You | Never. Add registrations the tool does not cover here. |
-| `GameFlow.cs`, `IInventoryService.cs`, `InventoryService.cs` | You | Never, created only when missing. |
+| `GameFlow.cs`, `IInventoryService.cs`, `InventoryService.cs` | You | Never, created only when missing. Services you add are empty classes to fill in. |
+| `ISaveService.cs`, `SaveService.cs` | You | Never. Complete: any serializable type by `DataKey` (slots, folders), sync and async, through Pretzel Data. A corrupt file throws and is kept, never overwritten. If the project already has these files (the Pretzel Data examples create the same ones), they are reused. |
+| `IGameService.cs`, `GameService.cs`, `GameState.cs`, `GameProgress.cs` | You | Never. Complete: menu, playing, paused and game-over states, score, pause through `Time.timeScale`, saved high score and games played. Call `LoadProgressAsync` once at startup; progress is only saved after a successful load. |
+| `GameServicesExample.cs` | You | Never. Shows the calls; plays one session on every start. Untick **Usage example** and delete it when done. |
+
+Using the starter services from your own code:
+
+```csharp
+public sealed class HudPresenter : IStartable, IDisposable
+{
+    private readonly IGameService _game;
+    private readonly HudView _view;
+
+    public HudPresenter(IGameService game, HudView view)
+    {
+        _game = game;
+        _view = view;
+    }
+
+    public void Start()
+    {
+        _game.ScoreChanged += _view.ShowScore;
+        _view.PauseClicked += _game.Pause;
+    }
+
+    public void Dispose()
+    {
+        _game.ScoreChanged -= _view.ShowScore;
+        _view.PauseClicked -= _game.Pause;
+    }
+}
+```
+
+Save anything serializable with `ISaveService`: `_save.Save(new DataKey("settings"), options)`,
+`await _save.LoadOrCreateAsync<Options>(new DataKey("settings"))`, or per slot with `new DataKey("run", slot: 1)`.
 
 If the code folder belongs to an assembly definition, add references to `VContainer`,
 `Pretzel.Integrations.VContainer` and the Pretzel modules you register; the tab lists them.
@@ -131,7 +169,9 @@ builder.RegisterEntryPoint<QuestManager>(Lifetime.Singleton);
 
 `RegisterEntryPoint` registers every interface of the class and runs `IStartable.Start`, `ITickable.Tick` and the
 other [entry point interfaces](https://vcontainer.hadashikick.jp/integrations/entrypoint) on Unity's PlayerLoop.
-A manager therefore needs no MonoBehaviour and no `Update`.
+VContainer inserts one PlayerLoop system per phase and calls every tickable from a plain C# loop, so one system that
+moves 500 bullets or advances every timer is cheaper than 500 `MonoBehaviour.Update` calls. Tickables keep running
+while their scope lives, regardless of GameObject state; pause them with a flag or dispose the scope.
 
 ### The flow class replaces the GameManager logic
 
@@ -223,6 +263,71 @@ using (LifetimeScope.Enqueue(builder => builder.RegisterInstance(levelData)))
 
 The level's `PretzelLifetimeScope` picks up the root scope as parent and the enqueued `levelData` as a registration.
 Use `LifetimeScope.EnqueueParent(scope)` in the same way to parent it to a scope other than the root.
+
+### Injecting the current scope
+
+Every scope registers itself as `LifetimeScope`. A class that creates scopes takes it in its constructor and gets the
+scope it was registered in. This parents a loaded scene to a level scope instead of the root:
+
+```csharp
+public sealed class RoomLoader
+{
+    private readonly LifetimeScope _scope;
+    private readonly SceneLoader _scenes;
+
+    public RoomLoader(LifetimeScope scope, SceneLoader scenes)
+    {
+        _scope = scope;
+        _scenes = scenes;
+    }
+
+    public async Awaitable LoadAsync(string room, CancellationToken cancellation)
+    {
+        using (LifetimeScope.EnqueueParent(_scope))
+        {
+            await _scenes.LoadAsync(room, new SceneLoadOptions { Mode = LoadSceneMode.Additive }, cancellation);
+        }
+    }
+}
+```
+
+The room is loaded additively so the level scene, and the scope it holds, stays loaded.
+
+This is the one place where depending on a VContainer type is right: the class's job is creating scopes.
+
+### Child scopes without a scene
+
+A match, a popup or a procedurally built level often has no scene of its own. Create a child scope in code and
+dispose it when it ends:
+
+```csharp
+public sealed class MatchRunner
+{
+    private readonly LifetimeScope _scope;
+    private readonly MatchInstaller _installer;
+    private LifetimeScope _match;
+
+    public MatchRunner(LifetimeScope scope, MatchInstaller installer)
+    {
+        _scope = scope;
+        _installer = installer;
+    }
+
+    public void Begin() => _match = _scope.CreateChild(_installer, "Match");
+
+    public void End()
+    {
+        _match?.Dispose();
+        _match = null;
+    }
+}
+```
+
+`MatchInstaller` is a `ScriptableInstaller` asset listed in the root scope's **Settings**, so it can be injected.
+`CreateChild` also accepts a lambda (`builder => builder.RegisterInstance(matchData)`), and
+`CreateChildFromPrefab(prefab, installer)` instantiates a scope prefab with its own installers and scene objects.
+`Dispose` disposes every service the child created and destroys its GameObject. Scoped entry points registered in
+the child start when it is created and stop when it is disposed.
 
 ## Testing
 
@@ -316,11 +421,33 @@ Use `builder.Register(_ => new PoolRegistry(), Lifetime.Singleton)` so it is dis
 **Circular dependencies.** `A(B)` and `B(A)` cannot be built. Usually one of them should publish an event on
 `IEventBus`, or a third class should hold the shared logic.
 
+## Diagnostics
+
+Turn on **Enable diagnostics** in the VContainer tab (it sets `EnableDiagnostics` on `VContainerSettings`) and open
+**Window > VContainer Diagnostics**. During Play it lists every scope, its registrations, the instances created and
+who resolved them. Use it when a registration is missing or a service is created more often than expected.
+Collection is not limited to the Editor and slows resolving, so turn it off before a release build; the tab shows a
+warning while it is on.
+
 ## Builds and IL2CPP
 
 VContainer builds objects through reflection. With Managed Stripping Level set to High, constructors used only by
 the container can be stripped. Mark them with `[Inject]` (it counts as a preserve attribute) or keep the assembly
 in a `link.xml`. Test a player build after adding services.
+
+### Source generator
+
+VContainer's [source generator](https://vcontainer.hadashikick.jp/optimization/source-generator) writes the
+construction and injection code at compile time, which makes resolving faster and preserves the generated types
+from stripping. It is not part of the package:
+
+1. Download `VContainer.SourceGenerator.dll` from the [VContainer releases](https://github.com/hadashiA/VContainer/releases)
+   for the installed version and put it under `Assets/`.
+2. In its import settings, turn off **Any Platform**, **Editor** and **Standalone**, and add the asset label
+   `RoslynAnalyzer`.
+
+It applies to classes in assemblies that reference `VContainer`, that are registered with a `Register*` call or
+have `[Inject]`. Nested classes, structs and private types fall back to reflection.
 
 ## Troubleshooting
 
@@ -331,3 +458,4 @@ in a `link.xml`. Test a player build after adding services.
 | A MonoBehaviour's injected field is null | It is not registered, not listed in Auto Inject Game Objects, or it was created with `Object.Instantiate`. |
 | `Start`/`Tick` never runs | The class was registered with `Register` instead of `RegisterEntryPoint`. |
 | `Installers element 0 is empty` | A slot on the scope is unassigned. Assign it or remove it. |
+| You cannot tell which scope resolved what | Turn on diagnostics and open **Window > VContainer Diagnostics**. |

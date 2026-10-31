@@ -1,37 +1,41 @@
-using System.Globalization;
 using Pretzel.DevConsole;
 using UnityEngine;
 
 namespace Pretzel.Samples.Console
 {
-    /// <summary>Registers gameplay commands on a DeveloperConsole in the same GameObject.</summary>
+    /// <summary>
+    /// Connects the console to the arena: registers <see cref="ArenaCommands"/> and keeps typing from moving the player.
+    /// Put it on the same GameObject as the <see cref="DeveloperConsole"/>.
+    /// </summary>
     [RequireComponent(typeof(DeveloperConsole))]
     public sealed class GameCommands : MonoBehaviour
     {
-        private bool _godMode;
+        [Tooltip("Found in the scene when empty.")]
+        [SerializeField] private ArenaGame _game;
+
+        private DeveloperConsole _console;
 
         private void Start()
         {
-            CommandRegistry commands = GetComponent<DeveloperConsole>().Commands;
-
-            commands.Register("timescale", "timescale <value> - sets Time.timeScale.", args =>
+            _console = GetComponent<DeveloperConsole>();
+            if (!_game)
             {
-                if (args.Length == 1 && float.TryParse(args[0], NumberStyles.Float, CultureInfo.InvariantCulture, out float scale) && scale >= 0f)
-                {
-                    Time.timeScale = scale;
-                    return $"Time scale is {scale}.";
-                }
+                _game = FindAnyObjectByType<ArenaGame>();
+            }
 
-                return "Usage: timescale <value>";
-            });
-
-            commands.Register("god", "Toggles god mode.", _ =>
+            if (!_game)
             {
-                _godMode = !_godMode;
-                return _godMode ? "God mode on." : "God mode off.";
-            });
+                Debug.LogWarning("GameCommands needs an ArenaGame in the scene.", this);
+                enabled = false;
+                return;
+            }
 
-            commands.Register("fps", "Shows the current frame rate.", _ => $"{1f / Mathf.Max(0.0001f, Time.unscaledDeltaTime):0} fps");
+            new ArenaCommands(_game).Register(_console.Commands);
+        }
+
+        private void Update()
+        {
+            _game.InputBlocked = _console.IsOpen;
         }
     }
 }

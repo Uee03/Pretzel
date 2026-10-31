@@ -6,7 +6,7 @@ namespace Pretzel.Samples.Audio
     /// <summary>Plays cues, switches music and changes channel volumes from the context menu.</summary>
     public sealed class AudioUsageExample : MonoBehaviour
     {
-        [SerializeField] private AudioManager _audio;
+        [SerializeField] private AudioService _audio;
         [SerializeField] private AudioCue _footstep;
         [SerializeField] private AudioCue _explosion;
         [SerializeField] private AudioClip _calmMusic;
@@ -18,7 +18,7 @@ namespace Pretzel.Samples.Audio
         {
             if (!_audio)
             {
-                Debug.LogError("Assign an AudioManager.", this);
+                Debug.LogError("Assign an AudioService.", this);
                 enabled = false;
                 return;
             }

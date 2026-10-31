@@ -13,10 +13,11 @@
 
 Rules:
 
-- Load once at startup and keep one `PreferencesService` for the session, for example in a DI container.
+- Load once at startup and keep one `IPreferencesService` for the session, for example in a DI container. Depend on the
+  interface; see the Custom Preferences Service sample for other implementations.
 - `Load` never throws for a missing or corrupt file. It falls back to defaults and returns why.
 - `GraphicsPreferences.Apply` changes resolution and full-screen mode on desktop players only; quality, vSync and
   frame rate apply everywhere.
 - Store Input System rebinds as JSON in `controls.bindingOverridesJson`
   (`InputActionAsset.SaveBindingOverridesAsJson` and `LoadBindingOverridesFromJson`).
-- If you use Pretzel Audio, forward volumes with `AudioManager.SetVolume` in the `Changed` handler instead.
+- If you use Pretzel Audio, forward volumes with `IAudioService.SetVolume` in the `Changed` handler instead.

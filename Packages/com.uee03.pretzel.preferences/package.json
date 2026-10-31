@@ -15,6 +15,16 @@
       "displayName": "Preferences Usage",
       "description": "Loads preferences at startup, applies graphics and forwards audio volumes to an AudioMixer.",
       "path": "Samples~/PreferencesUsage"
+    },
+    {
+      "displayName": "Custom Preferences Service",
+      "description": "Implements IPreferencesService on PlayerPrefs and in memory, and swaps backends from one composition root.",
+      "path": "Samples~/CustomPreferencesService"
+    },
+    {
+      "displayName": "Options Menu",
+      "description": "A runtime UI Toolkit options screen with an Apply/Revert draft and appliers for audio, graphics and language.",
+      "path": "Samples~/OptionsMenu"
     }
   ]
 }

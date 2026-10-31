@@ -1,0 +1,33 @@
+{
+  "name": "Pretzel.Integrations.Samples.VContainer.Audio",
+  "rootNamespace": "Pretzel.Samples.VContainerExample",
+  "references": [
+    "Pretzel.Audio",
+    "Pretzel.Integrations.Samples.VContainer",
+    "Pretzel.Integrations.VContainer",
+    "VContainer"
+  ],
+  "includePlatforms": [],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": true,
+  "defineConstraints": [
+    "PRETZEL_VCONTAINER",
+    "PRETZEL_AUDIO"
+  ],
+  "versionDefines": [
+    {
+      "name": "jp.hadashikick.vcontainer",
+      "expression": "",
+      "define": "PRETZEL_VCONTAINER"
+    },
+    {
+      "name": "com.uee03.pretzel.audio",
+      "expression": "",
+      "define": "PRETZEL_AUDIO"
+    }
+  ],
+  "noEngineReferences": false
+}

@@ -1,0 +1,28 @@
+{
+  "name": "Pretzel.Cloud.CloudCode",
+  "rootNamespace": "Pretzel.Cloud.CloudCode",
+  "references": [
+    "Pretzel.Core",
+    "Pretzel.Data",
+    "Pretzel.Cloud",
+    "Unity.Services.Core",
+    "Unity.Services.CloudCode"
+  ],
+  "includePlatforms": [],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": true,
+  "defineConstraints": [
+    "PRETZEL_UGS_CLOUDCODE"
+  ],
+  "versionDefines": [
+    {
+      "name": "com.unity.services.cloudcode",
+      "expression": "[2.10.4,3.0.0)",
+      "define": "PRETZEL_UGS_CLOUDCODE"
+    }
+  ],
+  "noEngineReferences": false
+}

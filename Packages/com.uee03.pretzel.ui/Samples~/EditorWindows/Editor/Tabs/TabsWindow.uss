@@ -1,0 +1,26 @@
+.pretzel-tabs__root {
+    flex-grow: 1;
+}
+
+.pretzel-tabs__view {
+    flex-grow: 1;
+    margin: var(--pretzel-sample-gap);
+}
+
+.pretzel-tabs__tab {
+    padding: var(--pretzel-sample-gap);
+}
+
+.pretzel-tabs__progress {
+    margin-top: var(--pretzel-sample-gap);
+}
+
+.pretzel-tabs__footer {
+    flex-direction: row;
+    align-items: center;
+    padding: 0 var(--pretzel-sample-gap) var(--pretzel-sample-gap);
+}
+
+.pretzel-tabs__footer > Label {
+    flex-grow: 1;
+}

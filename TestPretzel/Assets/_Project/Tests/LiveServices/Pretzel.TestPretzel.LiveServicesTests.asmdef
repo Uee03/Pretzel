@@ -1,0 +1,20 @@
+{
+  "name": "Pretzel.TestPretzel.LiveServicesTests",
+  "rootNamespace": "Pretzel.TestPretzel.LiveServicesTests",
+  "references": [
+    "Pretzel.Core",
+    "Pretzel.Data",
+    "Pretzel.Cloud",
+    "Pretzel.Cloud.Authentication",
+    "Pretzel.Cloud.CloudSave",
+    "Pretzel.Cloud.CloudCode",
+    "Pretzel.Multiplayer",
+    "Unity.Netcode.Runtime",
+    "UnityEngine.TestRunner"
+  ],
+  "includePlatforms": [],
+  "overrideReferences": true,
+  "precompiledReferences": ["nunit.framework.dll"],
+  "autoReferenced": false,
+  "defineConstraints": ["UNITY_INCLUDE_TESTS"]
+}

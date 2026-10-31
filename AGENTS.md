@@ -32,6 +32,8 @@ newer API. `TestPretzel` is the consumer host for Unity import, compilation, and
 | [Pretzel UITK Editor Tools](./.github/agents/uitk-editor-tools.agent.md) | Pretzel-specific UI Toolkit Editor tools |
 | [.NET Reviewer](./.github/agents/dotnet-reviewer.agent.md) | Review standalone .NET code; use Unity-specific review rules for packages |
 | [.NET Scaffolder](./.github/agents/dotnet-scaffolder.agent.md) | Only for separately requested standalone .NET tools or services |
+| [Craft Visual Artist](./.github/agents/craft-visual-artist.agent.md) | Icons, sprites and UI art made with VectorCraft and FigCraft, exported for the game or a sample |
+| [Craft Sound Designer](./.github/agents/craft-sound-designer.agent.md) | Sound effects and short music made with SoundCraft, bounced to WAV |
 
 Keep guidance model-agnostic. Reviewers distinguish measured facts from hypotheses. Preserve local
 customizations and user changes when importing or applying guidance.
@@ -68,6 +70,10 @@ customizations and user changes when importing or applying guidance.
 | [unity-adr](./.github/skills/unity-adr/SKILL.md) | Record an approved architecture decision when requested |
 | [dotnet-clean-architecture](./.github/skills/dotnet-clean-architecture/SKILL.md) | Apply layering/SOLID ideas selectively; Unity suitability limits are explicit |
 | [dotnet-cqrs](./.github/skills/dotnet-cqrs/SKILL.md) | Evaluate CQRS as a pattern only where Unity package domains warrant it |
+| [craft-tools](./.github/skills/craft-tools/SKILL.md) | Art, UI or sound work with FigCraft, VectorCraft or SoundCraft: where the CLIs are, how to drive them, pitfalls, delivery into Unity |
+| [figcraft-ui](./.github/skills/figcraft-ui/SKILL.md) | UI layouts, buttons, panels and HUD mockups |
+| [vectorcraft-art](./.github/skills/vectorcraft-art/SKILL.md) | Icons, logos, sprites and illustrations |
+| [soundcraft-audio](./.github/skills/soundcraft-audio/SKILL.md) | Sound effects, jingles and short music |
 
 Path-scoped rules: [unity-csharp.instructions.md](./.github/instructions/unity-csharp.instructions.md).
 For separately requested standalone .NET code only, load

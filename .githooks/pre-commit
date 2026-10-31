@@ -1,7 +1,36 @@
 #!/bin/sh
-# Checks staged C# files against the Pretzel code standards. Enable once per clone: git config core.hooksPath .githooks
-script=".github/skills/pretzel-code-standards/scripts/Test-CodeStandards.ps1"
+# Pre-commit checks. Enable once per clone: git config core.hooksPath .githooks
+#   1. Code standards on staged C# files.
+#   2. Regenerates the sample list in README.md from the package.json files and stages it.
 if command -v pwsh >/dev/null 2>&1; then
-    exec pwsh -NoProfile -File "$script" -Staged
+    shell="pwsh"
+else
+    shell="powershell.exe"
 fi
-exec powershell.exe -NoProfile -ExecutionPolicy Bypass -File "$script" -Staged
+
+run() {
+    "$shell" -NoProfile -ExecutionPolicy Bypass -File "$@"
+}
+
+run ".github/skills/pretzel-code-standards/scripts/Test-CodeStandards.ps1" -Staged || exit 1
+
+# The host project must not be committed linked to anyone's Unity Cloud project (see .gitattributes).
+if git show :TestPretzel/ProjectSettings/ProjectSettings.asset 2>/dev/null \
+    | grep -Eq '^  (cloudProjectId|organizationId): *[^[:space:]]'; then
+    echo "TestPretzel/ProjectSettings/ProjectSettings.asset is staged with a Unity Cloud project link."
+    echo "Run: git config filter.unity-cloud-link.clean \"sed -E 's/^(  (cloudProjectId|projectName|organizationId):)[^\\r]*/\\1 /'\""
+    echo "then: git add --renormalize TestPretzel/ProjectSettings/ProjectSettings.asset"
+    exit 1
+fi
+
+# Do not stage a README.md that has unrelated unstaged edits.
+if git diff --quiet -- README.md; then
+    run ".github/scripts/Update-SampleCatalog.ps1" || exit 1
+    git add README.md
+else
+    run ".github/scripts/Update-SampleCatalog.ps1" -Check || {
+        echo "README.md has unstaged changes and its sample list is out of date."
+        echo "Run .github/scripts/Update-SampleCatalog.ps1, stage README.md and commit again."
+        exit 1
+    }
+fi

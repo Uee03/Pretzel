@@ -1,0 +1,4 @@
+[
+  {"command": "file.new", "params": {"name": "Button"}},
+  {"command": "node.create", "params": {"type": "frame", "name": "Button", "x": 0, "y": 0, "width": 240, "height": 72, "props": {"fill": "#2d6cdf", "cornerRadius": 16, "layout": "horizontal", "mainAlign": "center", "crossAlign": "center", "padding": 12}}}
+]

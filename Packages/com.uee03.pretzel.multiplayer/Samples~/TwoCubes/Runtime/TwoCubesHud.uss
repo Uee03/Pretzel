@@ -1,0 +1,40 @@
+.pretzel-twocubes {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 12px;
+    align-items: center;
+    display: none;
+}
+
+.pretzel-twocubes__bar {
+    flex-direction: row;
+    align-items: center;
+    padding: 8px 12px;
+    background-color: rgba(10, 12, 18, 0.72);
+    border-radius: 8px;
+}
+
+.pretzel-twocubes__button {
+    margin: 0 6px 0 0;
+    padding: 6px 14px;
+    color: rgb(236, 239, 244);
+    background-color: rgb(66, 133, 244);
+    border-color: rgb(66, 133, 244);
+    border-radius: 6px;
+}
+
+.pretzel-twocubes__button--danger {
+    background-color: rgb(214, 80, 80);
+    border-color: rgb(214, 80, 80);
+}
+
+.pretzel-twocubes__count {
+    margin-left: 8px;
+    color: rgb(236, 239, 244);
+}
+
+.pretzel-twocubes__hint {
+    margin-top: 6px;
+    color: rgb(160, 168, 184);
+}

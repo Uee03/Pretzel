@@ -1,0 +1,27 @@
+{
+  "name": "Pretzel.Multiplayer.Samples.TwoCubes",
+  "rootNamespace": "Pretzel.Multiplayer.Samples.TwoCubes",
+  "references": [
+    "Pretzel.Core",
+    "Pretzel.Pooling",
+    "Pretzel.Multiplayer",
+    "Pretzel.UI",
+    "Unity.Netcode.Runtime",
+    "Unity.InputSystem"
+  ],
+  "includePlatforms": [],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": true,
+  "defineConstraints": [],
+  "versionDefines": [
+    {
+      "name": "com.unity.inputsystem",
+      "expression": "",
+      "define": "PRETZEL_INPUT_SYSTEM"
+    }
+  ],
+  "noEngineReferences": false
+}

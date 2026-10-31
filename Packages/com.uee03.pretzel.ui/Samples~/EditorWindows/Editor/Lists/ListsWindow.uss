@@ -1,0 +1,22 @@
+.pretzel-lists__list {
+    flex-grow: 1;
+    margin: var(--pretzel-sample-gap);
+}
+
+.pretzel-lists__row {
+    flex-direction: row;
+    align-items: center;
+    padding: 0 4px;
+}
+
+.pretzel-lists__done {
+    margin-right: 4px;
+}
+
+.pretzel-lists__title {
+    flex-grow: 1;
+}
+
+.pretzel-lists__row--done > .pretzel-lists__title {
+    color: var(--pretzel-sample-muted);
+}

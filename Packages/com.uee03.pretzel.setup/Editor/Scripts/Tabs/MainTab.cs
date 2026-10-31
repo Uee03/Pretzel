@@ -269,7 +269,7 @@ namespace Pretzel.Setup.Tabs
 
             if (templates.Count == 0)
             {
-                _sceneTemplates.Add(new HelpBox("No Pretzel scene templates found. They come with the Pretzel Templates package.", HelpBoxMessageType.Info));
+                _sceneTemplates.Add(new HelpBox("No Pretzel scene templates found in this package's SceneTemplates folder.", HelpBoxMessageType.Info));
                 return;
             }
 

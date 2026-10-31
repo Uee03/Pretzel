@@ -18,6 +18,7 @@ else Debug.LogWarning($"{item.StatusCode} {item.Error} {item.ErrorBody}");
 - A failed request is a `Response<T>` with `Ok` false, `StatusCode`, `Error`, `ErrorBody` and `TimedOut`. Only cancellation throws.
 - `RequestOptions`: per-call timeout, retries with exponential backoff, headers, content type and `IProgress<float>`.
 - Call it from the main thread.
+- Depend on **IApiClient** in your services and view models, and use `ApiClient` only where you create it. A test passes a fake that returns `Response<T>.Success(data)` or `Response<T>.Failure("offline", 503)` without any network.
 
 For UniTask or R3 versions of these calls, install `pretzel.integrations` and add UniTask or R3.
 

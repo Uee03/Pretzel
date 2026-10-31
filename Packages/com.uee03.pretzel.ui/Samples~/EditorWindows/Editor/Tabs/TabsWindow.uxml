@@ -1,0 +1,25 @@
+<engine:UXML xmlns:engine="UnityEngine.UIElements" xmlns:editor="UnityEditor.UIElements">
+    <engine:VisualElement class="pretzel-tabs__root">
+        <engine:TabView name="tabs__view" class="pretzel-tabs__view">
+            <engine:Tab name="tabs__overview" label="Overview" class="pretzel-tabs__tab">
+                <engine:Label text="Overview" class="pretzel-sample__title" />
+                <engine:Label text="A TabView holds Tab children declared in UXML. Each tab is a container for any content." class="pretzel-sample__caption" />
+                <engine:ProgressBar name="tabs__progress" title="Progress" value="40" class="pretzel-tabs__progress" />
+            </engine:Tab>
+            <engine:Tab name="tabs__settings" label="Settings" class="pretzel-tabs__tab">
+                <engine:Label text="Settings" class="pretzel-sample__title" />
+                <engine:Toggle name="tabs__enabled" label="Enabled" value="true" />
+                <engine:Slider name="tabs__speed" label="Speed" low-value="0" high-value="10" value="3" show-input-field="true" />
+                <engine:DropdownField name="tabs__mode" label="Mode" />
+            </engine:Tab>
+            <engine:Tab name="tabs__about" label="About" class="pretzel-tabs__tab">
+                <engine:Label text="About" class="pretzel-sample__title" />
+                <engine:Label text="The active tab is remembered per Editor session. Use Add Tab to create a closeable tab from code." class="pretzel-sample__caption" />
+            </engine:Tab>
+        </engine:TabView>
+        <engine:VisualElement class="pretzel-tabs__footer">
+            <engine:Button name="tabs__add" text="Add Tab" />
+            <engine:Label name="tabs__status" class="pretzel-sample__status" />
+        </engine:VisualElement>
+    </engine:VisualElement>
+</engine:UXML>

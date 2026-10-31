@@ -1,0 +1,19 @@
+{
+  "name": "Pretzel.Multiplayer.Editor",
+  "rootNamespace": "Pretzel.Multiplayer.Editor",
+  "references": [
+    "Pretzel.Multiplayer",
+    "Unity.Netcode.Runtime"
+  ],
+  "includePlatforms": [
+    "Editor"
+  ],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": false,
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": false
+}

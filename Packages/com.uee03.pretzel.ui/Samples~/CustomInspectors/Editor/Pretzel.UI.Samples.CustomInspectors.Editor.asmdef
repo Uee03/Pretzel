@@ -1,0 +1,19 @@
+{
+  "name": "Pretzel.UI.Samples.CustomInspectors.Editor",
+  "rootNamespace": "Pretzel.Samples.UI.CustomInspectors.Editors",
+  "references": [
+    "Pretzel.UI.Editor",
+    "Pretzel.UI.Samples.CustomInspectors.Runtime"
+  ],
+  "includePlatforms": [
+    "Editor"
+  ],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": false,
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": false
+}

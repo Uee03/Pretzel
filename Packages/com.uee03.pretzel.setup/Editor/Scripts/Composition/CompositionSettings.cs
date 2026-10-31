@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using Newtonsoft.Json;
 using UnityEditor;
@@ -15,6 +16,8 @@ namespace Pretzel.Setup.Composition
         public string codeFolder = "Assets/_Scripts/Runtime/Composition";
         public string assetFolder = "Assets/_Project/Settings/Composition";
         public bool createFlow = true;
+        public bool starterServices = true;
+        public bool starterExample = true;
         public string apiBaseUrl = string.Empty;
         public List<string> pretzelServices = new();
         public List<ServiceDefinition> services = new();
@@ -27,6 +30,10 @@ namespace Pretzel.Setup.Composition
 
         [JsonIgnore]
         public string ScopePrefabName => scopeName + "LifetimeScope";
+
+        /// <summary>True when the installer registers an IDataStore: selected directly, or needed by SaveService.</summary>
+        [JsonIgnore]
+        public bool UsesDataStore => starterServices || pretzelServices.Contains(PretzelServiceCatalog.Data, StringComparer.OrdinalIgnoreCase);
 
         public void Normalize()
         {

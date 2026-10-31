@@ -1,0 +1,38 @@
+.pretzel-weapon {
+    --pretzel-weapon-gap: 4px;
+    --pretzel-weapon-muted: rgba(128, 128, 128, 1);
+    --pretzel-weapon-surface: rgba(128, 128, 128, 0.12);
+    --pretzel-weapon-border: var(--unity-colors-default-border);
+}
+
+.pretzel-weapon__title {
+    -unity-font-style: bold;
+    font-size: 13px;
+    margin: 6px 0 var(--pretzel-weapon-gap);
+}
+
+.pretzel-weapon__section {
+    margin-bottom: var(--pretzel-weapon-gap);
+}
+
+.pretzel-weapon__group {
+    padding-left: var(--pretzel-weapon-gap);
+    border-left-width: 2px;
+    border-left-color: var(--pretzel-weapon-border);
+    margin-bottom: var(--pretzel-weapon-gap);
+}
+
+.pretzel-weapon__group--hidden {
+    display: none;
+}
+
+.pretzel-weapon__group-title {
+    color: var(--pretzel-weapon-muted);
+    margin-bottom: 2px;
+}
+
+.pretzel-weapon__preview {
+    background-color: var(--pretzel-weapon-surface);
+    border-radius: 3px;
+    padding: var(--pretzel-weapon-gap);
+}

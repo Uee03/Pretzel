@@ -11,7 +11,7 @@ namespace Pretzel.Preferences
     /// <see cref="Changed"/> after every load or change. A missing or unreadable file falls back to defaults; the load result
     /// tells you which happened, so a corrupt file can be reported instead of silently replaced.
     /// </summary>
-    public sealed class PreferencesService
+    public sealed class PreferencesService : IPreferencesService
     {
         public static readonly DataKey DefaultKey = new("preferences");
 

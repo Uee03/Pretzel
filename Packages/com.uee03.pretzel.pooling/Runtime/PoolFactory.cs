@@ -13,7 +13,7 @@ namespace Pretzel.Pooling
     /// Derive a concrete class only if you want a named type; the generic one serializes as it is.
     /// </summary>
     [Serializable]
-    public class PoolFactory<TKey, T> : IDisposable where T : Component
+    public class PoolFactory<TKey, T> : IPoolFactory<TKey, T> where T : Component
     {
         [SerializeField] private PoolSettings _settings = new();
 
@@ -109,6 +109,10 @@ namespace Pretzel.Pooling
 
             throw new KeyNotFoundException($"No pool for key '{key}'. Add an entry for it or call Register.");
         }
+
+        IComponentPool<T> IPoolFactory<TKey, T>.GetPool(TKey key) => GetPool(key);
+
+        IComponentPool<T> IPoolFactory<TKey, T>.Register(TKey key, T prefab, int prewarm) => Register(key, prefab, prewarm);
 
         public T Spawn(TKey key) => GetPool(key).Get();
 
