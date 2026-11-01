@@ -1,0 +1,76 @@
+[
+ {
+  "command": "file.new",
+  "params": {
+   "name": "camera-orb",
+   "width": 64,
+   "height": 64,
+   "units": "Pixels",
+   "backgroundContents": "transparent",
+   "colorMode": "rgb"
+  }
+ },
+ {
+  "command": "shape.ellipse",
+  "params": {
+   "x": 4,
+   "y": 4,
+   "width": 56,
+   "height": 56
+  }
+ },
+ {
+  "command": "paint.setFill",
+  "params": {
+   "color": "#ff7b54"
+  }
+ },
+ {
+  "command": "paint.setStroke",
+  "params": {
+   "none": true
+  }
+ },
+ {
+  "command": "shape.ellipse",
+  "params": {
+   "x": 12,
+   "y": 12,
+   "width": 40,
+   "height": 40
+  }
+ },
+ {
+  "command": "paint.setFill",
+  "params": {
+   "color": "#ffb26b"
+  }
+ },
+ {
+  "command": "paint.setStroke",
+  "params": {
+   "none": true
+  }
+ },
+ {
+  "command": "shape.ellipse",
+  "params": {
+   "x": 18,
+   "y": 19,
+   "width": 16,
+   "height": 12
+  }
+ },
+ {
+  "command": "paint.setFill",
+  "params": {
+   "color": "#fff3d6"
+  }
+ },
+ {
+  "command": "paint.setStroke",
+  "params": {
+   "none": true
+  }
+ }
+]

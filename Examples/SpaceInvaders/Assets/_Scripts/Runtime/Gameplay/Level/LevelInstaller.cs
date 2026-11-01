@@ -1,6 +1,9 @@
+using Pretzel.Cameras;
 using Pretzel.DevConsole;
 using Pretzel.Integrations.VContainer;
+using Pretzel.Parallax;
 using SpaceInvaders.Audio;
+using SpaceInvaders.Feel;
 using SpaceInvaders.UI;
 using UnityEngine;
 using VContainer;
@@ -20,6 +23,8 @@ namespace SpaceInvaders.Gameplay
         [SerializeField] private BunkerField _bunkers;
         [SerializeField] private ProjectileSpawner _projectiles;
         [SerializeField] private ExplosionSpawner _explosions;
+        [SerializeField] private CameraShake _shake;
+        [SerializeField] private ParallaxController _stars;
         [SerializeField] private HudView _hud;
         [SerializeField] private DeveloperConsole _console;
 
@@ -31,6 +36,8 @@ namespace SpaceInvaders.Gameplay
             builder.RegisterComponent(_bunkers);
             builder.RegisterComponent(_projectiles).As<IProjectileSpawner>();
             builder.RegisterComponent(_explosions);
+            builder.RegisterComponent(_shake).As<ICameraShaker>();
+            builder.RegisterComponent(_stars);
             builder.RegisterComponent(_hud);
             builder.RegisterComponent(_console);
 
@@ -39,6 +46,8 @@ namespace SpaceInvaders.Gameplay
             builder.RegisterEntryPoint<LevelPresenter>(Lifetime.Scoped).AsSelf();
             builder.RegisterEntryPoint<HudPresenter>(Lifetime.Scoped);
             builder.RegisterEntryPoint<GameAudioReactions>(Lifetime.Scoped);
+            builder.RegisterEntryPoint<GameMusic>(Lifetime.Scoped);
+            builder.RegisterEntryPoint<GameFeelReactions>(Lifetime.Scoped);
             builder.RegisterEntryPoint<DevCommands>(Lifetime.Scoped);
         }
     }

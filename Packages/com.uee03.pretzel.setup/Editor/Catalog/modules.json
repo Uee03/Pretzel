@@ -101,6 +101,15 @@
       "optionalLibraries": []
     },
     {
+      "name": "com.uee03.pretzel.sfx",
+      "displayName": "SFX",
+      "description": "Sound effects by name on top of Pretzel Audio: an SfxLibrary asset of ids to audio cues, a player that rate-limits and caps concurrent voices per sound, and a ready pack of generated game sounds.",
+      "version": "0.2.0",
+      "dependencies": ["com.uee03.pretzel.audio"],
+      "packages": [],
+      "optionalLibraries": []
+    },
+    {
       "name": "com.uee03.pretzel.preferences",
       "displayName": "Preferences",
       "description": "Player preferences for audio, graphics, controls and language, saved through Pretzel Data, with change events and graphics apply.",
@@ -137,13 +146,58 @@
       "optionalLibraries": []
     },
     {
+      "name": "com.uee03.pretzel.input",
+      "displayName": "Input",
+      "description": "Input System tools for 2D, 2.5D and 3D games: a context stack that enables one action map at a time, reasoned input blocking (for example during scene loads), input buffering, last-used-device tracking, a safe interactive rebind and persisted binding overrides. Optional adapters for Pretzel Preferences and Pretzel Scenes compile only when those modules are installed.",
+      "version": "0.2.0",
+      "dependencies": [],
+      "packages": ["com.unity.inputsystem"],
+      "optionalLibraries": []
+    },
+    {
+      "name": "com.uee03.pretzel.camera",
+      "displayName": "Camera",
+      "description": "Camera tools on Cinemachine 3 for 2D, 2.5D and 3D: a trauma-based screen shake and a playfield fit that keep any aspect ratio correct, both as allocation-free Cinemachine extensions, plus menu entries that build a ready camera rig. The math is plain C# and unit tested.",
+      "version": "0.2.0",
+      "dependencies": [],
+      "packages": ["com.unity.cinemachine"],
+      "optionalLibraries": []
+    },
+    {
+      "name": "com.uee03.pretzel.vfx",
+      "displayName": "VFX",
+      "description": "Game feel for visual effects: hit stop and slow motion on a safe time-scale stack, sprite flash and punch scale. The math is plain C# and unit tested. Needs no other Pretzel module.",
+      "version": "0.2.0",
+      "dependencies": [],
+      "packages": [],
+      "optionalLibraries": []
+    },
+    {
+      "name": "com.uee03.pretzel.parallax",
+      "displayName": "Parallax",
+      "description": "Parallax scrolling for 2D and 2.5D: layers with a per-axis factor or a depth, infinite tiling, optional pixel snapping, and one controller that moves every layer in a single LateUpdate without allocations. Works with any camera, including Cinemachine. Needs no other Pretzel module.",
+      "version": "0.2.0",
+      "dependencies": [],
+      "packages": [],
+      "optionalLibraries": []
+    },
+    {
+      "name": "com.uee03.pretzel.vcontainer",
+      "displayName": "VContainer",
+      "description": "VContainer scopes for Pretzel: PretzelLifetimeScope, ScriptableInstaller and MonoInstaller, and the setup the Project Setup window generates on top of them. Needs no other Pretzel module. The assembly compiles only when VContainer is installed.",
+      "version": "0.2.0",
+      "dependencies": [],
+      "packages": [],
+      "optionalLibraries": [{ "displayName": "VContainer", "packageName": "jp.hadashikick.vcontainer" }]
+    },
+    {
       "name": "com.uee03.pretzel.integrations",
       "displayName": "Integrations",
-      "description": "Optional adapters between Pretzel and LitMotion, UniTask, R3 and VContainer. Each adapter assembly compiles only when its library is installed.",
+      "description": "Optional adapters between Pretzel and LitMotion, UniTask and R3. Each adapter assembly compiles only when its library is installed.",
       "version": "0.2.0",
       "dependencies": ["com.uee03.pretzel.core", "com.uee03.pretzel.tween", "com.uee03.pretzel.api", "com.uee03.pretzel.ui"],
       "packages": [],
-      "optionalLibraries": [{ "displayName": "LitMotion", "packageName": "com.annulusgames.lit-motion" }, { "displayName": "R3", "packageName": "com.cysharp.r3" }, { "displayName": "UniTask", "packageName": "com.cysharp.unitask" }, { "displayName": "VContainer", "packageName": "jp.hadashikick.vcontainer" }]
+      "optionalLibraries": [{ "displayName": "LitMotion", "packageName": "com.annulusgames.lit-motion" }, { "displayName": "R3", "packageName": "com.cysharp.r3" }, { "displayName": "UniTask", "packageName": "com.cysharp.unitask" }]
     },
     {
       "name": "com.uee03.pretzel.editor",

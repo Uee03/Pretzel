@@ -11,6 +11,12 @@
     "Pretzel.UI",
     "Pretzel.UI.Editor",
     "Pretzel.Integrations.VContainer",
+    "Pretzel.Sfx",
+    "Pretzel.Vfx",
+    "Pretzel.Cameras",
+    "Pretzel.Cameras.Editor",
+    "Pretzel.Parallax",
+    "Unity.Cinemachine",
     "VContainer"
   ],
   "includePlatforms": [

@@ -1,18 +1,25 @@
 {
   "dependencies": {
+    "com.unity.cinemachine": "3.1.7",
     "com.github-glitchenzo.nugetforunity": "https://github.com/GlitchEnzo/NuGetForUnity.git?path=/src/NuGetForUnity#v4.5.0",
     "com.uee03.pretzel.api": "file:../../Packages/com.uee03.pretzel.api",
     "com.uee03.pretzel.audio": "file:../../Packages/com.uee03.pretzel.audio",
     "com.uee03.pretzel.cloud": "file:../../Packages/com.uee03.pretzel.cloud",
     "com.uee03.pretzel.core": "file:../../Packages/com.uee03.pretzel.core",
+    "com.uee03.pretzel.camera": "file:../../Packages/com.uee03.pretzel.camera",
     "com.uee03.pretzel.data": "file:../../Packages/com.uee03.pretzel.data",
     "com.uee03.pretzel.devconsole": "file:../../Packages/com.uee03.pretzel.devconsole",
     "com.uee03.pretzel.editor": "file:../../Packages/com.uee03.pretzel.editor",
     "com.uee03.pretzel.events": "file:../../Packages/com.uee03.pretzel.events",
     "com.uee03.pretzel.extensions": "file:../../Packages/com.uee03.pretzel.extensions",
     "com.uee03.pretzel.integrations": "file:../../Packages/com.uee03.pretzel.integrations",
+    "com.uee03.pretzel.input": "file:../../Packages/com.uee03.pretzel.input",
+    "com.uee03.pretzel.parallax": "file:../../Packages/com.uee03.pretzel.parallax",
+    "com.uee03.pretzel.vcontainer": "file:../../Packages/com.uee03.pretzel.vcontainer",
+    "com.uee03.pretzel.vfx": "file:../../Packages/com.uee03.pretzel.vfx",
     "com.uee03.pretzel.multiplayer": "file:../../Packages/com.uee03.pretzel.multiplayer",
     "com.uee03.pretzel.pooling": "file:../../Packages/com.uee03.pretzel.pooling",
+    "com.uee03.pretzel.sfx": "file:../../Packages/com.uee03.pretzel.sfx",
     "com.uee03.pretzel.preferences": "file:../../Packages/com.uee03.pretzel.preferences",
     "com.uee03.pretzel.scenes": "file:../../Packages/com.uee03.pretzel.scenes",
     "com.uee03.pretzel.setup": "file:../../Packages/com.uee03.pretzel.setup",
@@ -85,6 +92,7 @@
   "testables": [
     "com.uee03.pretzel.api",
     "com.uee03.pretzel.audio",
+    "com.uee03.pretzel.camera",
     "com.uee03.pretzel.cloud",
     "com.uee03.pretzel.core",
     "com.uee03.pretzel.data",
@@ -92,12 +100,17 @@
     "com.uee03.pretzel.editor",
     "com.uee03.pretzel.events",
     "com.uee03.pretzel.extensions",
+    "com.uee03.pretzel.input",
     "com.uee03.pretzel.multiplayer",
+    "com.uee03.pretzel.parallax",
     "com.uee03.pretzel.pooling",
     "com.uee03.pretzel.preferences",
     "com.uee03.pretzel.scenes",
     "com.uee03.pretzel.setup",
+    "com.uee03.pretzel.sfx",
     "com.uee03.pretzel.tween",
-    "com.uee03.pretzel.ui"
+    "com.uee03.pretzel.ui",
+    "com.uee03.pretzel.vcontainer",
+    "com.uee03.pretzel.vfx"
   ]
 }

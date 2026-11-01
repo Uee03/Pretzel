@@ -27,6 +27,7 @@ namespace SpaceInvaders.Gameplay
         private readonly BunkerField _bunkers;
         private readonly HudView _hud;
         private readonly ShipControls _controls;
+        private readonly GameInput _input;
         private readonly CompositeDisposable _subscriptions = new();
         private readonly CancellationTokenSource _cancellation = new();
 
@@ -41,7 +42,8 @@ namespace SpaceInvaders.Gameplay
             UfoSpawner ufo,
             BunkerField bunkers,
             HudView hud,
-            ShipControls controls)
+            ShipControls controls,
+            GameInput input)
         {
             _bus = bus;
             _game = game;
@@ -54,12 +56,16 @@ namespace SpaceInvaders.Gameplay
             _bunkers = bunkers;
             _hud = hud;
             _controls = controls;
+            _input = input;
         }
 
         public void Start()
         {
             _run.Reset();
             _game.StartGame();
+
+            // A game left from the pause screen must not leave the Player map off for the next one.
+            _input.Resume();
             _bus.Subscribe<InvaderDestroyed>(OnInvaderDestroyed).AddTo(_subscriptions);
             _bus.Subscribe<UfoDestroyed>(message => _game.AddScore(message.Points)).AddTo(_subscriptions);
             _bus.Subscribe<PlayerHit>(_ => OnPlayerHit()).AddTo(_subscriptions);
@@ -80,6 +86,7 @@ namespace SpaceInvaders.Gameplay
             if (_game.State == GameState.Playing)
             {
                 _game.Pause();
+                _input.Pause();
                 _hud.ShowPause();
             }
             else if (_game.State == GameState.Paused)
@@ -90,6 +97,7 @@ namespace SpaceInvaders.Gameplay
 
         public void Dispose()
         {
+            _input.Resume();
             _cancellation.Cancel();
             _cancellation.Dispose();
             _subscriptions.Dispose();
@@ -180,6 +188,7 @@ namespace SpaceInvaders.Gameplay
         private void Resume()
         {
             _game.Resume();
+            _input.Resume();
             _hud.HidePause();
         }
 

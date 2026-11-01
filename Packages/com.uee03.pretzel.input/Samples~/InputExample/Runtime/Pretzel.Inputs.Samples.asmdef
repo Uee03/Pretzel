@@ -1,0 +1,17 @@
+{
+  "name": "Pretzel.Inputs.Samples",
+  "rootNamespace": "Pretzel.Inputs.Samples",
+  "references": [
+    "Pretzel.Inputs",
+    "Unity.InputSystem"
+  ],
+  "includePlatforms": [],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": true,
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": false
+}

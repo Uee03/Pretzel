@@ -1,0 +1,21 @@
+{
+  "name": "Pretzel.Cameras.Samples.Editor",
+  "rootNamespace": "Pretzel.Cameras.Samples.Editor",
+  "references": [
+    "Pretzel.Cameras",
+    "Pretzel.Cameras.Editor",
+    "Pretzel.Cameras.Samples",
+    "Unity.Cinemachine"
+  ],
+  "includePlatforms": [
+    "Editor"
+  ],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": false,
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": false
+}

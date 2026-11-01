@@ -1,0 +1,19 @@
+{
+  "name": "com.uee03.pretzel.camera",
+  "displayName": "Pretzel Camera",
+  "version": "0.2.0",
+  "unity": "6000.0",
+  "description": "Camera tools on Cinemachine 3 for 2D, 2.5D and 3D: a trauma-based screen shake and a playfield fit that keep any aspect ratio correct, both as allocation-free Cinemachine extensions, plus menu entries that build a ready camera rig. The math is plain C# and unit tested.",
+  "author": { "name": "Uee03" },
+  "license": "MIT",
+  "dependencies": {
+    "com.unity.cinemachine": "3.1.7"
+  },
+  "samples": [
+    {
+      "displayName": "Camera Example",
+      "description": "A 2D arena with a Cinemachine follow camera, trauma shake on click and a playfield that fits every aspect ratio.",
+      "path": "Samples~/CameraExample"
+    }
+  ]
+}

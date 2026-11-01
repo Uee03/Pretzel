@@ -1,0 +1,19 @@
+{
+  "name": "com.uee03.pretzel.sfx",
+  "displayName": "Pretzel SFX",
+  "version": "0.2.0",
+  "unity": "6000.0",
+  "description": "Sound effects by name on top of Pretzel Audio: an SfxLibrary asset of ids to audio cues, a player that rate-limits and caps concurrent voices per sound, and a ready pack of generated game sounds.",
+  "author": { "name": "Uee03" },
+  "license": "MIT",
+  "dependencies": {
+    "com.uee03.pretzel.audio": "0.2.0"
+  },
+  "samples": [
+    {
+      "displayName": "SFX Pack",
+      "description": "Thirteen generated sounds (UI, pickups, hits, explosion, stingers) wired into an SfxLibrary, with a sound board scene.",
+      "path": "Samples~/SfxPack"
+    }
+  ]
+}

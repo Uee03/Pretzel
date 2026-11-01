@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Pretzel.Vfx;
 using SpaceInvaders.Gameplay;
 using UnityEditor;
 using UnityEngine;
@@ -7,7 +8,7 @@ namespace SpaceInvaders.Editor
 {
     /// <summary>
     /// Builds every actor prefab from Unity's built-in UI sprites (a rounded rectangle and a circle), tinted and composed into shapes.
-    /// No imported art is needed, so the demo works in any project that has the default resources.
+    /// Only the explosion uses imported art: the pixel-art frames drawn in Aseprite.
     /// </summary>
     internal static class ActorPrefabsBuilder
     {
@@ -77,7 +78,13 @@ namespace SpaceInvaders.Editor
 
             PlayerShip ship = root.AddComponent<PlayerShip>();
             BuilderUtil.SetObject(ship, "_muzzle", muzzle.transform);
-            BuilderUtil.SetObjects(ship, "_renderers", ToObjects(root.GetComponentsInChildren<SpriteRenderer>()));
+            List<Object> renderers = ToObjects(root.GetComponentsInChildren<SpriteRenderer>());
+            BuilderUtil.SetObjects(ship, "_renderers", renderers);
+
+            // A red flash and a pop when the ship is hit. GameFeelReactions fires them; the ship knows nothing about them.
+            SpriteFlash flash = root.AddComponent<SpriteFlash>();
+            BuilderUtil.SetObjects(flash, "_renderers", renderers);
+            root.AddComponent<PunchScale>();
             return Save(root, "Player");
         }
 
@@ -153,9 +160,16 @@ namespace SpaceInvaders.Editor
         private static GameObject BuildExplosion()
         {
             GameObject root = new("Explosion");
-            SpriteRenderer renderer = Disc("Disc", root.transform, Vector2.zero, Vector2.one, Color.white, 5);
+            GameObject burst = new("Burst");
+            burst.transform.SetParent(root.transform, false);
+            SpriteRenderer renderer = burst.AddComponent<SpriteRenderer>();
+            renderer.sprite = (Sprite)ArtImporter.LoadExplosionFrames()[0];
+            renderer.sharedMaterial = _unlit;
+            renderer.sortingOrder = 5;
+
             ExplosionFx fx = root.AddComponent<ExplosionFx>();
             BuilderUtil.SetObject(fx, "_renderer", renderer);
+            BuilderUtil.SetObjects(fx, "_frames", ArtImporter.LoadExplosionFrames());
             return Save(root, "Explosion");
         }
 

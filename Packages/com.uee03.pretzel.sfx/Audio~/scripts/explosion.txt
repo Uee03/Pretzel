@@ -1,0 +1,10 @@
+# explosion
+session.new {"name":"explosion","sample_rate":44100,"bit_depth":16}
+track.new {"kind":"instrument","name":"explosion","instrument":"drum_synth","format":"stereo"}
+mix.instrument {"track":1,"plugin":"drum_synth","params":{"kick_decay":900,"kick_tune":-14,"snare_decay":700,"snare_snappy":100,"cymbal_decay":900}}
+mix.insert {"track":1,"slot":"a","plugin":"room_reverb","params":{}}
+mix.insert {"track":1,"slot":"b","plugin":"lofi","params":{}}
+midi.new_clip {"track":1}
+midi.note_add {"clip":2,"pitch":36,"start_ticks":0,"length_ticks":240,"velocity":127}
+midi.note_add {"clip":2,"pitch":38,"start_ticks":0,"length_ticks":240,"velocity":127}
+midi.note_add {"clip":2,"pitch":49,"start_ticks":0,"length_ticks":240,"velocity":100}

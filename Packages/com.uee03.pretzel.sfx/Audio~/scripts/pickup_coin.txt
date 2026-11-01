@@ -1,0 +1,7 @@
+# pickup_coin
+session.new {"name":"pickup_coin","sample_rate":44100,"bit_depth":16}
+track.new {"kind":"instrument","name":"pickup_coin","instrument":"subtractive_synth","format":"mono"}
+mix.instrument {"track":1,"plugin":"subtractive_synth","params":{"osc1_wave":1,"osc2_wave":1,"osc_mix":0,"cutoff":9000,"resonance":10,"filter_env_amount":0,"amp_attack":1,"amp_decay":120,"amp_sustain":60,"amp_release":150,"velocity":100,"level":-6}}
+midi.new_clip {"track":1}
+midi.note_add {"clip":2,"pitch":83,"start_ticks":0,"length_ticks":100,"velocity":110}
+midi.note_add {"clip":2,"pitch":88,"start_ticks":100,"length_ticks":300,"velocity":110}

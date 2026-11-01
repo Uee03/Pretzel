@@ -4,11 +4,15 @@ using UnityEngine;
 
 namespace SpaceInvaders.Gameplay
 {
-    /// <summary>A pooled burst: grows and fades with Pretzel easing, then returns itself to the pool.</summary>
+    /// <summary>
+    /// A pooled burst. It plays the pixel-art explosion frames drawn in Aseprite, tinted per kind of invader, grows a little
+    /// with Pretzel easing, then returns itself to the pool.
+    /// </summary>
     public sealed class ExplosionFx : MonoBehaviour, IPoolable
     {
         [SerializeField] private SpriteRenderer _renderer;
-        [SerializeField, Min(0.05f)] private float _duration = 0.35f;
+        [SerializeField] private Sprite[] _frames = new Sprite[0];
+        [SerializeField, Min(0.05f)] private float _duration = 0.4f;
 
         private PooledObject _pooled;
         private Color _tint = Color.white;
@@ -51,11 +55,14 @@ namespace SpaceInvaders.Gameplay
 
         private void Apply(float progress)
         {
-            float scale = EaseUtility.Lerp(EaseType.OutCubic, 0.2f, _size, progress);
+            if (_frames.Length > 0)
+            {
+                _renderer.sprite = _frames[Mathf.Min(_frames.Length - 1, (int)(progress * _frames.Length))];
+            }
+
+            float scale = EaseUtility.Lerp(EaseType.OutCubic, 0.85f, 1.15f, progress) * _size;
             transform.localScale = new Vector3(scale, scale, 1f);
-            Color color = _tint;
-            color.a = 1f - EaseUtility.Evaluate(EaseType.InQuad, progress);
-            _renderer.color = color;
+            _renderer.color = _tint;
         }
     }
 }

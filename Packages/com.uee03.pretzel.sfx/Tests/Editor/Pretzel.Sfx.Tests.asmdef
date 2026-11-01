@@ -1,0 +1,10 @@
+{
+  "name": "Pretzel.Sfx.Tests",
+  "rootNamespace": "Pretzel.Sfx.Tests",
+  "references": ["Pretzel.Sfx", "Pretzel.Audio", "UnityEngine.TestRunner", "UnityEditor.TestRunner"],
+  "includePlatforms": ["Editor"],
+  "overrideReferences": true,
+  "precompiledReferences": ["nunit.framework.dll"],
+  "autoReferenced": false,
+  "defineConstraints": ["UNITY_INCLUDE_TESTS"]
+}

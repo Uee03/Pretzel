@@ -1,0 +1,67 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c84d417af0bbef642a73752c0f1ca5e6, type: 3}
+  m_Name: SfxLibrary
+  m_EditorClassIdentifier: Pretzel.Sfx::Pretzel.Sfx.SfxLibrary
+  _entries:
+  - _id: ui_click
+    _cue: {fileID: 11400000, guid: f7368ee26713e044fafd97d9ac21fd4e, type: 2}
+    _cooldownSeconds: 0.03
+    _maxConcurrent: 0
+  - _id: ui_confirm
+    _cue: {fileID: 11400000, guid: eac29f1db252ca14fa94faa488d33ef9, type: 2}
+    _cooldownSeconds: 0.1
+    _maxConcurrent: 0
+  - _id: ui_back
+    _cue: {fileID: 11400000, guid: 9011f0d056f8a4b4cab1060a440fa0b1, type: 2}
+    _cooldownSeconds: 0.1
+    _maxConcurrent: 0
+  - _id: ui_error
+    _cue: {fileID: 11400000, guid: f4f566be8ccbab745a3877b733009dc1, type: 2}
+    _cooldownSeconds: 0.15
+    _maxConcurrent: 0
+  - _id: pickup_coin
+    _cue: {fileID: 11400000, guid: 65755dbb3e67f1b44b2da4d27de36ba5, type: 2}
+    _cooldownSeconds: 0.05
+    _maxConcurrent: 4
+  - _id: power_up
+    _cue: {fileID: 11400000, guid: bfd17e62507d7e2419ba676098f63a70, type: 2}
+    _cooldownSeconds: 0
+    _maxConcurrent: 1
+  - _id: jump
+    _cue: {fileID: 11400000, guid: 2385be99ecc03c047a9ab7e47d0a081d, type: 2}
+    _cooldownSeconds: 0.1
+    _maxConcurrent: 0
+  - _id: laser
+    _cue: {fileID: 11400000, guid: 4fd32885eece70a49ab49e4d990a98a5, type: 2}
+    _cooldownSeconds: 0.07
+    _maxConcurrent: 4
+  - _id: hit_light
+    _cue: {fileID: 11400000, guid: df40852524cc7f6409154ff6b44d61dc, type: 2}
+    _cooldownSeconds: 0.08
+    _maxConcurrent: 3
+  - _id: hit_heavy
+    _cue: {fileID: 11400000, guid: c6d824b961058954d863da7e01751075, type: 2}
+    _cooldownSeconds: 0
+    _maxConcurrent: 2
+  - _id: explosion
+    _cue: {fileID: 11400000, guid: 255df97fe5c86cb4583d3bc057e19fa4, type: 2}
+    _cooldownSeconds: 0
+    _maxConcurrent: 2
+  - _id: stinger_win
+    _cue: {fileID: 11400000, guid: 39af46817b2b7f94eaf6df797def5603, type: 2}
+    _cooldownSeconds: 0
+    _maxConcurrent: 1
+  - _id: stinger_lose
+    _cue: {fileID: 11400000, guid: 75fb0ea8c8160084d86dc65e6e055e68, type: 2}
+    _cooldownSeconds: 0
+    _maxConcurrent: 1

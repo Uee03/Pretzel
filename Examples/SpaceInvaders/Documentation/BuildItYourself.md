@@ -12,7 +12,7 @@ The order a new project would follow to end up with this game, the editor tools 
    ```
 
    This example lives next to the packages, so its manifest uses `file:../../../Packages/<name>` paths instead.
-3. **Open Pretzel > Project Setup.** On *Main*, set the company and product name and create the *Game* folder preset. On *Addons*, install the modules you need: core, extensions, tween, data, events, pooling, scenes, ui, audio, preferences, devconsole and integrations, plus VContainer.
+3. **Open Pretzel > Project Setup.** On *Main*, set the company and product name and create the *Game* folder preset. On *Addons*, install the modules you need: core, extensions, tween, data, events, pooling, scenes, ui, audio, preferences, devconsole and vcontainer, plus VContainer.
 4. **VContainer tab.** Set the namespace (`SpaceInvaders`), keep *Starter services* on, and tick the Pretzel services you use: event bus, scene loader, data store, preferences, pool registry and audio. Add one custom service, `GameNavigator`, with an interface. Click **Generate and set up**.
 5. After compilation the tool creates the installer asset, the scope prefab and the VContainer settings. Pressing Play now runs `GameFlow.Start` in any scene.
 
@@ -45,8 +45,8 @@ The *Space Invaders* menu is the example's own tooling. All of it is in `Assets/
 
 | Menu item | What it does |
 |---|---|
-| **Build Demo** | Renders the sounds, creates the wave and panel assets, builds every prefab from Unity's built-in sprites, puts the settings and the loading screen on the root scope prefab, creates both scenes from the Pretzel 2D template and sets the build settings. Every step is repeatable, and a rebuild keeps edits made to existing wave assets |
-| **Regenerate Sound Effects** | Renders the six effects and the four march notes with a small chip-style synth (`SfxSynth`) to `_Project/Audio/SFX` and refreshes the cues |
+| **Build Demo** | Sets the import settings of the art (`ArtImporter`), builds the sound library, creates the wave and panel assets, builds every prefab (the explosion from its eight frames, the player with `SpriteFlash` and `PunchScale`), puts the settings and the loading screen on the root scope prefab, creates both scenes from the Pretzel 2D template with a Cinemachine rig and three scrolling star layers, and sets the build settings. Every step is repeatable, and a rebuild keeps edits made to existing wave assets |
+| **Rebuild Sound Library** | Reads the WAV files in `_Project/Audio/SFX` and `_Project/Audio/Music`, refreshes the cues and the `SfxLibrary`, and fills the `SoundBank` with the march notes and the three tunes (imported as streamed Vorbis) |
 | **Build Windows Player** | Builds the two scenes to `Builds/SpaceInvaders` (git-ignored). Pass `-buildOutput <path>` to choose another file |
 
 The committed scenes and assets came from **Build Demo**, so you do not need to run it. It is there so you can see how generated content is kept repeatable, and to rebuild after changing a prefab recipe.
@@ -73,7 +73,8 @@ Do not add `-quit` to a test run, and do not add `-nographics` to the PlayMode r
 
 | Suite | What it proves |
 |---|---|
-| `Tests/EditMode` | The march turns and drops at the edges; the tempo only ever gets faster; scores; the wave lap rules; lives and waves |
+| `Tests/EditMode` | The march turns and drops at the edges; the tempo only ever gets faster; scores; the wave lap rules; lives and waves. `GameFeelReactionsTests` and `GameAudioReactionsTests` check which sound, freeze, shake and backdrop speed each event asks for, against fakes (`Fakes.cs`) |
+| `Tests/PlayMode/FeelAndInputTests.cs` | In the real scenes: a hit gives a hit stop, a shake and a flash and time returns to 1; a pause is never undone by an overlapping effect; the playfield stays fully visible at 16:9, 1:1 and 9:16; the star layers scroll by themselves and stop on pause; pausing changes the input context; input is blocked during a scene load |
 | `Tests/PlayMode/GameFlowTests.cs` | The title boots the root scope and loads progress. A full game: a real bullet kills an invader through pooling and physics, bombs drop, a cleared wave starts the next, a hit makes the ship invulnerable, three hits end the game and save the high score, and the game returns to the title. Pause stops time. The console commands change the game |
 
 The PlayMode tests save screenshots to `Temp/TestScreenshots`. `ScreenshotUtility` renders the camera and every UI panel to render textures and blends them, because `WaitForEndOfFrame` never completes in batch mode. Copy the pictures out before the next Unity run.
@@ -93,4 +94,5 @@ The result opens on the title screen. A build touches URP's prefilter settings, 
 - Add a wave: duplicate a wave asset, edit it in the Inspector and add it to the `WaveSet`.
 - Add a new bomb kind: a new prefab, a `ProjectileKind` value and an entry in the `ProjectileSpawner` factory. Nothing else changes.
 - Add a console command in `DevCommands`.
-- Replace the placeholder sounds: assign new clips on the cues, or point the `SoundBank` at your own cues.
+- Replace the sounds: drop a WAV with the same name into `_Project/Audio/SFX` and run **Rebuild Sound Library**, or edit `Art~/*.js` and run `Art~/build-audio.ps1` (SoundCraft). The same goes for the art: `Art~/build.ps1` runs the Aseprite scripts.
+- Tune the feel: every number is a constant at the top of `Feel/GameFeelReactions.cs`.

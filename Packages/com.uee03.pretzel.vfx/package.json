@@ -1,0 +1,17 @@
+{
+  "name": "com.uee03.pretzel.vfx",
+  "displayName": "Pretzel VFX",
+  "version": "0.2.0",
+  "unity": "6000.0",
+  "description": "Game feel for visual effects: hit stop and slow motion on a safe time-scale stack, sprite flash and punch scale. The math is plain C# and unit tested. Needs no other Pretzel module.",
+  "author": { "name": "Uee03" },
+  "license": "MIT",
+  "dependencies": {},
+  "samples": [
+    {
+      "displayName": "Game Feel Example",
+      "description": "A bouncing orb with buttons for hit stop, slow motion, flash and punch, alone and together.",
+      "path": "Samples~/GameFeelExample"
+    }
+  ]
+}

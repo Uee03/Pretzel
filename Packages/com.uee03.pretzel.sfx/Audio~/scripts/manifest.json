@@ -1,0 +1,54 @@
+[
+ {
+  "name": "ui_click",
+  "seconds": 0.25
+ },
+ {
+  "name": "ui_confirm",
+  "seconds": 0.6
+ },
+ {
+  "name": "ui_back",
+  "seconds": 0.6
+ },
+ {
+  "name": "ui_error",
+  "seconds": 0.7
+ },
+ {
+  "name": "pickup_coin",
+  "seconds": 0.7
+ },
+ {
+  "name": "power_up",
+  "seconds": 1.1
+ },
+ {
+  "name": "jump",
+  "seconds": 0.45
+ },
+ {
+  "name": "laser",
+  "seconds": 0.5
+ },
+ {
+  "name": "hit_light",
+  "seconds": 0.5
+ },
+ {
+  "name": "hit_heavy",
+  "seconds": 1.9
+ },
+ {
+  "name": "explosion",
+  "seconds": 2
+ },
+ {
+  "name": "stinger_win",
+  "seconds": 2.4
+ },
+ {
+  "name": "stinger_lose",
+  "seconds": 2.6
+ }
+]

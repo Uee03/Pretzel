@@ -1,0 +1,20 @@
+{
+  "name": "Pretzel.Inputs.Samples.Editor",
+  "rootNamespace": "Pretzel.Inputs.Samples.Editor",
+  "references": [
+    "Pretzel.Inputs",
+    "Pretzel.Inputs.Samples",
+    "Unity.InputSystem"
+  ],
+  "includePlatforms": [
+    "Editor"
+  ],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": false,
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": false
+}

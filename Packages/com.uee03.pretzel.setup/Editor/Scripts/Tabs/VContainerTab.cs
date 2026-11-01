@@ -16,7 +16,8 @@ namespace Pretzel.Setup.Tabs
     /// <summary>Sets up VContainer: a root scope created before the first scene, an installer, and generated service code.</summary>
     public sealed class VContainerTab : IPretzelTab
     {
-        private const string GuidePath = "Packages/com.uee03.pretzel.integrations/Documentation~/VContainer.md";
+        private const string GuidePath = "Packages/com.uee03.pretzel.vcontainer/Documentation~/VContainer.md";
+        private const string NoContainerGuidePath = "Packages/com.uee03.pretzel.setup/Documentation~/WithoutAContainer.md";
         private const string DiagnosticsMenu = "Window/VContainer Diagnostics";
         private const string OfficialDocsUrl = "https://vcontainer.hadashikick.jp/";
 
@@ -82,7 +83,8 @@ namespace Pretzel.Setup.Tabs
             _rootStatus = Hint(section);
 
             _install = Action(section, "Install VContainer", InstallVContainer, primary: true);
-            Action(section, "Open the VContainer guide", OpenGuide);
+            Action(section, "Open the VContainer guide", () => OpenGuide(GuidePath));
+            Action(section, "Open the guide for working without a container", () => OpenGuide(NoContainerGuidePath));
             Action(section, "Open the official VContainer documentation", () => Application.OpenURL(OfficialDocsUrl));
             return section;
         }
@@ -91,7 +93,8 @@ namespace Pretzel.Setup.Tabs
         {
             VisualElement section = Section("Composition root");
             Hint(section).text = "One root scope prefab, created by VContainer before the first scene loads and kept for the whole session. " +
-                                 "It replaces a GameManager: services are plain classes registered in the installer, and the flow class is the entry point.";
+                                 "It is an alternative to a GameManager: services are plain classes registered in the installer, and the flow class is the entry point. " +
+                                 "A container is optional. The no-container guide shows the same setup with ScriptableObjects.";
 
             Bind(section, "Namespace", () => Settings.namespaceName, v => Settings.namespaceName = v);
             Bind(section, "Scope name", () => Settings.scopeName, v => Settings.scopeName = v);
@@ -242,7 +245,7 @@ namespace Pretzel.Setup.Tabs
             Type scopeType = CompositionAssets.ScopeType;
             if (scopeType == null)
             {
-                _result.text = "Install VContainer and the Pretzel Integrations module first.";
+                _result.text = "Install VContainer and the Pretzel VContainer module first.";
                 return;
             }
 
@@ -262,9 +265,9 @@ namespace Pretzel.Setup.Tabs
             }
         }
 
-        private static void OpenGuide()
+        private static void OpenGuide(string guidePath)
         {
-            string path = Path.GetFullPath(GuidePath);
+            string path = Path.GetFullPath(guidePath);
             if (File.Exists(path))
             {
                 EditorUtility.OpenWithDefaultApp(path);
@@ -300,8 +303,8 @@ namespace Pretzel.Setup.Tabs
             bool integration = CompositionAssets.IsIntegrationActive;
             _vcontainerStatus.text = vcontainer ? "VContainer is installed." : "VContainer is not installed.";
             _integrationStatus.text = integration
-                ? "Pretzel Integrations: PretzelLifetimeScope, ScriptableInstaller and MonoInstaller are available."
-                : "Pretzel Integrations is not installed, or VContainer is missing. Install the module from the Addons tab.";
+                ? "Pretzel VContainer: PretzelLifetimeScope, ScriptableInstaller and MonoInstaller are available."
+                : "Pretzel VContainer is not installed, or VContainer is missing. Install the Pretzel VContainer module from the Addons tab.";
             UnityEngine.Object vcontainerSettings = CompositionAssets.PreloadedSettings();
             UnityEngine.Object root = CompositionAssets.RootScopeOf(vcontainerSettings);
             _rootStatus.text = root != null

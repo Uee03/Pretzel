@@ -1,0 +1,20 @@
+[
+  {
+    "name": "title_theme",
+    "bpm": 90,
+    "loopSeconds": 32,
+    "notes": 124
+  },
+  {
+    "name": "gameplay_loop",
+    "bpm": 120,
+    "loopSeconds": 24,
+    "notes": 422
+  },
+  {
+    "name": "last_stand",
+    "bpm": 150,
+    "loopSeconds": 19.2,
+    "notes": 583
+  }
+]

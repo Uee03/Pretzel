@@ -4,7 +4,10 @@ using UnityEngine.InputSystem;
 
 namespace SpaceInvaders.Gameplay
 {
-    /// <summary>Reads the project-wide Input System actions, so rebinding or a new device needs no code change.</summary>
+    /// <summary>
+    /// Reads the project-wide Input System actions, so rebinding or a new device needs no code change. It never enables or
+    /// disables an action: <see cref="GameInput"/> decides which maps are live, so a paused or loading game reads zero.
+    /// </summary>
     public sealed class ShipControls
     {
         private readonly InputAction _move;
@@ -24,10 +27,6 @@ namespace SpaceInvaders.Gameplay
             _attack = actions.FindAction("Player/Attack", true);
             _jump = actions.FindAction("Player/Jump", true);
             _cancel = actions.FindAction("UI/Cancel", true);
-            if (!actions.enabled)
-            {
-                actions.Enable();
-            }
         }
 
         public float Horizontal => _move.ReadValue<Vector2>().x;

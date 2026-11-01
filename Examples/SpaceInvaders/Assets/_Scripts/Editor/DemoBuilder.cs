@@ -1,6 +1,7 @@
 using Pretzel.Audio;
 using Pretzel.Integrations.VContainer;
 using Pretzel.Scenes;
+using Pretzel.Sfx;
 using SpaceInvaders.Audio;
 using SpaceInvaders.Gameplay;
 using UnityEditor;
@@ -22,6 +23,7 @@ namespace SpaceInvaders.Editor
         public static void BuildAll()
         {
             BuilderUtil.EnsureFolder("Assets/_Project/Scenes");
+            ArtImporter.Import();
             SoundBankBuilder.Build();
             WaveAssetsBuilder.Build();
             AssetDatabase.SaveAssets();
@@ -40,25 +42,26 @@ namespace SpaceInvaders.Editor
             Debug.Log("[SI] Demo built: Title and Game scenes are in the build settings.");
         }
 
-        [MenuItem("Space Invaders/Regenerate Sound Effects", priority = 20)]
+        [MenuItem("Space Invaders/Rebuild Sound Library", priority = 20)]
         public static void RegenerateSounds()
         {
             SoundBankBuilder.Build();
             AssetDatabase.SaveAssets();
-            Debug.Log("[SI] Sound effects rendered to " + SoundBankBuilder.SfxFolder);
+            Debug.Log("[SI] Sound library rebuilt from " + SoundBankBuilder.SfxFolder);
         }
 
         /// <summary>Puts the settings assets and the loading screen on the root scope prefab that the Pretzel VContainer tab created.</summary>
         private static void ConfigureRootScope()
         {
             SoundBank sounds = AssetDatabase.LoadAssetAtPath<SoundBank>(SoundBankBuilder.SoundBankPath);
+            SfxLibrary sfx = AssetDatabase.LoadAssetAtPath<SfxLibrary>(SoundBankBuilder.SfxLibraryPath);
             WaveSet waves = AssetDatabase.LoadAssetAtPath<WaveSet>(WaveAssetsBuilder.WaveSetPath);
             PanelSettings loadingPanel = AssetDatabase.LoadAssetAtPath<PanelSettings>(PanelAssetsBuilder.LoadingPath);
             GameObject root = PrefabUtility.LoadPrefabContents(RootScopePath);
             try
             {
                 PretzelLifetimeScope scope = root.GetComponent<PretzelLifetimeScope>();
-                BuilderUtil.SetObjects(scope, "_settings", new Object[] { sounds, waves });
+                BuilderUtil.SetObjects(scope, "_settings", new Object[] { sounds, sfx, waves });
 
                 UIDocumentSceneTransition transition = root.GetComponentInChildren<UIDocumentSceneTransition>(true);
                 if (transition == null)

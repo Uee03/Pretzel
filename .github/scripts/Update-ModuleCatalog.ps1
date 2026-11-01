@@ -25,7 +25,7 @@ $output = Join-Path $packagesRoot "$setupName\Editor\Catalog\modules.json"
 
 # Order of the Addons tab: the base layer first, optional extras last. Unlisted modules follow alphabetically.
 $order = @("core", "extensions", "data", "tween", "ui", "ui.ugui", "api", "events", "pooling", "scenes",
-    "audio", "preferences", "devconsole", "cloud", "multiplayer", "integrations", "editor")
+    "audio", "sfx", "preferences", "devconsole", "cloud", "multiplayer", "input", "camera", "vfx", "parallax", "vcontainer", "integrations", "editor")
 
 function ConvertTo-JsonString([string]$value) {
     $builder = New-Object System.Text.StringBuilder

@@ -1,0 +1,20 @@
+{
+  "name": "Pretzel.Sfx.Samples.Editor",
+  "rootNamespace": "Pretzel.Sfx.Samples.Editor",
+  "references": [
+    "Pretzel.Sfx",
+    "Pretzel.Sfx.Samples",
+    "Pretzel.Audio"
+  ],
+  "includePlatforms": [
+    "Editor"
+  ],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": false,
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": false
+}

@@ -1,0 +1,14 @@
+{
+  "name": "Pretzel.Inputs.Adapters.Tests",
+  "rootNamespace": "Pretzel.Inputs.Adapters.Tests",
+  "references": ["Pretzel.Inputs", "Pretzel.Inputs.Preferences", "Pretzel.Inputs.Scenes", "Pretzel.Preferences", "Pretzel.Scenes", "Pretzel.Data", "Unity.InputSystem", "UnityEngine.TestRunner", "UnityEditor.TestRunner"],
+  "includePlatforms": ["Editor"],
+  "overrideReferences": true,
+  "precompiledReferences": ["nunit.framework.dll"],
+  "autoReferenced": false,
+  "defineConstraints": ["UNITY_INCLUDE_TESTS", "PRETZEL_INPUT_TEST_PREFERENCES", "PRETZEL_INPUT_TEST_SCENES"],
+  "versionDefines": [
+    { "name": "com.uee03.pretzel.preferences", "expression": "", "define": "PRETZEL_INPUT_TEST_PREFERENCES" },
+    { "name": "com.uee03.pretzel.scenes", "expression": "", "define": "PRETZEL_INPUT_TEST_SCENES" }
+  ]
+}

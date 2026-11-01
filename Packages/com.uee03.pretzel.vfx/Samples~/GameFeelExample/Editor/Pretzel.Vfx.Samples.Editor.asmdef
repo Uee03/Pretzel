@@ -1,0 +1,19 @@
+{
+  "name": "Pretzel.Vfx.Samples.Editor",
+  "rootNamespace": "Pretzel.Vfx.Samples.Editor",
+  "references": [
+    "Pretzel.Vfx",
+    "Pretzel.Vfx.Samples"
+  ],
+  "includePlatforms": [
+    "Editor"
+  ],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": false,
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": false
+}

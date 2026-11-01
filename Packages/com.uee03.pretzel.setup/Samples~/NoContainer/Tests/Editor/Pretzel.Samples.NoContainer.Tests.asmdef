@@ -1,0 +1,34 @@
+{
+  "name": "Pretzel.Samples.NoContainer.Tests",
+  "rootNamespace": "Pretzel.Samples.NoContainer.Tests",
+  "references": [
+    "Pretzel.Samples.NoContainer",
+    "Pretzel.Data",
+    "Pretzel.Events",
+    "Pretzel.Preferences",
+    "Pretzel.Scenes",
+    "UnityEngine.TestRunner",
+    "UnityEditor.TestRunner"
+  ],
+  "includePlatforms": [
+    "Editor"
+  ],
+  "overrideReferences": true,
+  "precompiledReferences": [
+    "nunit.framework.dll"
+  ],
+  "autoReferenced": false,
+  "defineConstraints": [
+    "UNITY_INCLUDE_TESTS",
+    "PRETZEL_NC_DATA",
+    "PRETZEL_NC_EVENTS",
+    "PRETZEL_NC_PREFERENCES",
+    "PRETZEL_NC_SCENES"
+  ],
+  "versionDefines": [
+    { "name": "com.uee03.pretzel.data", "expression": "", "define": "PRETZEL_NC_DATA" },
+    { "name": "com.uee03.pretzel.events", "expression": "", "define": "PRETZEL_NC_EVENTS" },
+    { "name": "com.uee03.pretzel.preferences", "expression": "", "define": "PRETZEL_NC_PREFERENCES" },
+    { "name": "com.uee03.pretzel.scenes", "expression": "", "define": "PRETZEL_NC_SCENES" }
+  ]
+}

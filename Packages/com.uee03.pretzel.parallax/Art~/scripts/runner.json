@@ -1,0 +1,120 @@
+[
+ {
+  "command": "file.new",
+  "params": {
+   "name": "parallax-runner",
+   "width": 64,
+   "height": 64,
+   "units": "Pixels",
+   "backgroundContents": "transparent",
+   "colorMode": "rgb"
+  }
+ },
+ {
+  "command": "shape.ellipse",
+  "params": {
+   "x": 10,
+   "y": 16,
+   "width": 44,
+   "height": 40
+  }
+ },
+ {
+  "command": "paint.setFill",
+  "params": {
+   "color": "#f2a33a"
+  }
+ },
+ {
+  "command": "paint.setStroke",
+  "params": {
+   "none": true
+  }
+ },
+ {
+  "command": "shape.ellipse",
+  "params": {
+   "x": 35,
+   "y": 24,
+   "width": 10,
+   "height": 12
+  }
+ },
+ {
+  "command": "paint.setFill",
+  "params": {
+   "color": "#ffffff"
+  }
+ },
+ {
+  "command": "paint.setStroke",
+  "params": {
+   "none": true
+  }
+ },
+ {
+  "command": "shape.ellipse",
+  "params": {
+   "x": 39.6,
+   "y": 28,
+   "width": 4.8,
+   "height": 6
+  }
+ },
+ {
+  "command": "paint.setFill",
+  "params": {
+   "color": "#222222"
+  }
+ },
+ {
+  "command": "paint.setStroke",
+  "params": {
+   "none": true
+  }
+ },
+ {
+  "command": "shape.rectangle",
+  "params": {
+   "x": 18,
+   "y": 52,
+   "width": 10,
+   "height": 8,
+   "radius": 3
+  }
+ },
+ {
+  "command": "paint.setFill",
+  "params": {
+   "color": "#c77b1d"
+  }
+ },
+ {
+  "command": "paint.setStroke",
+  "params": {
+   "none": true
+  }
+ },
+ {
+  "command": "shape.rectangle",
+  "params": {
+   "x": 36,
+   "y": 52,
+   "width": 10,
+   "height": 8,
+   "radius": 3
+  }
+ },
+ {
+  "command": "paint.setFill",
+  "params": {
+   "color": "#c77b1d"
+  }
+ },
+ {
+  "command": "paint.setStroke",
+  "params": {
+   "none": true
+  }
+ }
+]

@@ -1,0 +1,496 @@
+[
+ {
+  "command": "file.new",
+  "params": {
+   "name": "parallax-trees",
+   "width": 1024,
+   "height": 192,
+   "units": "Pixels",
+   "backgroundContents": "transparent",
+   "colorMode": "rgb"
+  }
+ },
+ {
+  "command": "shape.rectangle",
+  "params": {
+   "x": 0,
+   "y": 168,
+   "width": 1024,
+   "height": 24
+  }
+ },
+ {
+  "command": "paint.setFill",
+  "params": {
+   "color": "#1d4a3a"
+  }
+ },
+ {
+  "command": "paint.setStroke",
+  "params": {
+   "none": true
+  }
+ },
+ {
+  "command": "shape.polygon",
+  "params": {
+   "cx": 40,
+   "cy": 141,
+   "radius": 42,
+   "sides": 3
+  }
+ },
+ {
+  "command": "paint.setFill",
+  "params": {
+   "color": "#1d4a3a"
+  }
+ },
+ {
+  "command": "paint.setStroke",
+  "params": {
+   "none": true
+  }
+ },
+ {
+  "command": "shape.rectangle",
+  "params": {
+   "x": 36,
+   "y": 160,
+   "width": 8,
+   "height": 14
+  }
+ },
+ {
+  "command": "paint.setFill",
+  "params": {
+   "color": "#14362b"
+  }
+ },
+ {
+  "command": "paint.setStroke",
+  "params": {
+   "none": true
+  }
+ },
+ {
+  "command": "shape.polygon",
+  "params": {
+   "cx": 127,
+   "cy": 131.5,
+   "radius": 61,
+   "sides": 3
+  }
+ },
+ {
+  "command": "paint.setFill",
+  "params": {
+   "color": "#1d4a3a"
+  }
+ },
+ {
+  "command": "paint.setStroke",
+  "params": {
+   "none": true
+  }
+ },
+ {
+  "command": "shape.rectangle",
+  "params": {
+   "x": 123,
+   "y": 160,
+   "width": 8,
+   "height": 14
+  }
+ },
+ {
+  "command": "paint.setFill",
+  "params": {
+   "color": "#14362b"
+  }
+ },
+ {
+  "command": "paint.setStroke",
+  "params": {
+   "none": true
+  }
+ },
+ {
+  "command": "shape.polygon",
+  "params": {
+   "cx": 225,
+   "cy": 138.75,
+   "radius": 46.5,
+   "sides": 3
+  }
+ },
+ {
+  "command": "paint.setFill",
+  "params": {
+   "color": "#1d4a3a"
+  }
+ },
+ {
+  "command": "paint.setStroke",
+  "params": {
+   "none": true
+  }
+ },
+ {
+  "command": "shape.rectangle",
+  "params": {
+   "x": 221,
+   "y": 160,
+   "width": 8,
+   "height": 14
+  }
+ },
+ {
+  "command": "paint.setFill",
+  "params": {
+   "color": "#14362b"
+  }
+ },
+ {
+  "command": "paint.setStroke",
+  "params": {
+   "none": true
+  }
+ },
+ {
+  "command": "shape.polygon",
+  "params": {
+   "cx": 328,
+   "cy": 135,
+   "radius": 54,
+   "sides": 3
+  }
+ },
+ {
+  "command": "paint.setFill",
+  "params": {
+   "color": "#1d4a3a"
+  }
+ },
+ {
+  "command": "paint.setStroke",
+  "params": {
+   "none": true
+  }
+ },
+ {
+  "command": "shape.rectangle",
+  "params": {
+   "x": 324,
+   "y": 160,
+   "width": 8,
+   "height": 14
+  }
+ },
+ {
+  "command": "paint.setFill",
+  "params": {
+   "color": "#14362b"
+  }
+ },
+ {
+  "command": "paint.setStroke",
+  "params": {
+   "none": true
+  }
+ },
+ {
+  "command": "shape.polygon",
+  "params": {
+   "cx": 407,
+   "cy": 144,
+   "radius": 36,
+   "sides": 3
+  }
+ },
+ {
+  "command": "paint.setFill",
+  "params": {
+   "color": "#1d4a3a"
+  }
+ },
+ {
+  "command": "paint.setStroke",
+  "params": {
+   "none": true
+  }
+ },
+ {
+  "command": "shape.rectangle",
+  "params": {
+   "x": 403,
+   "y": 160,
+   "width": 8,
+   "height": 14
+  }
+ },
+ {
+  "command": "paint.setFill",
+  "params": {
+   "color": "#14362b"
+  }
+ },
+ {
+  "command": "paint.setStroke",
+  "params": {
+   "none": true
+  }
+ },
+ {
+  "command": "shape.polygon",
+  "params": {
+   "cx": 504,
+   "cy": 142.25,
+   "radius": 39.5,
+   "sides": 3
+  }
+ },
+ {
+  "command": "paint.setFill",
+  "params": {
+   "color": "#1d4a3a"
+  }
+ },
+ {
+  "command": "paint.setStroke",
+  "params": {
+   "none": true
+  }
+ },
+ {
+  "command": "shape.rectangle",
+  "params": {
+   "x": 500,
+   "y": 160,
+   "width": 8,
+   "height": 14
+  }
+ },
+ {
+  "command": "paint.setFill",
+  "params": {
+   "color": "#14362b"
+  }
+ },
+ {
+  "command": "paint.setStroke",
+  "params": {
+   "none": true
+  }
+ },
+ {
+  "command": "shape.polygon",
+  "params": {
+   "cx": 603,
+   "cy": 136.5,
+   "radius": 51,
+   "sides": 3
+  }
+ },
+ {
+  "command": "paint.setFill",
+  "params": {
+   "color": "#1d4a3a"
+  }
+ },
+ {
+  "command": "paint.setStroke",
+  "params": {
+   "none": true
+  }
+ },
+ {
+  "command": "shape.rectangle",
+  "params": {
+   "x": 599,
+   "y": 160,
+   "width": 8,
+   "height": 14
+  }
+ },
+ {
+  "command": "paint.setFill",
+  "params": {
+   "color": "#14362b"
+  }
+ },
+ {
+  "command": "paint.setStroke",
+  "params": {
+   "none": true
+  }
+ },
+ {
+  "command": "shape.polygon",
+  "params": {
+   "cx": 700,
+   "cy": 134.25,
+   "radius": 55.5,
+   "sides": 3
+  }
+ },
+ {
+  "command": "paint.setFill",
+  "params": {
+   "color": "#1d4a3a"
+  }
+ },
+ {
+  "command": "paint.setStroke",
+  "params": {
+   "none": true
+  }
+ },
+ {
+  "command": "shape.rectangle",
+  "params": {
+   "x": 696,
+   "y": 160,
+   "width": 8,
+   "height": 14
+  }
+ },
+ {
+  "command": "paint.setFill",
+  "params": {
+   "color": "#14362b"
+  }
+ },
+ {
+  "command": "paint.setStroke",
+  "params": {
+   "none": true
+  }
+ },
+ {
+  "command": "shape.polygon",
+  "params": {
+   "cx": 805,
+   "cy": 142,
+   "radius": 40,
+   "sides": 3
+  }
+ },
+ {
+  "command": "paint.setFill",
+  "params": {
+   "color": "#1d4a3a"
+  }
+ },
+ {
+  "command": "paint.setStroke",
+  "params": {
+   "none": true
+  }
+ },
+ {
+  "command": "shape.rectangle",
+  "params": {
+   "x": 801,
+   "y": 160,
+   "width": 8,
+   "height": 14
+  }
+ },
+ {
+  "command": "paint.setFill",
+  "params": {
+   "color": "#14362b"
+  }
+ },
+ {
+  "command": "paint.setStroke",
+  "params": {
+   "none": true
+  }
+ },
+ {
+  "command": "shape.polygon",
+  "params": {
+   "cx": 882,
+   "cy": 140.5,
+   "radius": 43,
+   "sides": 3
+  }
+ },
+ {
+  "command": "paint.setFill",
+  "params": {
+   "color": "#1d4a3a"
+  }
+ },
+ {
+  "command": "paint.setStroke",
+  "params": {
+   "none": true
+  }
+ },
+ {
+  "command": "shape.rectangle",
+  "params": {
+   "x": 878,
+   "y": 160,
+   "width": 8,
+   "height": 14
+  }
+ },
+ {
+  "command": "paint.setFill",
+  "params": {
+   "color": "#14362b"
+  }
+ },
+ {
+  "command": "paint.setStroke",
+  "params": {
+   "none": true
+  }
+ },
+ {
+  "command": "shape.polygon",
+  "params": {
+   "cx": 957,
+   "cy": 135.75,
+   "radius": 52.5,
+   "sides": 3
+  }
+ },
+ {
+  "command": "paint.setFill",
+  "params": {
+   "color": "#1d4a3a"
+  }
+ },
+ {
+  "command": "paint.setStroke",
+  "params": {
+   "none": true
+  }
+ },
+ {
+  "command": "shape.rectangle",
+  "params": {
+   "x": 953,
+   "y": 160,
+   "width": 8,
+   "height": 14
+  }
+ },
+ {
+  "command": "paint.setFill",
+  "params": {
+   "color": "#14362b"
+  }
+ },
+ {
+  "command": "paint.setStroke",
+  "params": {
+   "none": true
+  }
+ }
+]

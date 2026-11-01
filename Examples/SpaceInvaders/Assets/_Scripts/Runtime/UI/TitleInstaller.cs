@@ -1,4 +1,5 @@
 using Pretzel.Integrations.VContainer;
+using SpaceInvaders.Audio;
 using UnityEngine;
 using VContainer;
 using VContainer.Unity;
@@ -14,6 +15,7 @@ namespace SpaceInvaders.UI
         {
             builder.RegisterComponent(_title);
             builder.RegisterEntryPoint<TitlePresenter>(Lifetime.Scoped);
+            builder.RegisterEntryPoint<TitleMusic>(Lifetime.Scoped);
         }
     }
 }

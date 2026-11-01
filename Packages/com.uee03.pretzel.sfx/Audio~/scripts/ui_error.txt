@@ -1,0 +1,8 @@
+# ui_error
+session.new {"name":"ui_error","sample_rate":44100,"bit_depth":16}
+track.new {"kind":"instrument","name":"ui_error","instrument":"subtractive_synth","format":"mono"}
+mix.instrument {"track":1,"plugin":"subtractive_synth","params":{"osc1_wave":0,"osc2_wave":2,"osc_mix":0,"cutoff":700,"resonance":5,"filter_env_amount":0,"amp_attack":1,"amp_decay":120,"amp_sustain":50,"amp_release":100,"velocity":100,"level":-4}}
+mix.insert {"track":1,"slot":"a","plugin":"lofi","params":{}}
+midi.new_clip {"track":1}
+midi.note_add {"clip":2,"pitch":45,"start_ticks":0,"length_ticks":110,"velocity":110}
+midi.note_add {"clip":2,"pitch":43,"start_ticks":130,"length_ticks":200,"velocity":110}

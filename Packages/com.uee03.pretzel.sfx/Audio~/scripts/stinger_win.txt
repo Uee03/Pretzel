@@ -1,0 +1,12 @@
+# stinger_win
+session.new {"name":"stinger_win","sample_rate":44100,"bit_depth":16}
+track.new {"kind":"instrument","name":"stinger_win","instrument":"subtractive_synth","format":"stereo"}
+mix.instrument {"track":1,"plugin":"subtractive_synth","params":{"osc1_wave":1,"osc2_wave":0,"osc_mix":40,"cutoff":7000,"resonance":5,"filter_env_amount":0,"amp_attack":1,"amp_decay":300,"amp_sustain":40,"amp_release":700,"velocity":100,"level":-6}}
+mix.insert {"track":1,"slot":"a","plugin":"room_reverb","params":{}}
+midi.new_clip {"track":1}
+midi.note_add {"clip":2,"pitch":72,"start_ticks":0,"length_ticks":120,"velocity":110}
+midi.note_add {"clip":2,"pitch":76,"start_ticks":120,"length_ticks":120,"velocity":110}
+midi.note_add {"clip":2,"pitch":79,"start_ticks":240,"length_ticks":120,"velocity":110}
+midi.note_add {"clip":2,"pitch":84,"start_ticks":360,"length_ticks":700,"velocity":110}
+midi.note_add {"clip":2,"pitch":88,"start_ticks":360,"length_ticks":700,"velocity":110}
+midi.note_add {"clip":2,"pitch":91,"start_ticks":360,"length_ticks":700,"velocity":110}

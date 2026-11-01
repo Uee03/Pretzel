@@ -72,7 +72,7 @@ namespace Pretzel.Setup.Composition
         /// <summary>Creates or repairs every asset. Returns one line per action for the tab.</summary>
         public static IReadOnlyList<string> Apply(CompositionSettings settings)
         {
-            Type scopeType = ScopeType ?? throw new InvalidOperationException("Install VContainer and Pretzel Integrations first.");
+            Type scopeType = ScopeType ?? throw new InvalidOperationException("Install VContainer and the Pretzel VContainer module first.");
             Type installerType = FindInstallerType(settings)
                                  ?? throw new InvalidOperationException($"{settings.namespaceName}.{settings.InstallerName} is not compiled yet. Generate the code and wait for compilation.");
 

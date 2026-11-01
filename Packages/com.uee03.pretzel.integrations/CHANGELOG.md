@@ -11,8 +11,8 @@ All notable changes to this package are documented here. The format follows [Kee
 
 ### Changed
 
+- **Breaking:** the VContainer pieces (`PretzelLifetimeScope`, `ScriptableInstaller`, `MonoInstaller`), their tests, the guide and the VContainer Example moved to the new `com.uee03.pretzel.vcontainer` package, which needs no other Pretzel module. Projects that use them add that package. The assembly (`Pretzel.Integrations.VContainer`), the namespace and the script GUIDs are unchanged, so existing code, prefabs and scenes keep working once it is installed.
 - The UniTask and R3 `ApiClient` extensions now extend `IApiClient`, so they work on fakes.
-- VContainer Example: a `16_Audio` folder registers `AudioService` as `IAudioService` through an optional `MonoInstaller`. It has its own assembly that compiles only when VContainer and Pretzel Audio are installed.
 
 ## [0.2.0] - 2026-10-27
 

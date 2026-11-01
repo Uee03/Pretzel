@@ -1,0 +1,7 @@
+# laser
+session.new {"name":"laser","sample_rate":44100,"bit_depth":16}
+track.new {"kind":"instrument","name":"laser","instrument":"subtractive_synth","format":"mono"}
+mix.instrument {"track":1,"plugin":"subtractive_synth","params":{"osc1_wave":0,"osc2_wave":1,"osc_mix":35,"cutoff":6500,"resonance":25,"filter_env_amount":0,"amp_attack":1,"amp_decay":200,"amp_sustain":0,"amp_release":80,"velocity":100,"level":-6,"glide":200}}
+midi.new_clip {"track":1}
+midi.note_add {"clip":2,"pitch":100,"start_ticks":0,"length_ticks":40,"velocity":110}
+midi.note_add {"clip":2,"pitch":55,"start_ticks":40,"length_ticks":160,"velocity":110}

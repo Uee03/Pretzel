@@ -1,0 +1,319 @@
+[
+ {
+  "command": "file.new",
+  "params": {
+   "name": "parallax-ground",
+   "width": 256,
+   "height": 192,
+   "units": "Pixels",
+   "backgroundContents": "transparent",
+   "colorMode": "rgb"
+  }
+ },
+ {
+  "command": "shape.rectangle",
+  "params": {
+   "x": 0,
+   "y": 0,
+   "width": 256,
+   "height": 192
+  }
+ },
+ {
+  "command": "paint.setFill",
+  "params": {
+   "color": "#6b4a2f"
+  }
+ },
+ {
+  "command": "paint.setStroke",
+  "params": {
+   "none": true
+  }
+ },
+ {
+  "command": "shape.rectangle",
+  "params": {
+   "x": 0,
+   "y": 0,
+   "width": 256,
+   "height": 18
+  }
+ },
+ {
+  "command": "paint.setFill",
+  "params": {
+   "color": "#5fae4a"
+  }
+ },
+ {
+  "command": "paint.setStroke",
+  "params": {
+   "none": true
+  }
+ },
+ {
+  "command": "shape.rectangle",
+  "params": {
+   "x": 6,
+   "y": 40,
+   "width": 14,
+   "height": 8,
+   "radius": 3
+  }
+ },
+ {
+  "command": "paint.setFill",
+  "params": {
+   "color": "#5a3d27"
+  }
+ },
+ {
+  "command": "paint.setStroke",
+  "params": {
+   "none": true
+  }
+ },
+ {
+  "command": "shape.rectangle",
+  "params": {
+   "x": 70,
+   "y": 40,
+   "width": 14,
+   "height": 8,
+   "radius": 3
+  }
+ },
+ {
+  "command": "paint.setFill",
+  "params": {
+   "color": "#5a3d27"
+  }
+ },
+ {
+  "command": "paint.setStroke",
+  "params": {
+   "none": true
+  }
+ },
+ {
+  "command": "shape.rectangle",
+  "params": {
+   "x": 134,
+   "y": 40,
+   "width": 14,
+   "height": 8,
+   "radius": 3
+  }
+ },
+ {
+  "command": "paint.setFill",
+  "params": {
+   "color": "#5a3d27"
+  }
+ },
+ {
+  "command": "paint.setStroke",
+  "params": {
+   "none": true
+  }
+ },
+ {
+  "command": "shape.rectangle",
+  "params": {
+   "x": 198,
+   "y": 40,
+   "width": 14,
+   "height": 8,
+   "radius": 3
+  }
+ },
+ {
+  "command": "paint.setFill",
+  "params": {
+   "color": "#5a3d27"
+  }
+ },
+ {
+  "command": "paint.setStroke",
+  "params": {
+   "none": true
+  }
+ },
+ {
+  "command": "shape.rectangle",
+  "params": {
+   "x": 6,
+   "y": 92,
+   "width": 14,
+   "height": 8,
+   "radius": 3
+  }
+ },
+ {
+  "command": "paint.setFill",
+  "params": {
+   "color": "#5a3d27"
+  }
+ },
+ {
+  "command": "paint.setStroke",
+  "params": {
+   "none": true
+  }
+ },
+ {
+  "command": "shape.rectangle",
+  "params": {
+   "x": 70,
+   "y": 92,
+   "width": 14,
+   "height": 8,
+   "radius": 3
+  }
+ },
+ {
+  "command": "paint.setFill",
+  "params": {
+   "color": "#5a3d27"
+  }
+ },
+ {
+  "command": "paint.setStroke",
+  "params": {
+   "none": true
+  }
+ },
+ {
+  "command": "shape.rectangle",
+  "params": {
+   "x": 134,
+   "y": 92,
+   "width": 14,
+   "height": 8,
+   "radius": 3
+  }
+ },
+ {
+  "command": "paint.setFill",
+  "params": {
+   "color": "#5a3d27"
+  }
+ },
+ {
+  "command": "paint.setStroke",
+  "params": {
+   "none": true
+  }
+ },
+ {
+  "command": "shape.rectangle",
+  "params": {
+   "x": 198,
+   "y": 92,
+   "width": 14,
+   "height": 8,
+   "radius": 3
+  }
+ },
+ {
+  "command": "paint.setFill",
+  "params": {
+   "color": "#5a3d27"
+  }
+ },
+ {
+  "command": "paint.setStroke",
+  "params": {
+   "none": true
+  }
+ },
+ {
+  "command": "shape.rectangle",
+  "params": {
+   "x": 6,
+   "y": 144,
+   "width": 14,
+   "height": 8,
+   "radius": 3
+  }
+ },
+ {
+  "command": "paint.setFill",
+  "params": {
+   "color": "#5a3d27"
+  }
+ },
+ {
+  "command": "paint.setStroke",
+  "params": {
+   "none": true
+  }
+ },
+ {
+  "command": "shape.rectangle",
+  "params": {
+   "x": 70,
+   "y": 144,
+   "width": 14,
+   "height": 8,
+   "radius": 3
+  }
+ },
+ {
+  "command": "paint.setFill",
+  "params": {
+   "color": "#5a3d27"
+  }
+ },
+ {
+  "command": "paint.setStroke",
+  "params": {
+   "none": true
+  }
+ },
+ {
+  "command": "shape.rectangle",
+  "params": {
+   "x": 134,
+   "y": 144,
+   "width": 14,
+   "height": 8,
+   "radius": 3
+  }
+ },
+ {
+  "command": "paint.setFill",
+  "params": {
+   "color": "#5a3d27"
+  }
+ },
+ {
+  "command": "paint.setStroke",
+  "params": {
+   "none": true
+  }
+ },
+ {
+  "command": "shape.rectangle",
+  "params": {
+   "x": 198,
+   "y": 144,
+   "width": 14,
+   "height": 8,
+   "radius": 3
+  }
+ },
+ {
+  "command": "paint.setFill",
+  "params": {
+   "color": "#5a3d27"
+  }
+ },
+ {
+  "command": "paint.setStroke",
+  "params": {
+   "none": true
+  }
+ }
+]

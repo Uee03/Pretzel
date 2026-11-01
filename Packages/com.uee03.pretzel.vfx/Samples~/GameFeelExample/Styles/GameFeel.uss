@@ -1,0 +1,33 @@
+.gf-bar {
+    position: absolute;
+    left: 16px;
+    right: 16px;
+    bottom: 40px;
+    flex-direction: row;
+    justify-content: center;
+}
+
+.gf-button {
+    min-width: 130px;
+    margin: 0 6px;
+    padding: 8px 14px;
+    font-size: 18px;
+    color: rgb(240, 242, 248);
+    background-color: rgba(30, 36, 52, 0.85);
+    border-width: 0;
+    border-radius: 8px;
+}
+
+.gf-button:hover {
+    background-color: rgba(70, 84, 120, 0.95);
+}
+
+.gf-info {
+    position: absolute;
+    left: 16px;
+    right: 16px;
+    bottom: 8px;
+    -unity-text-align: middle-center;
+    font-size: 14px;
+    color: rgb(230, 236, 248);
+}

@@ -14,6 +14,11 @@
       "displayName": "Setup Extensions",
       "description": "Add your own Project Setup tab and Main tab section with IPretzelTab and IPretzelMainSection.",
       "path": "Samples~/SetupExtensions"
+    },
+    {
+      "displayName": "No Container",
+      "description": "Click Rush: a complete small game with no DI container. Services live in a ScriptableObject filled by a bootstrap, with Events, Scenes, Data and Preferences, UI Toolkit screens, tests and scene builder.",
+      "path": "Samples~/NoContainer"
     }
   ]
 }

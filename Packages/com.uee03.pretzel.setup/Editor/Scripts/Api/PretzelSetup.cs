@@ -28,7 +28,7 @@ namespace Pretzel.Setup
         /// created after Unity compiles it; otherwise they are created or repaired now.
         /// </summary>
         /// <exception cref="ArgumentException">The settings are invalid.</exception>
-        /// <exception cref="InvalidOperationException">VContainer or Pretzel Integrations is not installed, or the installer is not compiled.</exception>
+        /// <exception cref="InvalidOperationException">VContainer or the Pretzel VContainer module is not installed, or the installer is not compiled.</exception>
         public static CompositionResult GenerateComposition()
         {
             return GenerateComposition(exitWhenAssetsAreApplied: false);
@@ -45,7 +45,7 @@ namespace Pretzel.Setup
         {
             if (!CompositionAssets.IsIntegrationActive)
             {
-                throw new InvalidOperationException("Install VContainer and the Pretzel Integrations module first.");
+                throw new InvalidOperationException("Install VContainer and the Pretzel VContainer module first.");
             }
 
             CompositionSettings settings = Settings();

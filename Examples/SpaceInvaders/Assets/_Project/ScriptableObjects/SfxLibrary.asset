@@ -1,0 +1,39 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c84d417af0bbef642a73752c0f1ca5e6, type: 3}
+  m_Name: SfxLibrary
+  m_EditorClassIdentifier: Pretzel.Sfx::Pretzel.Sfx.SfxLibrary
+  _entries:
+  - _id: player_shot
+    _cue: {fileID: 11400000, guid: 5e074d2d9a1d2ad469f7e87f28509d27, type: 2}
+    _cooldownSeconds: 0.05
+    _maxConcurrent: 4
+  - _id: invader_destroyed
+    _cue: {fileID: 11400000, guid: 9e4b50bb8a6c10a4aafc91e0dfbe651b, type: 2}
+    _cooldownSeconds: 0.04
+    _maxConcurrent: 5
+  - _id: player_hit
+    _cue: {fileID: 11400000, guid: 7fd3c56d249adf94482317d3b1e231b1, type: 2}
+    _cooldownSeconds: 0
+    _maxConcurrent: 1
+  - _id: ufo_destroyed
+    _cue: {fileID: 11400000, guid: de071074bcb7c8e4193c481f3c1ccc8e, type: 2}
+    _cooldownSeconds: 0
+    _maxConcurrent: 1
+  - _id: wave_cleared
+    _cue: {fileID: 11400000, guid: bdc54c2b056fea5439d863a59cc26a87, type: 2}
+    _cooldownSeconds: 0
+    _maxConcurrent: 1
+  - _id: game_over
+    _cue: {fileID: 11400000, guid: f662c5d803f3d5345886a9264b10c125, type: 2}
+    _cooldownSeconds: 0
+    _maxConcurrent: 1

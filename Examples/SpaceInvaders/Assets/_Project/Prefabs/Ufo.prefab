@@ -126,8 +126,8 @@ Transform:
   - {fileID: 4457403486645985944}
   - {fileID: 4995842254022675461}
   - {fileID: 233936148422845897}
-  - {fileID: 7416554122170615993}
-  - {fileID: 3147356059700072246}
+  - {fileID: 3842226418763194501}
+  - {fileID: 4776165651754993030}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!61 &4800179512099278167
@@ -190,7 +190,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: SpaceInvaders.Runtime::SpaceInvaders.Gameplay.Ufo
   _speed: 3.5
   _limitX: 9.5
---- !u!1 &3800361844040739672
+--- !u!1 &3919427147456847031
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -198,8 +198,8 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 3147356059700072246}
-  - component: {fileID: 7546585929363064911}
+  - component: {fileID: 3842226418763194501}
+  - component: {fileID: 3974289568417309881}
   m_Layer: 0
   m_Name: Window
   m_TagString: Untagged
@@ -207,29 +207,29 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &3147356059700072246
+--- !u!4 &3842226418763194501
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3800361844040739672}
+  m_GameObject: {fileID: 3919427147456847031}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.26, y: -0.01, z: 0}
+  m_LocalPosition: {x: 0, y: -0.01, z: 0}
   m_LocalScale: {x: 0.5, y: 0.5, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 5801547756172037590}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!212 &7546585929363064911
+--- !u!212 &3974289568417309881
 SpriteRenderer:
   serializedVersion: 3
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3800361844040739672}
+  m_GameObject: {fileID: 3919427147456847031}
   m_Enabled: 1
   m_CastShadows: 0
   m_ReceiveShadows: 0
@@ -282,7 +282,7 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_SpriteSortPoint: 0
   m_BlendShapeWeights: []
---- !u!1 &8126348810532356393
+--- !u!1 &8060563647622979288
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -290,8 +290,8 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 7416554122170615993}
-  - component: {fileID: 3588029907062868841}
+  - component: {fileID: 4776165651754993030}
+  - component: {fileID: 7849164401806970484}
   m_Layer: 0
   m_Name: Window
   m_TagString: Untagged
@@ -299,29 +299,29 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &7416554122170615993
+--- !u!4 &4776165651754993030
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8126348810532356393}
+  m_GameObject: {fileID: 8060563647622979288}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: -0.01, z: 0}
+  m_LocalPosition: {x: 0.26, y: -0.01, z: 0}
   m_LocalScale: {x: 0.5, y: 0.5, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 5801547756172037590}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!212 &3588029907062868841
+--- !u!212 &7849164401806970484
 SpriteRenderer:
   serializedVersion: 3
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8126348810532356393}
+  m_GameObject: {fileID: 8060563647622979288}
   m_Enabled: 1
   m_CastShadows: 0
   m_ReceiveShadows: 0

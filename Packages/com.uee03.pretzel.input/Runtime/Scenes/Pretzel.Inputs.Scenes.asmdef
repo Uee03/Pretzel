@@ -1,0 +1,25 @@
+{
+  "name": "Pretzel.Inputs.Scenes",
+  "rootNamespace": "Pretzel.Inputs.Scenes",
+  "references": [
+    "Pretzel.Inputs",
+    "Pretzel.Scenes"
+  ],
+  "includePlatforms": [],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": true,
+  "defineConstraints": [
+    "PRETZEL_INPUT_SCENES"
+  ],
+  "versionDefines": [
+    {
+      "name": "com.uee03.pretzel.scenes",
+      "expression": "",
+      "define": "PRETZEL_INPUT_SCENES"
+    }
+  ],
+  "noEngineReferences": false
+}

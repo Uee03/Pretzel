@@ -23,10 +23,10 @@ Pick `--end` after the last note's **release/reverb tail**, or it is cut.
 
 ## The session model (verified)
 
-- `session.new {"name","sample_rate":44100,"bit_depth":16}`. Default tempo 120 BPM, 4/4; **480 ticks = one quarter note = 0.5 s**. One bar = 2 s.
+- `session.new {"name","sample_rate":44100,"bit_depth":16}`. Default tempo 120 BPM, 4/4; **960 ticks = one quarter note = 0.5 s** (measured in 0.14.0: a note at tick 9600 sounds at 5 s; do not assume 480). One bar = 2 s. `event.tempo {"bpm"}` changes the tempo; set it before creating clips.
 - `track.new {"kind":"instrument","name","instrument":"<plugin id>","format":"mono|stereo"}` returns `{"tracks":[N]}`; the first track is `1`.
 - `mix.instrument {"track":1,"plugin":"subtractive_synth","params":{...}}` sets the instrument and its parameters (values are clamped into range; **unknown ids are errors**).
-- `midi.new_clip {"track":1}` returns `{"clip":2,...}` (default 1 bar; the first clip is `2`). Optional `start`, `end` or `length`.
+- `midi.new_clip {"track":1}` returns `{"clip":N,...}`; ids share one counter, so with T tracks created first the clips are T+1, T+2... Default length is 1 bar; **`end` is in samples** (`{"track":1,"start":0,"end":1058400}`); `length` is ignored.
 - `midi.note_add {"clip":2,"pitch":83,"start_ticks":0,"length_ticks":100,"velocity":110}` (pitch is MIDI 0-127; 60 = C4, 69 = A4 = 440 Hz). `midi.notes`, `midi.note_edit`, `midi.note_delete`, `midi.notes_move` exist.
 - `mix.insert {"track":1,"slot":"a","plugin":"plate_reverb","params":{...}}` adds an effect (slots `0..9` or `a..j`); `mix.insert_param {track,slot,param,value}` changes it.
 - `mix.volume {"tracks":..,"db":-3}`, `mix.pan`, `mix.mute`, `mix.send`, `mix.new_bus` exist. `automation.set_point {track,param: volume|pan|mute|plugin:a:<id>,at,value}` automates a track or **insert** parameter (instrument parameters are set statically with `mix.instrument_param`).

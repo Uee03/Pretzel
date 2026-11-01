@@ -1,0 +1,17 @@
+{
+  "name": "com.uee03.pretzel.parallax",
+  "displayName": "Pretzel Parallax",
+  "version": "0.2.0",
+  "unity": "6000.0",
+  "description": "Parallax scrolling for 2D and 2.5D: layers with a per-axis factor or a depth, infinite tiling, optional pixel snapping, and one controller that moves every layer in a single LateUpdate without allocations. Works with any camera, including Cinemachine. Needs no other Pretzel module.",
+  "author": { "name": "Uee03" },
+  "license": "MIT",
+  "dependencies": {},
+  "samples": [
+    {
+      "displayName": "Parallax Example",
+      "description": "A side-scrolling backdrop with five layers: a 2D scene with an orthographic camera and a 2.5D scene with depth, both with infinitely tiling layers.",
+      "path": "Samples~/ParallaxExample"
+    }
+  ]
+}

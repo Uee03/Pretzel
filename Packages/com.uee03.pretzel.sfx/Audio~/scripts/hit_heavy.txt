@@ -1,0 +1,8 @@
+# hit_heavy
+session.new {"name":"hit_heavy","sample_rate":44100,"bit_depth":16}
+track.new {"kind":"instrument","name":"hit_heavy","instrument":"drum_synth","format":"stereo"}
+mix.instrument {"track":1,"plugin":"drum_synth","params":{"kick_decay":300,"kick_tune":-4,"snare_snappy":80,"snare_decay":350}}
+mix.insert {"track":1,"slot":"a","plugin":"plate_reverb","params":{}}
+midi.new_clip {"track":1}
+midi.note_add {"clip":2,"pitch":36,"start_ticks":0,"length_ticks":120,"velocity":127}
+midi.note_add {"clip":2,"pitch":38,"start_ticks":0,"length_ticks":120,"velocity":120}

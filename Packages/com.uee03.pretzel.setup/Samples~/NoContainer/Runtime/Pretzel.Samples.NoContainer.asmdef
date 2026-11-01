@@ -1,0 +1,29 @@
+{
+  "name": "Pretzel.Samples.NoContainer",
+  "rootNamespace": "Pretzel.Samples.NoContainer",
+  "references": [
+    "Pretzel.Data",
+    "Pretzel.Events",
+    "Pretzel.Preferences",
+    "Pretzel.Scenes"
+  ],
+  "includePlatforms": [],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": true,
+  "defineConstraints": [
+    "PRETZEL_NC_DATA",
+    "PRETZEL_NC_EVENTS",
+    "PRETZEL_NC_PREFERENCES",
+    "PRETZEL_NC_SCENES"
+  ],
+  "versionDefines": [
+    { "name": "com.uee03.pretzel.data", "expression": "", "define": "PRETZEL_NC_DATA" },
+    { "name": "com.uee03.pretzel.events", "expression": "", "define": "PRETZEL_NC_EVENTS" },
+    { "name": "com.uee03.pretzel.preferences", "expression": "", "define": "PRETZEL_NC_PREFERENCES" },
+    { "name": "com.uee03.pretzel.scenes", "expression": "", "define": "PRETZEL_NC_SCENES" }
+  ],
+  "noEngineReferences": false
+}

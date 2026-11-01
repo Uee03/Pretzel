@@ -1,0 +1,17 @@
+{
+  "name": "Pretzel.Sfx.Samples",
+  "rootNamespace": "Pretzel.Sfx.Samples",
+  "references": [
+    "Pretzel.Sfx",
+    "Pretzel.Audio"
+  ],
+  "includePlatforms": [],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": true,
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": false
+}

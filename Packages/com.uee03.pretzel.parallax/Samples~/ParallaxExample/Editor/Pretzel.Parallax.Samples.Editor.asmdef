@@ -1,0 +1,19 @@
+{
+  "name": "Pretzel.Parallax.Samples.Editor",
+  "rootNamespace": "Pretzel.Parallax.Samples.Editor",
+  "references": [
+    "Pretzel.Parallax",
+    "Pretzel.Parallax.Samples"
+  ],
+  "includePlatforms": [
+    "Editor"
+  ],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": false,
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": false
+}

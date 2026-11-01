@@ -25,10 +25,16 @@ graph TD
     pooling[pooling]
     scenes[scenes]
     audio[audio]
+    sfx[sfx]
     preferences[preferences]
     devconsole[devconsole]
     cloud[cloud]
     multiplayer[multiplayer]
+    input[input]
+    camera[camera]
+    vfx[vfx]
+    parallax[parallax]
+    vcontainerpkg[vcontainer]
 
     extensions --> core
     data --> core
@@ -49,6 +55,7 @@ graph TD
     scenes --> ui
     scenes --> tween
     audio --> core
+    sfx --> audio
     preferences --> core
     preferences --> data
     devconsole --> core
@@ -73,10 +80,16 @@ graph TD
 | [pooling](Packages/com.uee03.pretzel.pooling/README.md) | Prefab pools with prewarming and reset hooks |
 | [scenes](Packages/com.uee03.pretzel.scenes/README.md) | Scene loading with groups, preloading, request queuing, observable state, setup phases, transitions and fallback |
 | [audio](Packages/com.uee03.pretzel.audio/README.md) | Audio service with pooled voices, cues, mixer channels and music crossfades |
+| [sfx](Packages/com.uee03.pretzel.sfx/README.md) | Sound effects by name on top of Audio: an `SfxLibrary` asset, a player with per-sound cooldowns and voice limits, and a pack of thirteen generated game sounds |
 | [preferences](Packages/com.uee03.pretzel.preferences/README.md) | Saved player preferences for audio, graphics, controls and language |
 | [devconsole](Packages/com.uee03.pretzel.devconsole/README.md) | In-game log overlay and command console for development builds |
 | [cloud](Packages/com.uee03.pretzel.cloud/README.md) | Unity Gaming Services behind interfaces: Authentication, Cloud Save, Cloud Code, Remote Config, and an offline-first cloud save store for Pretzel Data. Adapters compile only when the Unity package is installed |
 | [multiplayer](Packages/com.uee03.pretzel.multiplayer/README.md) | Netcode for GameObjects + Multiplayer Services (Sessions/Relay): local couch co-op, online, cross-play tagging, rejoin, pooled spawns, a drop-in UI Toolkit menu and a two-cube sample |
+| [input](Packages/com.uee03.pretzel.input/README.md) | Input System tools: a context stack that enables one action map at a time, input blocked for named reasons (scene loads), input buffering, device tracking, a safe rebind and saved overrides. Optional Preferences and Scenes adapters |
+| [camera](Packages/com.uee03.pretzel.camera/README.md) | Cinemachine 3 tools for 2D, 2.5D and 3D: trauma-based screen shake, a playfield fit for every aspect ratio, and ready camera rigs from the GameObject menu. Needs no other Pretzel module |
+| [vfx](Packages/com.uee03.pretzel.vfx/README.md) | Game feel: hit stop and slow motion on a safe time-scale stack that cooperates with a pause, sprite flash and punch scale. Needs no other Pretzel module |
+| [parallax](Packages/com.uee03.pretzel.parallax/README.md) | Parallax scrolling for 2D and 2.5D: per-axis factor or depth, endless tiling, pixel snapping, one allocation-free update. Works with any camera, including Cinemachine. Needs no other Pretzel module |
+| [vcontainer](Packages/com.uee03.pretzel.vcontainer/README.md) | VContainer scopes and installers (`PretzelLifetimeScope`, `ScriptableInstaller`, `MonoInstaller`). Needs no other Pretzel module. Optional: every module also works [without a container](Packages/com.uee03.pretzel.setup/Documentation~/WithoutAContainer.md) |
 | [integrations](Packages/com.uee03.pretzel.integrations/README.md) | Adapters for LitMotion (ease mapping), UniTask (`ApiClient` calls) and R3 (UI Toolkit and `ApiClient` observables) |
 | [editor](Packages/com.uee03.pretzel.editor/README.md) | Standalone editor utilities that work in any project |
 
@@ -87,7 +100,7 @@ Each integration assembly compiles only when its third-party package is installe
 
 ## Example
 
-[`Examples/SpaceInvaders`](Examples/SpaceInvaders/README.md) is a complete game built on Pretzel, as a Unity project you can open (Unity 6000.6.5f1, Universal 2D template). It uses most of the modules together, and comes with architecture diagrams, a guide to where each module is used, and a build-it-yourself walkthrough.
+[`Examples/SpaceInvaders`](Examples/SpaceInvaders/README.md) is a complete game built on Pretzel, as a Unity project you can open (Unity 6000.6.5f1, Universal 2D template). Its code uses 18 of the 24 packages. It comes with architecture diagrams, [a guide that traces one shot through the modules and covers all 24 packages](Examples/SpaceInvaders/Documentation/PretzelUsage.md), and a build-it-yourself walkthrough.
 
 ## Using the packages
 
@@ -111,10 +124,16 @@ In Unity, open `Window > Package Manager`, choose `+ > Install package from git 
 | pooling | `https://github.com/Uee03/Pretzel.git?path=Packages/com.uee03.pretzel.pooling` |
 | scenes | `https://github.com/Uee03/Pretzel.git?path=Packages/com.uee03.pretzel.scenes` |
 | audio | `https://github.com/Uee03/Pretzel.git?path=Packages/com.uee03.pretzel.audio` |
+| sfx | `https://github.com/Uee03/Pretzel.git?path=Packages/com.uee03.pretzel.sfx` |
 | preferences | `https://github.com/Uee03/Pretzel.git?path=Packages/com.uee03.pretzel.preferences` |
 | devconsole | `https://github.com/Uee03/Pretzel.git?path=Packages/com.uee03.pretzel.devconsole` |
 | cloud | `https://github.com/Uee03/Pretzel.git?path=Packages/com.uee03.pretzel.cloud` |
 | multiplayer | `https://github.com/Uee03/Pretzel.git?path=Packages/com.uee03.pretzel.multiplayer` |
+| input | `https://github.com/Uee03/Pretzel.git?path=Packages/com.uee03.pretzel.input` |
+| camera | `https://github.com/Uee03/Pretzel.git?path=Packages/com.uee03.pretzel.camera` |
+| vfx | `https://github.com/Uee03/Pretzel.git?path=Packages/com.uee03.pretzel.vfx` |
+| parallax | `https://github.com/Uee03/Pretzel.git?path=Packages/com.uee03.pretzel.parallax` |
+| vcontainer | `https://github.com/Uee03/Pretzel.git?path=Packages/com.uee03.pretzel.vcontainer` |
 | integrations | `https://github.com/Uee03/Pretzel.git?path=Packages/com.uee03.pretzel.integrations` |
 | editor | `https://github.com/Uee03/Pretzel.git?path=Packages/com.uee03.pretzel.editor` |
 
@@ -156,12 +175,13 @@ sample always matches the API you installed. `TestPretzel/` is the consumer proj
 <!-- SAMPLES:START -->
 <!-- Generated by .github/scripts/Update-SampleCatalog.ps1 from each package.json. Do not edit by hand. -->
 
-32 samples in 18 packages.
+38 samples in 24 packages.
 
 | Package | Sample | What it shows | Source |
 |---|---|---|---|
 | [api](Packages/com.uee03.pretzel.api/README.md) | **API Usage** | Every request type (JSON, text, bytes, HEAD, file, texture and audio downloads), options, retries, errors and cancellation. | [Samples~/ApiUsage](Packages/com.uee03.pretzel.api/Samples~/ApiUsage) |
 | [audio](Packages/com.uee03.pretzel.audio/README.md) | **Audio Usage** | Plays cues, crossfades music and binds channel volumes to sliders. | [Samples~/AudioUsage](Packages/com.uee03.pretzel.audio/Samples~/AudioUsage) |
+| [camera](Packages/com.uee03.pretzel.camera/README.md) | **Camera Example** | A 2D arena with a Cinemachine follow camera, trauma shake on click and a playfield that fits every aspect ratio. | [Samples~/CameraExample](Packages/com.uee03.pretzel.camera/Samples~/CameraExample) |
 | [cloud](Packages/com.uee03.pretzel.cloud/README.md) | **Cloud Save Usage** | Signs in anonymously and saves and loads a profile through the offline-first synced store, with a sync status label. Needs the Authentication and Cloud Save packages. | [Samples~/CloudSaveUsage](Packages/com.uee03.pretzel.cloud/Samples~/CloudSaveUsage) |
 |  | **Cloud Code And Remote Config** | Calls a Cloud Code module endpoint and reads Remote Config values with typed defaults. Needs the Authentication, Cloud Code and Remote Config packages. | [Samples~/CloudCodeAndRemoteConfig](Packages/com.uee03.pretzel.cloud/Samples~/CloudCodeAndRemoteConfig) |
 |  | **Manual Wiring With Fakes** | Uses the cloud interfaces with in-memory fakes and a temp-folder local store, so a game runs and tests offline without any Unity Gaming Services package. | [Samples~/ManualWiringWithFakes](Packages/com.uee03.pretzel.cloud/Samples~/ManualWiringWithFakes) |
@@ -171,9 +191,10 @@ sample always matches the API you installed. `TestPretzel/` is the consumer proj
 | [editor](Packages/com.uee03.pretzel.editor/README.md) | **Editor Usage** | Builds a demo hierarchy and groups it with Group Selected Objects, with undo. | [Samples~/EditorUsage](Packages/com.uee03.pretzel.editor/Samples~/EditorUsage) |
 | [events](Packages/com.uee03.pretzel.events/README.md) | **Events Usage** | An EventBus publisher and subscriber, and a ScriptableObject channel raised from code. | [Samples~/EventsUsage](Packages/com.uee03.pretzel.events/Samples~/EventsUsage) |
 | [extensions](Packages/com.uee03.pretzel.extensions/README.md) | **Extensions Usage** | Every extension: strings, bytes, collections, floats, objects, layer masks, Transform, GameObject, MonoBehaviour, Texture2D and file IO. | [Samples~/ExtensionsUsage](Packages/com.uee03.pretzel.extensions/Samples~/ExtensionsUsage) |
+| [input](Packages/com.uee03.pretzel.input/README.md) | **Input Example** | A character moved through a Gameplay context, a pause that switches contexts, a buffered jump, device tracking and a rebind button with saved overrides. | [Samples~/InputExample](Packages/com.uee03.pretzel.input/Samples~/InputExample) |
 | [integrations](Packages/com.uee03.pretzel.integrations/README.md) | **Integrations Example** | One demo per library (LitMotion, UniTask, R3), one for R3 with Pretzel Events, and one that combines LitMotion, UniTask and R3. | [Samples~/IntegrationsExample](Packages/com.uee03.pretzel.integrations/Samples~/IntegrationsExample) |
-|  | **VContainer Example** | Every VContainer feature in one scene with one LifetimeScope, one folder per feature: registration, lifetimes, injection, entry points, tickable timers and bullets, factories, components, collections, keys, open generics, settings, installers, callbacks and child scopes. | [Samples~/VContainerExample](Packages/com.uee03.pretzel.integrations/Samples~/VContainerExample) |
 | [multiplayer](Packages/com.uee03.pretzel.multiplayer/README.md) | **Two Cubes** | Two networked cubes that can only move, jump and turn, plus Spawn Item and Delete Items buttons that use the pooled spawn handler. Works in local co-op, online host/join and quick-join through the drop-in menu. Create the scene with Pretzel > Samples > Multiplayer. | [Samples~/TwoCubes](Packages/com.uee03.pretzel.multiplayer/Samples~/TwoCubes) |
+| [parallax](Packages/com.uee03.pretzel.parallax/README.md) | **Parallax Example** | A side-scrolling backdrop with five layers: a 2D scene with an orthographic camera and a 2.5D scene with depth, both with infinitely tiling layers. | [Samples~/ParallaxExample](Packages/com.uee03.pretzel.parallax/Samples~/ParallaxExample) |
 | [pooling](Packages/com.uee03.pretzel.pooling/README.md) | **Pooling Usage** | An enum-keyed projectile factory configured in the Inspector, with prewarming and projectiles that release themselves after a delay. | [Samples~/PoolingUsage](Packages/com.uee03.pretzel.pooling/Samples~/PoolingUsage) |
 |  | **Enemy Waves** | A wave spawner on a keyed PoolFactory: prewarm sizing, a cap on live enemies, return callbacks and live pool metrics. | [Samples~/EnemyWaves](Packages/com.uee03.pretzel.pooling/Samples~/EnemyWaves) |
 |  | **Bullets And Impacts** | A turret with pooled bullets that spawn pooled impact effects through a small interface, on PoolRegistry and ComponentPool. | [Samples~/BulletsAndImpacts](Packages/com.uee03.pretzel.pooling/Samples~/BulletsAndImpacts) |
@@ -184,6 +205,8 @@ sample always matches the API you installed. `TestPretzel/` is the consumer proj
 | [scenes](Packages/com.uee03.pretzel.scenes/README.md) | **Scenes Usage** | A loading screen with UIDocumentSceneTransition and a menu that loads scenes additively or as a single scene. | [Samples~/ScenesUsage](Packages/com.uee03.pretzel.scenes/Samples~/ScenesUsage) |
 |  | **Level Loading** | Additive levels loaded behind a loading screen whose progress bar also covers spawning pooled enemies from placed markers. Needs Pretzel Pooling. | [Samples~/LevelLoading](Packages/com.uee03.pretzel.scenes/Samples~/LevelLoading) |
 | [setup](Packages/com.uee03.pretzel.setup/README.md) | **Setup Extensions** | Add your own Project Setup tab and Main tab section with IPretzelTab and IPretzelMainSection. | [Samples~/SetupExtensions](Packages/com.uee03.pretzel.setup/Samples~/SetupExtensions) |
+|  | **No Container** | Click Rush: a complete small game with no DI container. Services live in a ScriptableObject filled by a bootstrap, with Events, Scenes, Data and Preferences, UI Toolkit screens, tests and scene builder. | [Samples~/NoContainer](Packages/com.uee03.pretzel.setup/Samples~/NoContainer) |
+| [sfx](Packages/com.uee03.pretzel.sfx/README.md) | **SFX Pack** | Thirteen generated sounds (UI, pickups, hits, explosion, stingers) wired into an SfxLibrary, with a sound board scene. | [Samples~/SfxPack](Packages/com.uee03.pretzel.sfx/Samples~/SfxPack) |
 | [tween](Packages/com.uee03.pretzel.tween/README.md) | **Tween Usage** | Ease types and AnimationCurve lerps for float, Vector2, Vector3 and Color, plus Evaluate. | [Samples~/TweenUsage](Packages/com.uee03.pretzel.tween/Samples~/TweenUsage) |
 | [ui](Packages/com.uee03.pretzel.ui/README.md) | **UI Toolkit Usage** | Two screens with UIControllerBase, every element factory, fades, UIHoverFade, UIDocumentFader and an Editor window for the Editor-only factories. | [Samples~/UIUsage](Packages/com.uee03.pretzel.ui/Samples~/UIUsage) |
 |  | **Game UI Helpers** | Screen navigation with UIScreenStack, a modal dialog, toasts, a safe-area root and a name tag that follows a 3D object. | [Samples~/GameUIHelpers](Packages/com.uee03.pretzel.ui/Samples~/GameUIHelpers) |
@@ -192,6 +215,8 @@ sample always matches the API you installed. `TestPretzel/` is the consumer proj
 |  | **Custom Inspectors** | Custom editors with CreateInspectorGUI: the default layout plus extra buttons, fully custom layouts, components, ScriptableObjects and multi-object editing. | [Samples~/CustomInspectors](Packages/com.uee03.pretzel.ui/Samples~/CustomInspectors) |
 |  | **Property Drawers** | Property drawers in three levels of complexity: basic, intermediate (rows, min/max, ShowIf) and advanced (lists, data-source dropdowns, SerializeReference). | [Samples~/PropertyDrawers](Packages/com.uee03.pretzel.ui/Samples~/PropertyDrawers) |
 | [ui.ugui](Packages/com.uee03.pretzel.ui.ugui/README.md) | **UGUI Usage** | UIFader on a CanvasGroup, OnMouseHoverFade, and the Button and placeholder extensions. | [Samples~/UGUIUsage](Packages/com.uee03.pretzel.ui.ugui/Samples~/UGUIUsage) |
+| [vcontainer](Packages/com.uee03.pretzel.vcontainer/README.md) | **VContainer Example** | Every VContainer feature in one scene with one LifetimeScope, one folder per feature: registration, lifetimes, injection, entry points, tickable timers and bullets, factories, components, collections, keys, open generics, settings, installers, callbacks and child scopes. | [Samples~/VContainerExample](Packages/com.uee03.pretzel.vcontainer/Samples~/VContainerExample) |
+| [vfx](Packages/com.uee03.pretzel.vfx/README.md) | **Game Feel Example** | A bouncing orb with buttons for hit stop, slow motion, flash and punch, alone and together. | [Samples~/GameFeelExample](Packages/com.uee03.pretzel.vfx/Samples~/GameFeelExample) |
 <!-- SAMPLES:END -->
 
 The list is maintained by [Update-SampleCatalog.ps1](.github/scripts/Update-SampleCatalog.ps1), which reads the `samples`

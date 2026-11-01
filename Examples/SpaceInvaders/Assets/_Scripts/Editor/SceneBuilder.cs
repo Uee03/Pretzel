@@ -1,9 +1,13 @@
 using System.Collections.Generic;
+using Pretzel.Cameras;
+using Pretzel.Cameras.Editor;
 using Pretzel.DevConsole;
 using Pretzel.Integrations.VContainer;
+using Pretzel.Parallax;
 using SpaceInvaders.Audio;
 using SpaceInvaders.Gameplay;
 using SpaceInvaders.UI;
+using Unity.Cinemachine;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEditor.SceneTemplate;
@@ -25,6 +29,8 @@ namespace SpaceInvaders.Editor
         private const string TitleLayoutPath = "Assets/_Project/UI/Layouts/Title.uxml";
 
         private static readonly Color _background = new(0.02f, 0.02f, 0.07f);
+
+        private static CameraShake _shake;
 
         public static void BuildTitle()
         {
@@ -62,7 +68,7 @@ namespace SpaceInvaders.Editor
             Transform managers = Group(scene, "[MANAGERS]");
             Transform ui = Group(scene, "[UI]");
 
-            Stars(environment);
+            ParallaxController stars = Stars(environment);
             BunkerField bunkers = Bunkers(environment, prefabs.Bunker);
 
             PlayerShip player = Instantiate(prefabs.Player, actors, new Vector3(0f, -4.2f, 0f)).GetComponent<PlayerShip>();
@@ -101,6 +107,8 @@ namespace SpaceInvaders.Editor
                 BuilderUtil.Property(serialized, "_bunkers").objectReferenceValue = bunkers;
                 BuilderUtil.Property(serialized, "_projectiles").objectReferenceValue = projectiles;
                 BuilderUtil.Property(serialized, "_explosions").objectReferenceValue = explosions;
+                BuilderUtil.Property(serialized, "_shake").objectReferenceValue = _shake;
+                BuilderUtil.Property(serialized, "_stars").objectReferenceValue = stars;
                 BuilderUtil.Property(serialized, "_hud").objectReferenceValue = hudView;
                 BuilderUtil.Property(serialized, "_console").objectReferenceValue = console;
             });
@@ -132,6 +140,13 @@ namespace SpaceInvaders.Editor
             camera.backgroundColor = _background;
             camera.orthographic = true;
             camera.orthographicSize = 5f;
+            camera.tag = "MainCamera";
+
+            // Cinemachine drives the camera. The fitter keeps the whole 17.8 x 10 playfield visible on any window shape, and the
+            // shake component is what the game feel adds trauma to.
+            CinemachineCamera rig = CameraRigBuilder.Create(CameraRigKind.TwoD);
+            rig.GetComponent<PlayfieldFitter>().Configure(new Vector2(17.8f, 10f), FitMode.Contain);
+            _shake = rig.GetComponent<CameraShake>();
             return scene;
         }
 
@@ -237,26 +252,40 @@ namespace SpaceInvaders.Editor
             return field;
         }
 
-        private static void Stars(Transform parent)
+        // Three layers of pixel-art stars drawn in Aseprite. The camera does not move, so the layers scroll by themselves: the nearer the
+        // layer, the faster. The Parallax controller wraps them, so the field never ends, and a later wave speeds it all up.
+        private static ParallaxController Stars(Transform parent)
         {
             DefaultArt.Load();
-            GameObject stars = new("Stars");
-            stars.transform.SetParent(parent, false);
-            System.Random random = new(7);
-            Vector3 native = DefaultArt.Circle.bounds.size;
-            for (int i = 0; i < 90; i++)
-            {
-                GameObject star = new("Star");
-                star.transform.SetParent(stars.transform, false);
-                float size = 0.03f + (float)random.NextDouble() * 0.05f;
-                star.transform.localPosition = new Vector3(((float)random.NextDouble() * 2f - 1f) * 8.8f, ((float)random.NextDouble() * 2f - 1f) * 4.8f, 0f);
-                star.transform.localScale = new Vector3(size / native.x, size / native.y, 1f);
-                SpriteRenderer renderer = star.AddComponent<SpriteRenderer>();
-                renderer.sprite = DefaultArt.Circle;
-                renderer.sharedMaterial = DefaultArt.Unlit;
-                renderer.sortingOrder = -10;
-                renderer.color = new Color(0.75f, 0.8f, 1f, 0.2f + (float)random.NextDouble() * 0.5f);
-            }
+            GameObject root = new("Stars");
+            root.transform.SetParent(parent, false);
+            ParallaxController controller = root.AddComponent<ParallaxController>();
+            controller.SetCamera(Camera.main != null ? Camera.main.transform : null);
+
+            AddStarLayer(root.transform, "stars_far", -30, 0.35f);
+            AddStarLayer(root.transform, "stars_mid", -20, 0.9f);
+            AddStarLayer(root.transform, "stars_near", -10, 1.8f);
+            return controller;
+        }
+
+        private static void AddStarLayer(Transform parent, string tile, int sortingOrder, float unitsPerSecond)
+        {
+            Sprite sprite = ArtImporter.LoadStars(tile);
+            GameObject layerObject = new(tile);
+            layerObject.transform.SetParent(parent, false);
+
+            // 4 x 4 tiles of 16 units: enough for any window shape the playfield fitter can produce.
+            SpriteRenderer renderer = layerObject.AddComponent<SpriteRenderer>();
+            renderer.sprite = sprite;
+            renderer.sharedMaterial = DefaultArt.Unlit;
+            renderer.drawMode = SpriteDrawMode.Tiled;
+            renderer.tileMode = SpriteTileMode.Continuous;
+            renderer.size = sprite.bounds.size * 4f;
+            renderer.sortingOrder = sortingOrder;
+
+            ParallaxLayer layer = layerObject.AddComponent<ParallaxLayer>();
+            layer.Configure(Vector2.zero, repeatX: true, repeatY: true);
+            layer.SetAutoScroll(new Vector2(0f, -unitsPerSecond));
         }
 
         private sealed class PoolEntry

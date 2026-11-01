@@ -16,7 +16,12 @@ graph TD
         data["Data: DataIO, IDataStore"]
         prefs["Preferences: PreferencesService"]
         dev["DevConsole: DeveloperConsole"]
-        integ["Integrations: scopes and installers for VContainer"]
+        integ["VContainer module: scopes and installers"]
+        sfx["Sfx: SfxPlayer, SfxLibrary"]
+        vfx["Vfx: TimeScaleService, SpriteFlash, PunchScale"]
+        cams["Cameras: CameraShake, PlayfieldFitter"]
+        parallax["Parallax: ParallaxController"]
+        inputs["Inputs: InputRouter, SceneLoadInputGate"]
     end
 
     subgraph Game["Space Invaders"]
@@ -42,6 +47,11 @@ graph TD
     presenters --> actors
     presenters --> audio
     presenters --> dev
+    presenters --> sfx
+    presenters --> vfx
+    presenters --> cams
+    presenters --> parallax
+    comp --> inputs
 ```
 
 The rules know nothing about Unity objects, the actors and views are thin adapters, and the presenters connect them.
@@ -64,7 +74,9 @@ graph TD
         s7["MasterVolumeSetting"]
         ep["GameFlow entry point"]
         kids["Child objects of the prefab:<br/>AudioService, LoadingScreen<br/>with UIDocumentSceneTransition"]
-        settings["Settings assets: SoundBank, WaveSet"]
+        settings["Settings assets: SoundBank, SfxLibrary, WaveSet"]
+        s8["ISfxPlayer, ITimeScale"]
+        gin["GameInput entry point: InputRouter"]
     end
 
     subgraph Title["Title scene: TitleScope"]
@@ -74,8 +86,8 @@ graph TD
 
     subgraph Level["Game scene: LevelScope"]
         linst["LevelInstaller registers the scene components:<br/>PlayerShip, InvaderFormation, UfoSpawner,<br/>BunkerField, ProjectileSpawner,<br/>ExplosionSpawner, HudView, DeveloperConsole"]
-        lscoped["RunState, ShipControls: scoped"]
-        lep["Entry points: LevelPresenter, HudPresenter,<br/>GameAudioReactions, DevCommands"]
+        lscoped["RunState, ShipControls: scoped<br/>CameraShake as ICameraShaker, ParallaxController"]
+        lep["Entry points: LevelPresenter, HudPresenter,<br/>GameAudioReactions, GameMusic, GameFeelReactions, DevCommands"]
     end
 
     Root --> Title
@@ -108,7 +120,9 @@ graph LR
         Rules["LevelPresenter: score, lives, waves"]
         Hud["HudPresenter: toasts, game-over screen"]
         Sound["GameAudioReactions: sounds"]
+        Music["GameMusic: the tune per wave, fade-out on game over"]
         Fx["ExplosionSpawner: pooled bursts"]
+        Feel["GameFeelReactions: hit stop, slow motion, shake, flash, backdrop speed"]
     end
 
     Player -->|PlayerFired, PlayerHit| Bus
@@ -119,7 +133,9 @@ graph LR
     Bus --> Rules
     Bus --> Hud
     Bus --> Sound
+    Bus --> Music
     Bus --> Fx
+    Bus --> Feel
 ```
 
 | Message | Published by | Used by |
@@ -208,10 +224,12 @@ flowchart TD
 graph LR
     WaveSet["WaveSet asset"] --> W1["Wave01 ... Wave05: WaveDefinition assets"]
     W1 --> rows["rows of InvaderKind, columns, spacing, march speed, bomb rate"]
-    SoundBank["SoundBank asset"] --> cues["AudioCue assets"]
-    cues --> clips["WAV clips from the sound generator"]
+    SoundBank["SoundBank asset"] --> march["four march WAV clips"]
+    SfxLibrary["SfxLibrary asset"] --> cues["AudioCue assets"]
+    cues --> clips["WAV clips made with SoundCraft"]
     root["root scope prefab"] --> WaveSet
     root --> SoundBank
+    root --> SfxLibrary
 ```
 
-Both assets are registered as settings on the root scope prefab, so any class can ask for `WaveSet` or `SoundBank` in its constructor. Select a wave asset to see the formation preview of the custom inspector.
+All three assets are registered as settings on the root scope prefab, so any class can ask for `WaveSet`, `SoundBank` or `SfxLibrary` in its constructor. Select a wave asset to see the formation preview of the custom inspector.

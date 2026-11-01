@@ -1,0 +1,7 @@
+# ui_back
+session.new {"name":"ui_back","sample_rate":44100,"bit_depth":16}
+track.new {"kind":"instrument","name":"ui_back","instrument":"subtractive_synth","format":"mono"}
+mix.instrument {"track":1,"plugin":"subtractive_synth","params":{"osc1_wave":3,"osc2_wave":2,"osc_mix":0,"cutoff":12000,"resonance":5,"filter_env_amount":0,"amp_attack":1,"amp_decay":90,"amp_sustain":40,"amp_release":120,"velocity":100,"level":-6}}
+midi.new_clip {"track":1}
+midi.note_add {"clip":2,"pitch":83,"start_ticks":0,"length_ticks":90,"velocity":110}
+midi.note_add {"clip":2,"pitch":76,"start_ticks":90,"length_ticks":200,"velocity":110}

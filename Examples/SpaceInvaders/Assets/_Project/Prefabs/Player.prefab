@@ -226,6 +226,8 @@ GameObject:
   - component: {fileID: 4908360527114366030}
   - component: {fileID: 2267596227751045147}
   - component: {fileID: 7698020668604849419}
+  - component: {fileID: 5072297571180580945}
+  - component: {fileID: 2187393562875239227}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -319,6 +321,39 @@ MonoBehaviour:
   - {fileID: 5726837627823236627}
   - {fileID: 6510737884356629901}
   - {fileID: 7310142926128357252}
+--- !u!114 &5072297571180580945
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8189730386516645627}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ec866467954bce94c96799a7d3732221, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Pretzel.Vfx::Pretzel.Vfx.SpriteFlash
+  _renderers:
+  - {fileID: 5726837627823236627}
+  - {fileID: 6510737884356629901}
+  - {fileID: 7310142926128357252}
+  _color: {r: 1, g: 0.25, b: 0.2, a: 1}
+  _duration: 0.15
+--- !u!114 &2187393562875239227
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8189730386516645627}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c051fb6c67e67d546b4b866877b9692d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Pretzel.Vfx::Pretzel.Vfx.PunchScale
+  _amount: 0.25
+  _duration: 0.3
+  _cycles: 2
 --- !u!1 &9124013454484337437
 GameObject:
   m_ObjectHideFlags: 0

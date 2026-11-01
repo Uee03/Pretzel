@@ -1,0 +1,1336 @@
+[
+ {
+  "command": "file.new",
+  "params": {
+   "name": "camera-arena",
+   "width": 1024,
+   "height": 576,
+   "units": "Pixels",
+   "backgroundContents": "transparent",
+   "colorMode": "rgb"
+  }
+ },
+ {
+  "command": "shape.rectangle",
+  "params": {
+   "x": 0,
+   "y": 0,
+   "width": 1024,
+   "height": 576
+  }
+ },
+ {
+  "command": "paint.setFill",
+  "params": {
+   "color": "#26324a"
+  }
+ },
+ {
+  "command": "paint.setStroke",
+  "params": {
+   "none": true
+  }
+ },
+ {
+  "command": "shape.rectangle",
+  "params": {
+   "x": 31,
+   "y": 0,
+   "width": 2,
+   "height": 576
+  }
+ },
+ {
+  "command": "paint.setFill",
+  "params": {
+   "color": "#2e3b57"
+  }
+ },
+ {
+  "command": "paint.setStroke",
+  "params": {
+   "none": true
+  }
+ },
+ {
+  "command": "shape.rectangle",
+  "params": {
+   "x": 63,
+   "y": 0,
+   "width": 2,
+   "height": 576
+  }
+ },
+ {
+  "command": "paint.setFill",
+  "params": {
+   "color": "#2e3b57"
+  }
+ },
+ {
+  "command": "paint.setStroke",
+  "params": {
+   "none": true
+  }
+ },
+ {
+  "command": "shape.rectangle",
+  "params": {
+   "x": 95,
+   "y": 0,
+   "width": 2,
+   "height": 576
+  }
+ },
+ {
+  "command": "paint.setFill",
+  "params": {
+   "color": "#2e3b57"
+  }
+ },
+ {
+  "command": "paint.setStroke",
+  "params": {
+   "none": true
+  }
+ },
+ {
+  "command": "shape.rectangle",
+  "params": {
+   "x": 127,
+   "y": 0,
+   "width": 2,
+   "height": 576
+  }
+ },
+ {
+  "command": "paint.setFill",
+  "params": {
+   "color": "#3a4a6b"
+  }
+ },
+ {
+  "command": "paint.setStroke",
+  "params": {
+   "none": true
+  }
+ },
+ {
+  "command": "shape.rectangle",
+  "params": {
+   "x": 159,
+   "y": 0,
+   "width": 2,
+   "height": 576
+  }
+ },
+ {
+  "command": "paint.setFill",
+  "params": {
+   "color": "#2e3b57"
+  }
+ },
+ {
+  "command": "paint.setStroke",
+  "params": {
+   "none": true
+  }
+ },
+ {
+  "command": "shape.rectangle",
+  "params": {
+   "x": 191,
+   "y": 0,
+   "width": 2,
+   "height": 576
+  }
+ },
+ {
+  "command": "paint.setFill",
+  "params": {
+   "color": "#2e3b57"
+  }
+ },
+ {
+  "command": "paint.setStroke",
+  "params": {
+   "none": true
+  }
+ },
+ {
+  "command": "shape.rectangle",
+  "params": {
+   "x": 223,
+   "y": 0,
+   "width": 2,
+   "height": 576
+  }
+ },
+ {
+  "command": "paint.setFill",
+  "params": {
+   "color": "#2e3b57"
+  }
+ },
+ {
+  "command": "paint.setStroke",
+  "params": {
+   "none": true
+  }
+ },
+ {
+  "command": "shape.rectangle",
+  "params": {
+   "x": 255,
+   "y": 0,
+   "width": 2,
+   "height": 576
+  }
+ },
+ {
+  "command": "paint.setFill",
+  "params": {
+   "color": "#3a4a6b"
+  }
+ },
+ {
+  "command": "paint.setStroke",
+  "params": {
+   "none": true
+  }
+ },
+ {
+  "command": "shape.rectangle",
+  "params": {
+   "x": 287,
+   "y": 0,
+   "width": 2,
+   "height": 576
+  }
+ },
+ {
+  "command": "paint.setFill",
+  "params": {
+   "color": "#2e3b57"
+  }
+ },
+ {
+  "command": "paint.setStroke",
+  "params": {
+   "none": true
+  }
+ },
+ {
+  "command": "shape.rectangle",
+  "params": {
+   "x": 319,
+   "y": 0,
+   "width": 2,
+   "height": 576
+  }
+ },
+ {
+  "command": "paint.setFill",
+  "params": {
+   "color": "#2e3b57"
+  }
+ },
+ {
+  "command": "paint.setStroke",
+  "params": {
+   "none": true
+  }
+ },
+ {
+  "command": "shape.rectangle",
+  "params": {
+   "x": 351,
+   "y": 0,
+   "width": 2,
+   "height": 576
+  }
+ },
+ {
+  "command": "paint.setFill",
+  "params": {
+   "color": "#2e3b57"
+  }
+ },
+ {
+  "command": "paint.setStroke",
+  "params": {
+   "none": true
+  }
+ },
+ {
+  "command": "shape.rectangle",
+  "params": {
+   "x": 383,
+   "y": 0,
+   "width": 2,
+   "height": 576
+  }
+ },
+ {
+  "command": "paint.setFill",
+  "params": {
+   "color": "#3a4a6b"
+  }
+ },
+ {
+  "command": "paint.setStroke",
+  "params": {
+   "none": true
+  }
+ },
+ {
+  "command": "shape.rectangle",
+  "params": {
+   "x": 415,
+   "y": 0,
+   "width": 2,
+   "height": 576
+  }
+ },
+ {
+  "command": "paint.setFill",
+  "params": {
+   "color": "#2e3b57"
+  }
+ },
+ {
+  "command": "paint.setStroke",
+  "params": {
+   "none": true
+  }
+ },
+ {
+  "command": "shape.rectangle",
+  "params": {
+   "x": 447,
+   "y": 0,
+   "width": 2,
+   "height": 576
+  }
+ },
+ {
+  "command": "paint.setFill",
+  "params": {
+   "color": "#2e3b57"
+  }
+ },
+ {
+  "command": "paint.setStroke",
+  "params": {
+   "none": true
+  }
+ },
+ {
+  "command": "shape.rectangle",
+  "params": {
+   "x": 479,
+   "y": 0,
+   "width": 2,
+   "height": 576
+  }
+ },
+ {
+  "command": "paint.setFill",
+  "params": {
+   "color": "#2e3b57"
+  }
+ },
+ {
+  "command": "paint.setStroke",
+  "params": {
+   "none": true
+  }
+ },
+ {
+  "command": "shape.rectangle",
+  "params": {
+   "x": 511,
+   "y": 0,
+   "width": 2,
+   "height": 576
+  }
+ },
+ {
+  "command": "paint.setFill",
+  "params": {
+   "color": "#3a4a6b"
+  }
+ },
+ {
+  "command": "paint.setStroke",
+  "params": {
+   "none": true
+  }
+ },
+ {
+  "command": "shape.rectangle",
+  "params": {
+   "x": 543,
+   "y": 0,
+   "width": 2,
+   "height": 576
+  }
+ },
+ {
+  "command": "paint.setFill",
+  "params": {
+   "color": "#2e3b57"
+  }
+ },
+ {
+  "command": "paint.setStroke",
+  "params": {
+   "none": true
+  }
+ },
+ {
+  "command": "shape.rectangle",
+  "params": {
+   "x": 575,
+   "y": 0,
+   "width": 2,
+   "height": 576
+  }
+ },
+ {
+  "command": "paint.setFill",
+  "params": {
+   "color": "#2e3b57"
+  }
+ },
+ {
+  "command": "paint.setStroke",
+  "params": {
+   "none": true
+  }
+ },
+ {
+  "command": "shape.rectangle",
+  "params": {
+   "x": 607,
+   "y": 0,
+   "width": 2,
+   "height": 576
+  }
+ },
+ {
+  "command": "paint.setFill",
+  "params": {
+   "color": "#2e3b57"
+  }
+ },
+ {
+  "command": "paint.setStroke",
+  "params": {
+   "none": true
+  }
+ },
+ {
+  "command": "shape.rectangle",
+  "params": {
+   "x": 639,
+   "y": 0,
+   "width": 2,
+   "height": 576
+  }
+ },
+ {
+  "command": "paint.setFill",
+  "params": {
+   "color": "#3a4a6b"
+  }
+ },
+ {
+  "command": "paint.setStroke",
+  "params": {
+   "none": true
+  }
+ },
+ {
+  "command": "shape.rectangle",
+  "params": {
+   "x": 671,
+   "y": 0,
+   "width": 2,
+   "height": 576
+  }
+ },
+ {
+  "command": "paint.setFill",
+  "params": {
+   "color": "#2e3b57"
+  }
+ },
+ {
+  "command": "paint.setStroke",
+  "params": {
+   "none": true
+  }
+ },
+ {
+  "command": "shape.rectangle",
+  "params": {
+   "x": 703,
+   "y": 0,
+   "width": 2,
+   "height": 576
+  }
+ },
+ {
+  "command": "paint.setFill",
+  "params": {
+   "color": "#2e3b57"
+  }
+ },
+ {
+  "command": "paint.setStroke",
+  "params": {
+   "none": true
+  }
+ },
+ {
+  "command": "shape.rectangle",
+  "params": {
+   "x": 735,
+   "y": 0,
+   "width": 2,
+   "height": 576
+  }
+ },
+ {
+  "command": "paint.setFill",
+  "params": {
+   "color": "#2e3b57"
+  }
+ },
+ {
+  "command": "paint.setStroke",
+  "params": {
+   "none": true
+  }
+ },
+ {
+  "command": "shape.rectangle",
+  "params": {
+   "x": 767,
+   "y": 0,
+   "width": 2,
+   "height": 576
+  }
+ },
+ {
+  "command": "paint.setFill",
+  "params": {
+   "color": "#3a4a6b"
+  }
+ },
+ {
+  "command": "paint.setStroke",
+  "params": {
+   "none": true
+  }
+ },
+ {
+  "command": "shape.rectangle",
+  "params": {
+   "x": 799,
+   "y": 0,
+   "width": 2,
+   "height": 576
+  }
+ },
+ {
+  "command": "paint.setFill",
+  "params": {
+   "color": "#2e3b57"
+  }
+ },
+ {
+  "command": "paint.setStroke",
+  "params": {
+   "none": true
+  }
+ },
+ {
+  "command": "shape.rectangle",
+  "params": {
+   "x": 831,
+   "y": 0,
+   "width": 2,
+   "height": 576
+  }
+ },
+ {
+  "command": "paint.setFill",
+  "params": {
+   "color": "#2e3b57"
+  }
+ },
+ {
+  "command": "paint.setStroke",
+  "params": {
+   "none": true
+  }
+ },
+ {
+  "command": "shape.rectangle",
+  "params": {
+   "x": 863,
+   "y": 0,
+   "width": 2,
+   "height": 576
+  }
+ },
+ {
+  "command": "paint.setFill",
+  "params": {
+   "color": "#2e3b57"
+  }
+ },
+ {
+  "command": "paint.setStroke",
+  "params": {
+   "none": true
+  }
+ },
+ {
+  "command": "shape.rectangle",
+  "params": {
+   "x": 895,
+   "y": 0,
+   "width": 2,
+   "height": 576
+  }
+ },
+ {
+  "command": "paint.setFill",
+  "params": {
+   "color": "#3a4a6b"
+  }
+ },
+ {
+  "command": "paint.setStroke",
+  "params": {
+   "none": true
+  }
+ },
+ {
+  "command": "shape.rectangle",
+  "params": {
+   "x": 927,
+   "y": 0,
+   "width": 2,
+   "height": 576
+  }
+ },
+ {
+  "command": "paint.setFill",
+  "params": {
+   "color": "#2e3b57"
+  }
+ },
+ {
+  "command": "paint.setStroke",
+  "params": {
+   "none": true
+  }
+ },
+ {
+  "command": "shape.rectangle",
+  "params": {
+   "x": 959,
+   "y": 0,
+   "width": 2,
+   "height": 576
+  }
+ },
+ {
+  "command": "paint.setFill",
+  "params": {
+   "color": "#2e3b57"
+  }
+ },
+ {
+  "command": "paint.setStroke",
+  "params": {
+   "none": true
+  }
+ },
+ {
+  "command": "shape.rectangle",
+  "params": {
+   "x": 991,
+   "y": 0,
+   "width": 2,
+   "height": 576
+  }
+ },
+ {
+  "command": "paint.setFill",
+  "params": {
+   "color": "#2e3b57"
+  }
+ },
+ {
+  "command": "paint.setStroke",
+  "params": {
+   "none": true
+  }
+ },
+ {
+  "command": "shape.rectangle",
+  "params": {
+   "x": 0,
+   "y": 31,
+   "width": 1024,
+   "height": 2
+  }
+ },
+ {
+  "command": "paint.setFill",
+  "params": {
+   "color": "#2e3b57"
+  }
+ },
+ {
+  "command": "paint.setStroke",
+  "params": {
+   "none": true
+  }
+ },
+ {
+  "command": "shape.rectangle",
+  "params": {
+   "x": 0,
+   "y": 63,
+   "width": 1024,
+   "height": 2
+  }
+ },
+ {
+  "command": "paint.setFill",
+  "params": {
+   "color": "#2e3b57"
+  }
+ },
+ {
+  "command": "paint.setStroke",
+  "params": {
+   "none": true
+  }
+ },
+ {
+  "command": "shape.rectangle",
+  "params": {
+   "x": 0,
+   "y": 95,
+   "width": 1024,
+   "height": 2
+  }
+ },
+ {
+  "command": "paint.setFill",
+  "params": {
+   "color": "#2e3b57"
+  }
+ },
+ {
+  "command": "paint.setStroke",
+  "params": {
+   "none": true
+  }
+ },
+ {
+  "command": "shape.rectangle",
+  "params": {
+   "x": 0,
+   "y": 127,
+   "width": 1024,
+   "height": 2
+  }
+ },
+ {
+  "command": "paint.setFill",
+  "params": {
+   "color": "#3a4a6b"
+  }
+ },
+ {
+  "command": "paint.setStroke",
+  "params": {
+   "none": true
+  }
+ },
+ {
+  "command": "shape.rectangle",
+  "params": {
+   "x": 0,
+   "y": 159,
+   "width": 1024,
+   "height": 2
+  }
+ },
+ {
+  "command": "paint.setFill",
+  "params": {
+   "color": "#2e3b57"
+  }
+ },
+ {
+  "command": "paint.setStroke",
+  "params": {
+   "none": true
+  }
+ },
+ {
+  "command": "shape.rectangle",
+  "params": {
+   "x": 0,
+   "y": 191,
+   "width": 1024,
+   "height": 2
+  }
+ },
+ {
+  "command": "paint.setFill",
+  "params": {
+   "color": "#2e3b57"
+  }
+ },
+ {
+  "command": "paint.setStroke",
+  "params": {
+   "none": true
+  }
+ },
+ {
+  "command": "shape.rectangle",
+  "params": {
+   "x": 0,
+   "y": 223,
+   "width": 1024,
+   "height": 2
+  }
+ },
+ {
+  "command": "paint.setFill",
+  "params": {
+   "color": "#2e3b57"
+  }
+ },
+ {
+  "command": "paint.setStroke",
+  "params": {
+   "none": true
+  }
+ },
+ {
+  "command": "shape.rectangle",
+  "params": {
+   "x": 0,
+   "y": 255,
+   "width": 1024,
+   "height": 2
+  }
+ },
+ {
+  "command": "paint.setFill",
+  "params": {
+   "color": "#3a4a6b"
+  }
+ },
+ {
+  "command": "paint.setStroke",
+  "params": {
+   "none": true
+  }
+ },
+ {
+  "command": "shape.rectangle",
+  "params": {
+   "x": 0,
+   "y": 287,
+   "width": 1024,
+   "height": 2
+  }
+ },
+ {
+  "command": "paint.setFill",
+  "params": {
+   "color": "#2e3b57"
+  }
+ },
+ {
+  "command": "paint.setStroke",
+  "params": {
+   "none": true
+  }
+ },
+ {
+  "command": "shape.rectangle",
+  "params": {
+   "x": 0,
+   "y": 319,
+   "width": 1024,
+   "height": 2
+  }
+ },
+ {
+  "command": "paint.setFill",
+  "params": {
+   "color": "#2e3b57"
+  }
+ },
+ {
+  "command": "paint.setStroke",
+  "params": {
+   "none": true
+  }
+ },
+ {
+  "command": "shape.rectangle",
+  "params": {
+   "x": 0,
+   "y": 351,
+   "width": 1024,
+   "height": 2
+  }
+ },
+ {
+  "command": "paint.setFill",
+  "params": {
+   "color": "#2e3b57"
+  }
+ },
+ {
+  "command": "paint.setStroke",
+  "params": {
+   "none": true
+  }
+ },
+ {
+  "command": "shape.rectangle",
+  "params": {
+   "x": 0,
+   "y": 383,
+   "width": 1024,
+   "height": 2
+  }
+ },
+ {
+  "command": "paint.setFill",
+  "params": {
+   "color": "#3a4a6b"
+  }
+ },
+ {
+  "command": "paint.setStroke",
+  "params": {
+   "none": true
+  }
+ },
+ {
+  "command": "shape.rectangle",
+  "params": {
+   "x": 0,
+   "y": 415,
+   "width": 1024,
+   "height": 2
+  }
+ },
+ {
+  "command": "paint.setFill",
+  "params": {
+   "color": "#2e3b57"
+  }
+ },
+ {
+  "command": "paint.setStroke",
+  "params": {
+   "none": true
+  }
+ },
+ {
+  "command": "shape.rectangle",
+  "params": {
+   "x": 0,
+   "y": 447,
+   "width": 1024,
+   "height": 2
+  }
+ },
+ {
+  "command": "paint.setFill",
+  "params": {
+   "color": "#2e3b57"
+  }
+ },
+ {
+  "command": "paint.setStroke",
+  "params": {
+   "none": true
+  }
+ },
+ {
+  "command": "shape.rectangle",
+  "params": {
+   "x": 0,
+   "y": 479,
+   "width": 1024,
+   "height": 2
+  }
+ },
+ {
+  "command": "paint.setFill",
+  "params": {
+   "color": "#2e3b57"
+  }
+ },
+ {
+  "command": "paint.setStroke",
+  "params": {
+   "none": true
+  }
+ },
+ {
+  "command": "shape.rectangle",
+  "params": {
+   "x": 0,
+   "y": 511,
+   "width": 1024,
+   "height": 2
+  }
+ },
+ {
+  "command": "paint.setFill",
+  "params": {
+   "color": "#3a4a6b"
+  }
+ },
+ {
+  "command": "paint.setStroke",
+  "params": {
+   "none": true
+  }
+ },
+ {
+  "command": "shape.rectangle",
+  "params": {
+   "x": 0,
+   "y": 543,
+   "width": 1024,
+   "height": 2
+  }
+ },
+ {
+  "command": "paint.setFill",
+  "params": {
+   "color": "#2e3b57"
+  }
+ },
+ {
+  "command": "paint.setStroke",
+  "params": {
+   "none": true
+  }
+ },
+ {
+  "command": "shape.rectangle",
+  "params": {
+   "x": 0,
+   "y": 0,
+   "width": 1024,
+   "height": 24
+  }
+ },
+ {
+  "command": "paint.setFill",
+  "params": {
+   "color": "#f2a33a"
+  }
+ },
+ {
+  "command": "paint.setStroke",
+  "params": {
+   "none": true
+  }
+ },
+ {
+  "command": "shape.rectangle",
+  "params": {
+   "x": 0,
+   "y": 552,
+   "width": 1024,
+   "height": 24
+  }
+ },
+ {
+  "command": "paint.setFill",
+  "params": {
+   "color": "#f2a33a"
+  }
+ },
+ {
+  "command": "paint.setStroke",
+  "params": {
+   "none": true
+  }
+ },
+ {
+  "command": "shape.rectangle",
+  "params": {
+   "x": 0,
+   "y": 0,
+   "width": 24,
+   "height": 576
+  }
+ },
+ {
+  "command": "paint.setFill",
+  "params": {
+   "color": "#f2a33a"
+  }
+ },
+ {
+  "command": "paint.setStroke",
+  "params": {
+   "none": true
+  }
+ },
+ {
+  "command": "shape.rectangle",
+  "params": {
+   "x": 1000,
+   "y": 0,
+   "width": 24,
+   "height": 576
+  }
+ },
+ {
+  "command": "paint.setFill",
+  "params": {
+   "color": "#f2a33a"
+  }
+ },
+ {
+  "command": "paint.setStroke",
+  "params": {
+   "none": true
+  }
+ },
+ {
+  "command": "shape.ellipse",
+  "params": {
+   "x": 120,
+   "y": 120,
+   "width": 80,
+   "height": 80
+  }
+ },
+ {
+  "command": "paint.setFill",
+  "params": {
+   "color": "#3d5a80"
+  }
+ },
+ {
+  "command": "paint.setStroke",
+  "params": {
+   "none": true
+  }
+ },
+ {
+  "command": "shape.ellipse",
+  "params": {
+   "x": 136,
+   "y": 136,
+   "width": 48,
+   "height": 48
+  }
+ },
+ {
+  "command": "paint.setFill",
+  "params": {
+   "color": "#98c1d9"
+  }
+ },
+ {
+  "command": "paint.setStroke",
+  "params": {
+   "none": true
+  }
+ },
+ {
+  "command": "shape.ellipse",
+  "params": {
+   "x": 824,
+   "y": 120,
+   "width": 80,
+   "height": 80
+  }
+ },
+ {
+  "command": "paint.setFill",
+  "params": {
+   "color": "#3d5a80"
+  }
+ },
+ {
+  "command": "paint.setStroke",
+  "params": {
+   "none": true
+  }
+ },
+ {
+  "command": "shape.ellipse",
+  "params": {
+   "x": 840,
+   "y": 136,
+   "width": 48,
+   "height": 48
+  }
+ },
+ {
+  "command": "paint.setFill",
+  "params": {
+   "color": "#98c1d9"
+  }
+ },
+ {
+  "command": "paint.setStroke",
+  "params": {
+   "none": true
+  }
+ },
+ {
+  "command": "shape.ellipse",
+  "params": {
+   "x": 120,
+   "y": 376,
+   "width": 80,
+   "height": 80
+  }
+ },
+ {
+  "command": "paint.setFill",
+  "params": {
+   "color": "#3d5a80"
+  }
+ },
+ {
+  "command": "paint.setStroke",
+  "params": {
+   "none": true
+  }
+ },
+ {
+  "command": "shape.ellipse",
+  "params": {
+   "x": 136,
+   "y": 392,
+   "width": 48,
+   "height": 48
+  }
+ },
+ {
+  "command": "paint.setFill",
+  "params": {
+   "color": "#98c1d9"
+  }
+ },
+ {
+  "command": "paint.setStroke",
+  "params": {
+   "none": true
+  }
+ },
+ {
+  "command": "shape.ellipse",
+  "params": {
+   "x": 824,
+   "y": 376,
+   "width": 80,
+   "height": 80
+  }
+ },
+ {
+  "command": "paint.setFill",
+  "params": {
+   "color": "#3d5a80"
+  }
+ },
+ {
+  "command": "paint.setStroke",
+  "params": {
+   "none": true
+  }
+ },
+ {
+  "command": "shape.ellipse",
+  "params": {
+   "x": 840,
+   "y": 392,
+   "width": 48,
+   "height": 48
+  }
+ },
+ {
+  "command": "paint.setFill",
+  "params": {
+   "color": "#98c1d9"
+  }
+ },
+ {
+  "command": "paint.setStroke",
+  "params": {
+   "none": true
+  }
+ },
+ {
+  "command": "shape.ellipse",
+  "params": {
+   "x": 472,
+   "y": 248,
+   "width": 80,
+   "height": 80
+  }
+ },
+ {
+  "command": "paint.setFill",
+  "params": {
+   "color": "#3d5a80"
+  }
+ },
+ {
+  "command": "paint.setStroke",
+  "params": {
+   "none": true
+  }
+ },
+ {
+  "command": "shape.ellipse",
+  "params": {
+   "x": 488,
+   "y": 264,
+   "width": 48,
+   "height": 48
+  }
+ },
+ {
+  "command": "paint.setFill",
+  "params": {
+   "color": "#98c1d9"
+  }
+ },
+ {
+  "command": "paint.setStroke",
+  "params": {
+   "none": true
+  }
+ }
+]

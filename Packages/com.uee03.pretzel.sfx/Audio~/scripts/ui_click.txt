@@ -1,0 +1,6 @@
+# ui_click
+session.new {"name":"ui_click","sample_rate":44100,"bit_depth":16}
+track.new {"kind":"instrument","name":"ui_click","instrument":"subtractive_synth","format":"mono"}
+mix.instrument {"track":1,"plugin":"subtractive_synth","params":{"osc1_wave":2,"osc2_wave":2,"osc_mix":0,"cutoff":12000,"resonance":5,"filter_env_amount":0,"amp_attack":1,"amp_decay":35,"amp_sustain":0,"amp_release":25,"velocity":100,"level":-6}}
+midi.new_clip {"track":1}
+midi.note_add {"clip":2,"pitch":88,"start_ticks":0,"length_ticks":40,"velocity":110}

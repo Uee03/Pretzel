@@ -1,0 +1,25 @@
+{
+  "name": "Pretzel.Inputs.Preferences",
+  "rootNamespace": "Pretzel.Inputs.Preferences",
+  "references": [
+    "Pretzel.Inputs",
+    "Pretzel.Preferences"
+  ],
+  "includePlatforms": [],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": true,
+  "defineConstraints": [
+    "PRETZEL_INPUT_PREFERENCES"
+  ],
+  "versionDefines": [
+    {
+      "name": "com.uee03.pretzel.preferences",
+      "expression": "",
+      "define": "PRETZEL_INPUT_PREFERENCES"
+    }
+  ],
+  "noEngineReferences": false
+}

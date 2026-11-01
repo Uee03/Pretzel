@@ -1,0 +1,9 @@
+# power_up
+session.new {"name":"power_up","sample_rate":44100,"bit_depth":16}
+track.new {"kind":"instrument","name":"power_up","instrument":"subtractive_synth","format":"mono"}
+mix.instrument {"track":1,"plugin":"subtractive_synth","params":{"osc1_wave":1,"osc2_wave":0,"osc_mix":40,"cutoff":8000,"resonance":5,"filter_env_amount":0,"amp_attack":1,"amp_decay":120,"amp_sustain":50,"amp_release":180,"velocity":100,"level":-6,"osc2_detune":15}}
+midi.new_clip {"track":1}
+midi.note_add {"clip":2,"pitch":72,"start_ticks":0,"length_ticks":70,"velocity":110}
+midi.note_add {"clip":2,"pitch":76,"start_ticks":70,"length_ticks":70,"velocity":110}
+midi.note_add {"clip":2,"pitch":79,"start_ticks":140,"length_ticks":70,"velocity":110}
+midi.note_add {"clip":2,"pitch":84,"start_ticks":210,"length_ticks":320,"velocity":110}
