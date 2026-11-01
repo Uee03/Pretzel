@@ -2,6 +2,13 @@
 
 All notable changes to this package are documented here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the package uses [Semantic Versioning](https://semver.org/).
 
+## [Unreleased]
+
+### Fixed
+
+- The menu's text inputs (display name, session name, join code, the number fields) showed the menu's light text on Unity's light input background, so typed text was hard to read. Inputs now use dark text on a light background, set by two new tokens, `--pretzel-multiplayer-input-text` and `--pretzel-multiplayer-input-background`.
+- `NetworkPrefabListUtility.Register` no longer adds a prefab to a list asset twice when an Editor builder runs again. It checked only the NetworkManager's merged prefabs, which are empty on a fresh manager, so a repeated build gave NGO a duplicate `GlobalObjectIdHash` error at runtime.
+
 ## [0.2.0] - 2026-10-29
 
 First release.

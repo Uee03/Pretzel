@@ -30,6 +30,20 @@ namespace SpaceInvaders.Gameplay
             gameObject.SetActive(false);
         }
 
+        /// <summary>Shows or hides the ship where the host says it is. A mirrored ship never flies by itself.</summary>
+        public void Mirror(bool visible, Vector2 position)
+        {
+            if (visible)
+            {
+                transform.position = new Vector3(position.x, position.y, 0f);
+            }
+
+            if (gameObject.activeSelf != visible)
+            {
+                gameObject.SetActive(visible);
+            }
+        }
+
         private void Update()
         {
             if (!IsFlying)

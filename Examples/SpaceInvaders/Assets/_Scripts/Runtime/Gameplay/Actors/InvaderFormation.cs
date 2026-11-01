@@ -45,6 +45,15 @@ namespace SpaceInvaders.Gameplay
 
         public bool IsRunning => _running;
 
+        /// <summary>Off on a client that only mirrors the host's formation: <see cref="Spawn"/> then builds the invaders but never marches or bombs.</summary>
+        public bool SimulationEnabled { get; set; } = true;
+
+        /// <summary>The wave being played, or null before the first <see cref="Spawn"/>.</summary>
+        public WaveDefinition Wave => _wave;
+
+        /// <summary>Marches taken in this wave. The invaders' animation frame follows it.</summary>
+        public int StepIndex => _stepIndex;
+
         // Runs when the level scope builds, before Awake: keep it to storing dependencies.
         [Inject]
         public void Construct(IEventBus bus, IProjectileSpawner projectiles)
@@ -97,6 +106,7 @@ namespace SpaceInvaders.Gameplay
                     Invader invader = _invaders.Spawn(rows[row], transform.position, Quaternion.identity, transform);
                     invader.transform.localPosition = new Vector3((column - centre) * wave.Spacing.x, -row * wave.Spacing.y, 0f);
                     invader.Column = column;
+                    invader.Row = row;
                     invader.Killed += OnInvaderKilled;
                     _alive.Add(invader);
                 }
@@ -113,7 +123,7 @@ namespace SpaceInvaders.Gameplay
             _bombs.Duration = wave.BombIntervalSeconds;
             _bombs.Reset();
             _bombs.TryUse();
-            _running = true;
+            _running = SimulationEnabled;
         }
 
         /// <summary>Stops marching and bombing, for a pause between waves or the end of the game.</summary>
@@ -235,6 +245,67 @@ namespace SpaceInvaders.Gameplay
             if (_alive.Count == 0)
             {
                 _running = false;
+            }
+        }
+
+        /// <summary>Removes every invader without publishing events. Used when a match ends.</summary>
+        public void Clear()
+        {
+            ReleaseAll();
+            _running = false;
+        }
+
+        /// <summary>Which invaders are alive, one bit per slot of the grid (row * columns + column), 128 slots at most.</summary>
+        public void WriteAliveMask(out ulong low, out ulong high)
+        {
+            low = 0UL;
+            high = 0UL;
+            if (_wave == null)
+            {
+                return;
+            }
+
+            foreach (Invader invader in _alive)
+            {
+                int slot = invader.Row * _wave.Columns + invader.Column;
+                if (slot < 64)
+                {
+                    low |= 1UL << slot;
+                }
+                else if (slot < 128)
+                {
+                    high |= 1UL << (slot - 64);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Moves a mirrored formation to the host's state: the block position, the animation frame and the surviving invaders.
+        /// Invaders missing from the mask leave silently, because the host's events already reach this machine another way.
+        /// </summary>
+        public void ApplyMirror(Vector2 origin, int stepIndex, ulong low, ulong high)
+        {
+            if (_wave == null)
+            {
+                return;
+            }
+
+            transform.position = new Vector3(origin.x, origin.y, 0f);
+            _stepIndex = stepIndex;
+            for (int i = _alive.Count - 1; i >= 0; i--)
+            {
+                Invader invader = _alive[i];
+                int slot = invader.Row * _wave.Columns + invader.Column;
+                bool present = slot < 64 ? (low & (1UL << slot)) != 0UL : slot < 128 && (high & (1UL << (slot - 64))) != 0UL;
+                if (!present)
+                {
+                    invader.Killed -= OnInvaderKilled;
+                    _alive.RemoveAt(i);
+                    _invaders.Release(invader);
+                    continue;
+                }
+
+                invader.ShowFrame(stepIndex);
             }
         }
 

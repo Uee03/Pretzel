@@ -10,7 +10,7 @@ namespace SpaceInvaders.Editor
     /// Builds every actor prefab from Unity's built-in UI sprites (a rounded rectangle and a circle), tinted and composed into shapes.
     /// Only the explosion uses imported art: the pixel-art frames drawn in Aseprite.
     /// </summary>
-    internal static class ActorPrefabsBuilder
+    internal static partial class ActorPrefabsBuilder
     {
         public const string Folder = "Assets/_Project/Prefabs";
 

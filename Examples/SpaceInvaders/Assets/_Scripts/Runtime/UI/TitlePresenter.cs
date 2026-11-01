@@ -23,6 +23,7 @@ namespace SpaceInvaders.UI
         public void Start()
         {
             _view.PlayRequested += OnPlay;
+            _view.CoopRequested += OnCoop;
             _view.QuitRequested += OnQuit;
             _view.VolumeChanged += _volume.Set;
             _view.Bound += Refresh;
@@ -35,6 +36,7 @@ namespace SpaceInvaders.UI
         public void Dispose()
         {
             _view.PlayRequested -= OnPlay;
+            _view.CoopRequested -= OnCoop;
             _view.QuitRequested -= OnQuit;
             _view.VolumeChanged -= _volume.Set;
             _view.Bound -= Refresh;
@@ -50,6 +52,11 @@ namespace SpaceInvaders.UI
         private void OnPlay()
         {
             _ = _navigator.PlayAsync();
+        }
+
+        private void OnCoop()
+        {
+            _ = _navigator.PlayCoopAsync();
         }
 
         private static void OnQuit()

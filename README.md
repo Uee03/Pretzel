@@ -100,7 +100,7 @@ Each integration assembly compiles only when its third-party package is installe
 
 ## Example
 
-[`Examples/SpaceInvaders`](Examples/SpaceInvaders/README.md) is a complete game built on Pretzel, as a Unity project you can open (Unity 6000.6.5f1, Universal 2D template). Its code uses 18 of the 24 packages. It comes with architecture diagrams, [a guide that traces one shot through the modules and covers all 24 packages](Examples/SpaceInvaders/Documentation/PretzelUsage.md), and a build-it-yourself walkthrough.
+[`Examples/SpaceInvaders`](Examples/SpaceInvaders/README.md) is a complete game built on Pretzel, as a Unity project you can open (Unity 6000.6.5f1, Universal 2D template). It plays alone or as two-player co-op, local or online. Its code uses 19 of the 24 packages. It comes with architecture diagrams, [a guide that traces one shot through the modules and covers all 24 packages](Examples/SpaceInvaders/Documentation/PretzelUsage.md), and a build-it-yourself walkthrough.
 
 ## Using the packages
 

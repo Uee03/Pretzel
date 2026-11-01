@@ -62,6 +62,11 @@ namespace Pretzel.Multiplayer.Editor
             }
 
             NetworkPrefabsList list = EnsureList(networkManager, folder);
+            if (list.Contains(prefab))
+            {
+                return false;
+            }
+
             list.Add(new NetworkPrefab { Prefab = prefab });
             EditorUtility.SetDirty(list);
             AssetDatabase.SaveAssetIfDirty(list);

@@ -171,6 +171,36 @@
     min-width: 120px;
 }
 
+/* Co-op HUD: the two players keep the colour of their ship. */
+
+/* The Pretzel menu shows its own status pill in the top-left corner during a match. */
+.invaders-hud__bar--coop {
+    margin-top: 44px;
+}
+
+.invaders-coop__player--1 .invaders-coop__name,
+.invaders-coop__result--1 {
+    color: rgb(102, 255, 128);
+}
+
+.invaders-coop__player--2 .invaders-coop__name,
+.invaders-coop__result--2 {
+    color: rgb(89, 204, 255);
+}
+
+.invaders-coop__result {
+    font-size: 24px;
+}
+
+.invaders-coop__leave {
+    position: absolute;
+    left: 24px;
+    bottom: 18px;
+    min-width: 190px;
+    height: 38px;
+    font-size: 16px;
+}
+
 .invaders-toasts {
     position: absolute;
     left: 0;

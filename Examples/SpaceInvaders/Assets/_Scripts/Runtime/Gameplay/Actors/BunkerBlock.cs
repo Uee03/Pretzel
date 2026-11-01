@@ -17,6 +17,21 @@ namespace SpaceInvaders.Gameplay
             _health = _maxHealth;
         }
 
+        public int Health => _health;
+
+        public int MaxHealth => _maxHealth;
+
+        /// <summary>Sets the wear to match a replicated value. Zero hides the brick.</summary>
+        public void SetHealth(int health)
+        {
+            _health = Mathf.Clamp(health, 0, _maxHealth);
+            gameObject.SetActive(_health > 0);
+            if (_health > 0)
+            {
+                ApplyWear();
+            }
+        }
+
         public bool TakeHit(Team attacker)
         {
             if (_health <= 0)

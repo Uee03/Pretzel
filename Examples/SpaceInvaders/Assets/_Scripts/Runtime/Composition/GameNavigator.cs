@@ -12,6 +12,7 @@ namespace SpaceInvaders
     {
         public const string TitleScene = "Title";
         public const string GameScene = "Game";
+        public const string CoopScene = "Coop";
 
         private readonly SceneLoader _loader;
         private readonly UIDocumentSceneTransition _loadingScreen;
@@ -39,6 +40,21 @@ namespace SpaceInvaders
                 FallbackScene = TitleScene
             };
             return LoadAsync(GameScene, options);
+        }
+
+        public Awaitable PlayCoopAsync()
+        {
+            SceneLoadOptions options = new()
+            {
+                Mode = LoadSceneMode.Single,
+                Transition = _loadingScreen,
+                MinimumDuration = 0.5f,
+                SceneProgressWeight = 0.5f,
+                LoadingStatus = "Calling the second pilot",
+                SetupAsync = SetUpGameAsync,
+                FallbackScene = TitleScene
+            };
+            return LoadAsync(CoopScene, options);
         }
 
         public Awaitable ReturnToTitleAsync()

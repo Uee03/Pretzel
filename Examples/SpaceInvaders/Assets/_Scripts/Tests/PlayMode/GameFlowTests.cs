@@ -29,7 +29,7 @@ namespace SpaceInvaders.Tests
         private IDataStore _store;
         private bool _hadProgress;
 
-        private static string ShotFolder => Path.Combine(Directory.GetParent(Application.dataPath).FullName, "Temp", "TestScreenshots");
+        private static string ShotFolder => Environment.GetEnvironmentVariable("SI_SCREENSHOT_DIR") ?? Path.Combine(Directory.GetParent(Application.dataPath).FullName, "Temp", "TestScreenshots");
 
         [UnitySetUp]
         public IEnumerator SetUp()

@@ -18,6 +18,15 @@ namespace SpaceInvaders.Gameplay
         /// <summary>Column in the formation. The lowest invader of a column is the one that can drop a bomb.</summary>
         public int Column { get; set; }
 
+        /// <summary>Row in the formation, counted from the top. With the column it addresses an invader in a replicated snapshot.</summary>
+        public int Row { get; set; }
+
+        /// <summary>Shows animation frame <paramref name="frame"/> (wraps). A mirrored formation uses it to follow the host's march.</summary>
+        public void ShowFrame(int frame)
+        {
+            SetFrame(frame);
+        }
+
         public event Action<Invader> Killed;
 
         public void OnTakenFromPool()

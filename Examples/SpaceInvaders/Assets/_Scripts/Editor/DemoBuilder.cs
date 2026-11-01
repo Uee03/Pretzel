@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Pretzel.Audio;
 using Pretzel.Integrations.VContainer;
 using Pretzel.Scenes;
@@ -29,17 +30,36 @@ namespace SpaceInvaders.Editor
             AssetDatabase.SaveAssets();
             PanelAssetsBuilder.BuildAll();
             ActorPrefabsBuilder.Build();
+            ActorPrefabsBuilder.BuildCoopPrefabs();
             ConfigureRootScope();
             SceneBuilder.BuildTitle();
             SceneBuilder.BuildGame();
+            SceneBuilder.BuildCoop();
 
             EditorBuildSettings.scenes = new[]
             {
                 new EditorBuildSettingsScene(SceneBuilder.TitleScenePath, true),
-                new EditorBuildSettingsScene(SceneBuilder.GameScenePath, true)
+                new EditorBuildSettingsScene(SceneBuilder.GameScenePath, true),
+                new EditorBuildSettingsScene(SceneBuilder.CoopScenePath, true)
             };
             AssetDatabase.SaveAssets();
-            Debug.Log("[SI] Demo built: Title and Game scenes are in the build settings.");
+            Debug.Log("[SI] Demo built: Title, Game and Coop scenes are in the build settings.");
+        }
+
+        /// <summary>Builds only the co-op prefabs and scene and adds the scene to the build settings. Also the entry point for batch mode.</summary>
+        [MenuItem("Space Invaders/Build Co-op", priority = 2)]
+        public static void BuildCoop()
+        {
+            BuilderUtil.EnsureFolder("Assets/_Project/Scenes");
+            ActorPrefabsBuilder.BuildCoopPrefabs();
+            SceneBuilder.BuildCoop();
+
+            List<EditorBuildSettingsScene> scenes = new(EditorBuildSettings.scenes);
+            scenes.RemoveAll(scene => string.Equals(scene.path, SceneBuilder.CoopScenePath, System.StringComparison.Ordinal));
+            scenes.Add(new EditorBuildSettingsScene(SceneBuilder.CoopScenePath, true));
+            EditorBuildSettings.scenes = scenes.ToArray();
+            AssetDatabase.SaveAssets();
+            Debug.Log("[SI] Co-op built: the Coop scene is in the build settings.");
         }
 
         [MenuItem("Space Invaders/Rebuild Sound Library", priority = 20)]

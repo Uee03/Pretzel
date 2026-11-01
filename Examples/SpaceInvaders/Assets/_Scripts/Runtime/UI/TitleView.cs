@@ -17,6 +17,8 @@ namespace SpaceInvaders.UI
 
         public event Action PlayRequested;
 
+        public event Action CoopRequested;
+
         public event Action QuitRequested;
 
         public event Action<float> VolumeChanged;
@@ -27,6 +29,7 @@ namespace SpaceInvaders.UI
             _volume = root.QRequired<Slider>("volume");
             _play = root.QRequired<Button>("play");
             _bindings.Add(_play.OnClick(() => PlayRequested?.Invoke()));
+            _bindings.Add(root.QRequired<Button>("coop").OnClick(() => CoopRequested?.Invoke()));
             _bindings.Add(root.QRequired<Button>("quit").OnClick(() => QuitRequested?.Invoke()));
             _bindings.Add(_volume.OnValueChanged(evt => VolumeChanged?.Invoke(evt.newValue)));
             _play.Focus();

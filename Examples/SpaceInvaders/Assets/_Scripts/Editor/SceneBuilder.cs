@@ -19,7 +19,7 @@ using Object = UnityEngine.Object;
 namespace SpaceInvaders.Editor
 {
     /// <summary>Builds the Title and Game scenes from the Pretzel 2D scene template, so both start with the standard Pretzel groups.</summary>
-    internal static class SceneBuilder
+    internal static partial class SceneBuilder
     {
         public const string TitleScenePath = "Assets/_Project/Scenes/Title.unity";
         public const string GameScenePath = "Assets/_Project/Scenes/Game.unity";

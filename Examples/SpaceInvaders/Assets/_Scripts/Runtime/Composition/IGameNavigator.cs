@@ -8,6 +8,9 @@ namespace SpaceInvaders
     {
         Awaitable PlayAsync();
 
+    /// <summary>Opens the co-op scene, where players choose local or online play.</summary>
+    Awaitable PlayCoopAsync();
+
         Awaitable ReturnToTitleAsync();
     }
 }

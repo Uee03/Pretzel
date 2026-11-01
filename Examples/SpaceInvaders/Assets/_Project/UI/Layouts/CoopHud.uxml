@@ -1,0 +1,34 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:pretzel="Pretzel.UI">
+    <ui:Style src="../Styles/SpaceInvaders.uss" />
+    <pretzel:SafeAreaElement name="safe-area" class="invaders-root" picking-mode="Ignore">
+        <ui:VisualElement name="bar" class="invaders-hud__bar invaders-hud__bar--coop" picking-mode="Ignore">
+            <ui:VisualElement name="player-1" class="invaders-hud__stat invaders-coop__player invaders-coop__player--1" picking-mode="Ignore">
+                <ui:Label name="player-1-name" text="PLAYER 1" class="invaders-label invaders-coop__name" />
+                <ui:Label name="player-1-score" text="000000" class="invaders-value" />
+                <ui:Label name="player-1-lives" text="LIVES 3" class="invaders-label invaders-label--dim" />
+            </ui:VisualElement>
+            <ui:VisualElement class="invaders-hud__stat" picking-mode="Ignore">
+                <ui:Label text="WAVE" class="invaders-label invaders-label--dim" />
+                <ui:Label name="wave" text="1" class="invaders-value" />
+            </ui:VisualElement>
+            <ui:VisualElement name="player-2" class="invaders-hud__stat invaders-coop__player invaders-coop__player--2" picking-mode="Ignore">
+                <ui:Label name="player-2-name" text="PLAYER 2" class="invaders-label invaders-coop__name" />
+                <ui:Label name="player-2-score" text="000000" class="invaders-value" />
+                <ui:Label name="player-2-lives" text="LIVES 3" class="invaders-label invaders-label--dim" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+        <ui:VisualElement name="toasts" class="invaders-toasts" picking-mode="Ignore" />
+        <ui:Button name="leave" text="QUIT TO TITLE" class="invaders-button invaders-button--danger invaders-coop__leave" />
+        <ui:VisualElement name="game-over" class="invaders-screen invaders-screen--scrim">
+            <ui:VisualElement class="invaders-panel">
+                <ui:Label text="GAME OVER" class="invaders-title invaders-title--small" />
+                <ui:Label name="game-over-result" text="" class="invaders-label invaders-label--accent" />
+                <ui:Label name="game-over-player-1" text="" class="invaders-value invaders-coop__result invaders-coop__result--1" />
+                <ui:Label name="game-over-player-2" text="" class="invaders-value invaders-coop__result invaders-coop__result--2" />
+                <ui:Button name="game-over-lobby" text="BACK TO LOBBY" class="invaders-button" />
+                <ui:Label name="game-over-wait" text="Waiting for the host" class="invaders-hint" />
+                <ui:Button name="game-over-leave" text="QUIT TO TITLE" class="invaders-button invaders-button--danger" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+    </pretzel:SafeAreaElement>
+</ui:UXML>

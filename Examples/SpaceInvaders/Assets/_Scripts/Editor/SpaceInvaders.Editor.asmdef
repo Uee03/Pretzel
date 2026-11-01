@@ -3,6 +3,7 @@
   "rootNamespace": "SpaceInvaders.Editor",
   "references": [
     "SpaceInvaders.Runtime",
+    "SpaceInvaders.Coop",
     "Pretzel.Core",
     "Pretzel.Audio",
     "Pretzel.Pooling",
@@ -11,6 +12,9 @@
     "Pretzel.UI",
     "Pretzel.UI.Editor",
     "Pretzel.Integrations.VContainer",
+    "Pretzel.Multiplayer",
+    "Pretzel.Multiplayer.Editor",
+    "Unity.Netcode.Runtime",
     "Pretzel.Sfx",
     "Pretzel.Vfx",
     "Pretzel.Cameras",

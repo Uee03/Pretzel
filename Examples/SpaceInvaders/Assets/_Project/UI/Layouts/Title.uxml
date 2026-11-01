@@ -9,6 +9,7 @@
             <ui:Label name="high-score" text="000000" class="invaders-value" />
             <ui:Slider name="volume" label="VOLUME" low-value="0" high-value="1" value="1" class="invaders-slider" />
             <ui:Button name="play" text="PLAY" class="invaders-button" />
+            <ui:Button name="coop" text="CO-OP" class="invaders-button" />
             <ui:Button name="quit" text="QUIT" class="invaders-button invaders-button--danger" />
             <ui:Label text="A / D or arrows move    Space fires    Esc pauses    ` opens the dev console" class="invaders-hint" />
         </ui:VisualElement>

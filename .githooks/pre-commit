@@ -14,14 +14,16 @@ run() {
 
 run ".github/skills/pretzel-code-standards/scripts/Test-CodeStandards.ps1" -Staged || exit 1
 
-# The host project must not be committed linked to anyone's Unity Cloud project (see .gitattributes).
-if git show :TestPretzel/ProjectSettings/ProjectSettings.asset 2>/dev/null \
-    | grep -Eq '^  (cloudProjectId|organizationId): *[^[:space:]]'; then
-    echo "TestPretzel/ProjectSettings/ProjectSettings.asset is staged with a Unity Cloud project link."
-    echo "Run: git config filter.unity-cloud-link.clean \"sed -E 's/^(  (cloudProjectId|projectName|organizationId):)[^\\r]*/\\1 /'\""
-    echo "then: git add --renormalize TestPretzel/ProjectSettings/ProjectSettings.asset"
-    exit 1
-fi
+# The host projects must not be committed linked to anyone's Unity Cloud project (see .gitattributes).
+for settings in TestPretzel/ProjectSettings/ProjectSettings.asset Examples/SpaceInvaders/ProjectSettings/ProjectSettings.asset; do
+    if git show ":$settings" 2>/dev/null \
+        | grep -Eq '^  (cloudProjectId|organizationId): *[^[:space:]]'; then
+        echo "$settings is staged with a Unity Cloud project link."
+        echo "Run: git config filter.unity-cloud-link.clean \"sed -E 's/^(  (cloudProjectId|projectName|organizationId):)[^\\r]*/\\1 /'\""
+        echo "then: git add --renormalize $settings"
+        exit 1
+    fi
+done
 
 # Do not stage a README.md that has unrelated unstaged edits.
 if git diff --quiet -- README.md; then

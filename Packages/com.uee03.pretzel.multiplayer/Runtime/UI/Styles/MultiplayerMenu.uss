@@ -7,6 +7,8 @@
     --pretzel-multiplayer-border: rgb(72, 80, 100);
     --pretzel-multiplayer-text: rgb(236, 239, 244);
     --pretzel-multiplayer-text-muted: rgb(160, 168, 184);
+    --pretzel-multiplayer-input-text: rgb(20, 22, 28);
+    --pretzel-multiplayer-input-background: rgb(236, 239, 244);
     --pretzel-multiplayer-accent: rgb(66, 133, 244);
     --pretzel-multiplayer-accent-hover: rgb(96, 154, 250);
     --pretzel-multiplayer-danger: rgb(214, 80, 80);
@@ -99,6 +101,13 @@
 
 .pretzel-multiplayer__field--grow {
     flex-grow: 1;
+}
+
+/* Unity's runtime theme draws text inputs on a light background, so typed text needs a dark color; the light menu text would be unreadable there. */
+.pretzel-multiplayer .unity-base-text-field__input {
+    color: var(--pretzel-multiplayer-input-text);
+    background-color: var(--pretzel-multiplayer-input-background);
+    border-color: var(--pretzel-multiplayer-border);
 }
 
 .pretzel-multiplayer__progress {

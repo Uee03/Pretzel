@@ -1,0 +1,31 @@
+{
+  "name": "SpaceInvaders.Coop",
+  "rootNamespace": "SpaceInvaders.Coop",
+  "references": [
+    "SpaceInvaders.Runtime",
+    "Pretzel.Core",
+    "Pretzel.Events",
+    "Pretzel.Pooling",
+    "Pretzel.UI",
+    "Pretzel.Tween",
+    "Pretzel.Audio",
+    "Pretzel.Cameras",
+    "Pretzel.Parallax",
+    "Pretzel.Multiplayer",
+    "Pretzel.Integrations.VContainer",
+    "VContainer",
+    "Unity.Cinemachine",
+    "Unity.Netcode.Runtime",
+    "Unity.Collections",
+    "Unity.InputSystem"
+  ],
+  "includePlatforms": [],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": false,
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": false
+}

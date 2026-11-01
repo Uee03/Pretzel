@@ -11,5 +11,8 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/_Project/Scenes/Game.unity
     guid: ee5619c3b55db4048a02c323b847ed6c
+  - enabled: 1
+    path: Assets/_Project/Scenes/Coop.unity
+    guid: 5e2fed6d158e6fe47ad8ff0c58217f0a
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}

@@ -20,7 +20,7 @@ namespace SpaceInvaders.Editor
 
             BuildPlayerOptions options = new()
             {
-                scenes = new[] { SceneBuilder.TitleScenePath, SceneBuilder.GameScenePath },
+                scenes = new[] { SceneBuilder.TitleScenePath, SceneBuilder.GameScenePath, SceneBuilder.CoopScenePath },
                 locationPathName = output,
                 target = BuildTarget.StandaloneWindows64,
                 options = BuildOptions.None

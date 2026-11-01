@@ -3,6 +3,10 @@
   "rootNamespace": "SpaceInvaders.Tests",
   "references": [
     "SpaceInvaders.Runtime",
+    "SpaceInvaders.Coop",
+    "Pretzel.Multiplayer",
+    "Unity.Netcode.Runtime",
+    "Unity.Networking.Transport",
     "Pretzel.Data",
     "Pretzel.Audio",
     "Pretzel.Events",

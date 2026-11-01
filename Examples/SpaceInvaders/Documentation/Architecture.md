@@ -22,6 +22,7 @@ graph TD
         cams["Cameras: CameraShake, PlayfieldFitter"]
         parallax["Parallax: ParallaxController"]
         inputs["Inputs: InputRouter, SceneLoadInputGate"]
+        mp["Multiplayer: session service, menu, pooled network prefabs, player slots"]
     end
 
     subgraph Game["Space Invaders"]
@@ -52,6 +53,10 @@ graph TD
     presenters --> cams
     presenters --> parallax
     comp --> inputs
+    coop["Coop: shared match, world replication, host rules, network ship and projectiles"]
+    coop --> mp
+    coop --> events
+    coop --> pooling
 ```
 
 The rules know nothing about Unity objects, the actors and views are thin adapters, and the presenters connect them.
@@ -198,6 +203,98 @@ stateDiagram-v2
     Paused --> Menu: ReturnToMenu
     GameOver --> Menu: ReturnToMenu
 ```
+
+## Co-op
+
+The Coop scene runs the same game for two players, with one machine acting as the **host**. The host simulates everything that decides the score; every machine draws what the host reports and reacts to the same events. Players move their own ship. The Pretzel Multiplayer package provides the session, the menu, the player slots and the pooled network prefabs, and these classes in `Assets/_Scripts/Coop` add the rest.
+
+### Who owns what
+
+```mermaid
+graph LR
+    subgraph Host["The host machine"]
+        Director["CoopMatchDirector<br/>waves, lives, scores, game over"]
+        Sim["InvaderFormation, UfoSpawner, BunkerField<br/>simulate"]
+        Spawner["CoopProjectileSpawner<br/>spawns bullets and bombs"]
+        HostShip["CoopShip x its own players"]
+    end
+
+    subgraph Net["Replicated by Netcode for GameObjects"]
+        Match["CoopMatch<br/>phase, wave, player stats, event relay"]
+        World["CoopWorldReplicator<br/>formation, mystery ship, bunkers"]
+        Proj["CoopProjectile<br/>pooled network prefabs"]
+        Ship["CoopShip<br/>NetworkTransform, owner authority"]
+    end
+
+    subgraph Client["Every other machine"]
+        Mirror["InvaderFormation, Ufo, BunkerField<br/>mirror: simulation off"]
+        Reactions["Audio, explosions, shake, toasts<br/>on the client's own event bus"]
+        Hud["CoopHudPresenter<br/>reads CoopMatch"]
+        Own["Own CoopShip<br/>reads input, asks the host to fire"]
+    end
+
+    Director --> Match
+    Sim --> World
+    Spawner --> Proj
+    World --> Mirror
+    Match --> Hud
+    Match -->|forwarded events| Reactions
+    Own -->|FireRpc, owner only| HostShip
+    Own --> Ship
+    HostShip --> Ship
+```
+
+| Data | Kind | Carried by |
+|---|---|---|
+| Ship position | Client input, owner authority | `NetworkTransform` on the ship, on the X axis only |
+| A shot | Client input | `FireRpc` on the ship, invokable by its owner only. The host re-checks that the ship is alive, the match runs and the cooldown is over |
+| Bullets and bombs | Transient objects | Pooled network prefabs. They are spawned once and fly in a straight line on every machine, so no position is sent. Only the host keeps their colliders on |
+| Phase, wave, each player's lives and score | Durable state | `NetworkVariable`s and a `NetworkList` on `CoopMatch`, so a player who joins late reads the current values |
+| The invader block, the mystery ship, the bunker wear | Durable state | `FormationSnapshot` (wave, block position, animation step and a bit for each invader), `UfoSnapshot` and a `NetworkList<byte>`. Sent when something changes: a march step, a kill, a brick hit |
+| Sound, explosions, toasts, shake | Transient events | The host forwards `PlayerFired`, `InvaderDestroyed`, `PlayerHit`, `UfoDestroyed`, `WaveStarted`, `WaveCleared`, `InvaderMarched` and `GameEnded` as host-only RPCs to clients, which publish them on their own bus. The reaction classes are the single-player ones and do not know the difference. A player who joins mid-wave gets a local `WaveStarted` so the music and the star field match |
+
+### A client's shot, end to end
+
+```mermaid
+sequenceDiagram
+    actor Player as Player on a client
+    participant Ship as CoopShip (client, owner)
+    participant Host as CoopShip (host)
+    participant Spawner as CoopProjectileSpawner
+    participant Bullet as CoopProjectile
+    participant Invader as Invader (host)
+    participant Director as CoopMatchDirector
+    participant Match as CoopMatch
+    participant Client as Reactions (client)
+
+    Player->>Ship: fire
+    Ship->>Host: FireRpc (owner only)
+    Host->>Host: alive, match running, cooldown over?
+    Host->>Spawner: SpawnFor Bullet, slot
+    Spawner->>Bullet: pooled spawn, replicated to everyone
+    Note over Bullet: every machine flies it straight up; only the host has a collider
+    Bullet->>Invader: trigger hit, TakeHit
+    Invader-->>Director: InvaderDestroyed, credited to the shooter's slot
+    Director->>Match: score changes, replicated
+    Match-->>Client: InvaderDestroyed forwarded as an RPC
+    Client->>Client: sound, explosion, shake
+    Note over Match,Client: the formation snapshot with the invader's bit cleared reaches the client's mirror
+```
+
+### The match
+
+`CoopPhase` is replicated, and the host moves it along as the session service reports the session state.
+
+```mermaid
+stateDiagram-v2
+    [*] --> Lobby
+    Lobby --> Playing: host starts the match, first wave after 1.5 s
+    Playing --> GameOver: every player is out of lives, or the invaders land
+    GameOver --> Lobby: host chooses Back to lobby
+    Playing --> Lobby: the session leaves the Playing state
+```
+
+In the lobby the Pretzel menu is showing and the ships are hidden. A match starts when the host presses *Start match*: the package spawns a ship for every player, the director gives each full lives and starts wave 1. Leaving the session destroys the `NetworkManager` with the scene (`CoopNetworkLifetime`), because NGO would otherwise keep it across the load.
 
 ## One wave, frame by frame
 

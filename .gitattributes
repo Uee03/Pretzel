@@ -1,3 +1,4 @@
 # Strips the Unity Cloud project link on commit. Enable once per clone:
 #   git config filter.unity-cloud-link.clean "sed -E 's/^(  (cloudProjectId|projectName|organizationId):)[^\r]*/\1 /'"
 TestPretzel/ProjectSettings/ProjectSettings.asset filter=unity-cloud-link
+Examples/SpaceInvaders/ProjectSettings/ProjectSettings.asset filter=unity-cloud-link

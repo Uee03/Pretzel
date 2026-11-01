@@ -110,6 +110,16 @@ registers a `PooledNetworkPrefabHandler` per entry, so NGO instantiates and dest
 - Pooled instances stay at the scene root, because NGO rejects parenting a spawned object under a transform without a
   `NetworkObject`.
 
+## Scenes and the NetworkManager
+
+- **A `NetworkManager` cannot be nested.** NGO logs an error and fails to shut down when it sits under another object, so
+  keep it, and any scene-placed `NetworkObject`, at the scene root.
+- **NGO marks its `NetworkManager` `DontDestroyOnLoad`.** If the manager lives in a scene a player can leave and enter again,
+  the old one survives the unload and the next scene creates a second. Destroy the manager's GameObject when the scene
+  unloads (the Space Invaders example does this in `CoopNetworkLifetime`); destroying it also shuts the session down.
+- A scene-placed `NetworkObject` is spawned when the host starts, so the host must start after the scene is loaded. Clients
+  that already have the same scene loaded receive it through NGO's normal synchronization.
+
 ## Architecture
 
 | Area | Types | Notes |
@@ -127,12 +137,18 @@ factory to plug in another transport.
 
 - `Samples~/TwoCubes`: two networked cubes that can only move, jump and turn, plus Spawn Item and Delete Items buttons on
   the pooled spawn handler. See its README.
+- The Space Invaders example (`Examples/SpaceInvaders`) is a larger user of the package: two-player co-op, local or online,
+  with a host-authoritative game, pooled network bullets and a client that mirrors the host's world.
 
 ## Not verified
 
 - Hosting was run against a live project (Multiplayer Services 2.4.1): anonymous sign-in, a Relay session with a join
-  code, the session query, ready, start and end match, and leaving (which deletes the session). Joining from a second
-  client (by code, by id, quick join), reconnect and cross-play filters have not been run against a real service.
+  code, the session query, ready, start and end match, and leaving (which deletes the session).
+- Joining by code was run from a second Unity process on the same machine, through Relay and a linked Unity Cloud
+  project, with a different Authentication Profile for each process (the Space Invaders two-process test): the client
+  joined, readied up, received the host's world, sent an RPC to the host and saw the result. Joining by session id, quick
+  join, reconnect and cross-play filters have not been run against a real service, and no join has crossed two machines
+  or a NAT.
 - No multi-platform or device testing. Cross-play only means that sessions carry a platform tag; no cross-platform join
   has been exercised.
 - No performance measurement: the defaults in `NetworkSettings`, the pool sizes and the tick rate are not tuned or profiled.
