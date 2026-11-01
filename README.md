@@ -85,6 +85,10 @@ generated from these manifests by `.github/scripts/Update-ModuleCatalog.ps1`; ru
 
 Each integration assembly compiles only when its third-party package is installed. Their `versionDefines` switch the assembly on, so having them without the third-party package is harmless.
 
+## Example
+
+[`Examples/SpaceInvaders`](Examples/SpaceInvaders/README.md) is a complete game built on Pretzel, as a Unity project you can open (Unity 6000.6.5f1, Universal 2D template). It uses most of the modules together, and comes with architecture diagrams, a guide to where each module is used, and a build-it-yourself walkthrough.
+
 ## Using the packages
 
 The packages live in `Packages/`. `TestPretzel/` is a Unity project for trying them out. To use Pretzel in a project, add `com.uee03.pretzel.setup` to its `manifest.json` as a git dependency (`https://github.com/Uee03/Pretzel.git?path=Packages/com.uee03.pretzel.setup#v0.2.0`), then install the other modules from the Addons tab. The tab installs them from the same repository and tag that Setup came from, unless the Settings tab overrides it.

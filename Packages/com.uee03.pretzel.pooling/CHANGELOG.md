@@ -12,6 +12,7 @@ All notable changes to this package are documented here. The format follows [Kee
 ### Fixed
 
 - `PoolRegistry` threw `InvalidCastException` when the same prefab component was requested under two component types (for example `Spawn(GameObject)` and `GetPool<Component>`); pools are now keyed by prefab and type.
+- `ComponentPool<T>.CountActive` (and `CountAll`) grew with every instance destroyed from outside, for example idle instances at the scene root on a scene change, so spawn caps based on it could stop spawning. It now counts live taken instances only, and `Prewarm` drops destroyed idle instances before topping up.
 
 ## [0.2.0] - 2026-10-27
 

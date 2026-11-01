@@ -26,6 +26,8 @@ namespace #NAMESPACE#
 
         public event Action<int> ScoreChanged;
 
+        public event Action ProgressLoaded;
+
         public GameState State { get; private set; } = GameState.Menu;
 
         public int Score { get; private set; }
@@ -40,6 +42,7 @@ namespace #NAMESPACE#
         {
             _progress = await _save.LoadOrCreateAsync<GameProgress>(_progressKey, cancellationToken);
             IsLoaded = true;
+            ProgressLoaded?.Invoke();
         }
 
         public void StartGame()

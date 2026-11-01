@@ -97,6 +97,25 @@ namespace Pretzel.Pooling.Tests
         }
 
         [Test]
+        public void InstancesDestroyedFromOutside_AreNotCountedOrReused()
+        {
+            using ComponentPool<PoolableProbe> pool = new(_prefab.GetComponent<PoolableProbe>(), _root.transform);
+            pool.Prewarm(2);
+            PoolableProbe taken = pool.Get();
+            UnityEngine.Object.DestroyImmediate(taken.gameObject);
+            Assert.That(pool.CountActive, Is.EqualTo(0));
+
+            UnityEngine.Object.DestroyImmediate(_root.transform.GetChild(0).gameObject);
+            pool.Prewarm(2);
+            Assert.That(pool.CountInactive, Is.EqualTo(2));
+            Assert.That(pool.CountAll, Is.EqualTo(2));
+
+            PoolableProbe next = pool.Get();
+            Assert.That(next != null, Is.True);
+            Assert.That(pool.CountActive, Is.EqualTo(1));
+        }
+
+        [Test]
         public void RegistryKeepsOnePoolPerPrefab()
         {
             using PoolRegistry registry = new(_root.transform);

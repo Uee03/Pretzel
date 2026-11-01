@@ -4,6 +4,10 @@ All notable changes to this package are documented here. The format follows [Kee
 
 ## [Unreleased]
 
+### Added
+
+- A default style sheet for the console controls (`Resources/Pretzel/DevConsole/PretzelDevConsole.uss`): readable filter labels, a dark command line and buttons. Assign a `StyleSheet` on `DeveloperConsole` to replace it.
+
 ### Changed
 
 - The Dev Console Usage sample is now a playable arena: `god`, `heal`, `damage`, `spawn`, `killall`, `gold`, `tp`, `get`/`set`/`tuning` and `timescale` change real game state instead of only demonstrating registration.

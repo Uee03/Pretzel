@@ -1,0 +1,8 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements">
+    <ui:Style src="../Styles/SpaceInvaders.uss" />
+    <ui:VisualElement name="loading-screen" class="invaders-screen invaders-screen--solid">
+        <ui:Label text="LOADING" class="invaders-title invaders-title--small" />
+        <ui:Label name="status" text="" class="invaders-label invaders-label--dim" />
+        <ui:ProgressBar name="progress" low-value="0" high-value="1" title="0 %" class="invaders-loading__bar" />
+    </ui:VisualElement>
+</ui:UXML>

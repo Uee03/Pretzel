@@ -1,0 +1,45 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:pretzel="Pretzel.UI">
+    <ui:Style src="../Styles/SpaceInvaders.uss" />
+    <pretzel:SafeAreaElement name="safe-area" class="invaders-root" picking-mode="Ignore">
+        <ui:VisualElement class="invaders-hud__bar" picking-mode="Ignore">
+            <ui:VisualElement class="invaders-hud__stat" picking-mode="Ignore">
+                <ui:Label text="SCORE" class="invaders-label invaders-label--dim" />
+                <ui:Label name="score" text="000000" class="invaders-value" />
+            </ui:VisualElement>
+            <ui:VisualElement class="invaders-hud__stat" picking-mode="Ignore">
+                <ui:Label text="HI-SCORE" class="invaders-label invaders-label--dim" />
+                <ui:Label name="high-score" text="000000" class="invaders-value" />
+            </ui:VisualElement>
+            <ui:VisualElement class="invaders-hud__stat" picking-mode="Ignore">
+                <ui:Label text="WAVE" class="invaders-label invaders-label--dim" />
+                <ui:Label name="wave" text="1" class="invaders-value" />
+            </ui:VisualElement>
+            <ui:VisualElement class="invaders-hud__stat" picking-mode="Ignore">
+                <ui:Label text="LIVES" class="invaders-label invaders-label--dim" />
+                <ui:Label name="lives" text="3" class="invaders-value" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+        <ui:VisualElement name="toasts" class="invaders-toasts" picking-mode="Ignore" />
+        <ui:VisualElement name="pause" class="invaders-screen invaders-screen--scrim">
+            <ui:VisualElement class="invaders-panel">
+                <ui:Label text="PAUSED" class="invaders-title invaders-title--small" />
+                <ui:Slider name="pause-volume" label="VOLUME" low-value="0" high-value="1" value="1" class="invaders-slider" />
+                <ui:Button name="pause-resume" text="RESUME" class="invaders-button" />
+                <ui:Button name="pause-quit" text="QUIT TO TITLE" class="invaders-button invaders-button--danger" />
+                <ui:Label text="Esc to resume" class="invaders-hint" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+        <ui:VisualElement name="game-over" class="invaders-screen invaders-screen--scrim">
+            <ui:VisualElement class="invaders-panel">
+                <ui:Label text="GAME OVER" class="invaders-title invaders-title--small" />
+                <ui:Label name="game-over-new-high" text="NEW HIGH SCORE!" class="invaders-label invaders-label--accent" />
+                <ui:Label text="SCORE" class="invaders-label invaders-label--dim" />
+                <ui:Label name="game-over-score" text="000000" class="invaders-value" />
+                <ui:Label text="HI-SCORE" class="invaders-label invaders-label--dim" />
+                <ui:Label name="game-over-high-score" text="000000" class="invaders-value" />
+                <ui:Button name="game-over-retry" text="PLAY AGAIN" class="invaders-button" />
+                <ui:Button name="game-over-quit" text="TITLE" class="invaders-button invaders-button--danger" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+    </pretzel:SafeAreaElement>
+</ui:UXML>

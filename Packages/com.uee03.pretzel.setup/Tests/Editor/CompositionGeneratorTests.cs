@@ -15,6 +15,68 @@ namespace Pretzel.Setup.Tests
         }
 
         [Test]
+        public void ExistingSaveService_IsReusedOnlyWhenCompatible()
+        {
+            Assert.That(CompositionGenerator.IsCompatibleSaveService(typeof(IFakeSaveService), typeof(FakeSaveService)), Is.True);
+            Assert.That(CompositionGenerator.IsCompatibleSaveService(typeof(IFakeSaveService), typeof(UnrelatedSaveService)), Is.False);
+            Assert.That(CompositionGenerator.IsCompatibleSaveService(typeof(IPartialSaveService), typeof(PartialSaveService)), Is.False);
+            Assert.That(CompositionGenerator.IsCompatibleSaveService(typeof(IFakeSaveService), typeof(StringSaveService)), Is.False);
+            Assert.That(CompositionGenerator.IsCompatibleSaveService(null, typeof(FakeSaveService)), Is.False);
+        }
+
+        private interface IFakeSaveService
+        {
+            void LoadOrCreateAsync();
+
+            void Save();
+        }
+
+        private interface IPartialSaveService
+        {
+            void Save();
+        }
+
+        private sealed class FakeSaveService : IFakeSaveService
+        {
+            public void LoadOrCreateAsync()
+            {
+            }
+
+            public void Save()
+            {
+            }
+        }
+
+        private sealed class UnrelatedSaveService
+        {
+        }
+
+        private sealed class PartialSaveService : IPartialSaveService
+        {
+            public void Save()
+            {
+            }
+        }
+
+        private sealed class StringSaveService : IFakeSaveService
+        {
+            public StringSaveService(string path)
+            {
+                Path = path;
+            }
+
+            public string Path { get; }
+
+            public void LoadOrCreateAsync()
+            {
+            }
+
+            public void Save()
+            {
+            }
+        }
+
+        [Test]
         public void Registrations_CoverServicesEntryPointsAndFlow()
         {
             CompositionSettings settings = Settings();

@@ -30,7 +30,8 @@ panel.FadeOut(0.4f, EaseType.InCubic, () => Debug.Log("hidden"));
   keeps the screen below visible for dialogs and pause overlays; `Pop`, `Replace`, `PopToRoot`, `Clear`. Hook `Pop` to
   `NavigationCancelEvent` for Escape and the gamepad back button.
 - `ToastService`: short notifications in a container, styled with `pretzel-toast` and `--info`, `--success`, `--warning`,
-  `--error` modifiers.
+  `--error` modifiers. A default look (`Resources/Pretzel/UI/PretzelToast.uss`) is added to the panel root with the lowest
+  priority, so a rule of yours for the same class wins; pass `useDefaultStyle: false` to skip it.
 - `SafeAreaElement` (UXML `<Pretzel.UI.SafeAreaElement>`): pads its content to `Screen.safeArea` and updates on resize.
   `SafeAreaInsets.Compute` is the pure calculation.
 - `VisualElementExtensions`: `QRequired<T>` (throws with a clear message when the UXML lacks an element), `OnClick`,

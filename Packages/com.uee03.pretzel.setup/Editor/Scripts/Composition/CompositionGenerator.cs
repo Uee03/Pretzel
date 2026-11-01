@@ -2,8 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
+using UnityEditor.Compilation;
 
 namespace Pretzel.Setup.Composition
 {
@@ -41,9 +43,10 @@ namespace Pretzel.Setup.Composition
 
             if (settings.starterServices)
             {
+                bool reuseSaveService = CanReuseProjectSaveService(settings);
                 foreach (string template in StarterTemplates)
                 {
-                    if (!ExistsElsewhere(settings, template))
+                    if (!reuseSaveService || !IsSaveTemplate(template))
                     {
                         WriteIfMissing(written, settings, template + ".cs", CompositionTemplates.Render(template, settings));
                     }
@@ -283,19 +286,63 @@ namespace Pretzel.Setup.Composition
         }
 
         /// <summary>
-        /// The Pretzel Data examples create the same ISaveService and SaveService (same API, global namespace). When the
-        /// project already has one outside the code folder, the generated GameService uses it instead of a second copy.
+        /// The Pretzel Data examples create ISaveService and SaveService in the global namespace. The generated GameService
+        /// uses that pair instead of a second copy only when both are compiled, compatible and visible from the code folder.
+        /// Otherwise the starter copies are written in the settings namespace, which never clashes with a global type.
         /// </summary>
-        private static bool ExistsElsewhere(CompositionSettings settings, string template)
+        private static bool CanReuseProjectSaveService(CompositionSettings settings)
         {
-            if (!string.Equals(template, "ISaveService", StringComparison.Ordinal) && !string.Equals(template, "SaveService", StringComparison.Ordinal))
+            Type saveInterface = FindSingleGlobalType("ISaveService");
+            Type saveClass = FindSingleGlobalType("SaveService");
+            return IsCompatibleSaveService(saveInterface, saveClass)
+                   && IsVisibleFrom(settings, saveInterface.Assembly)
+                   && IsVisibleFrom(settings, saveClass.Assembly);
+        }
+
+        /// <summary>True when the pair offers what GameService and the generated registration need.</summary>
+        internal static bool IsCompatibleSaveService(Type saveInterface, Type saveClass)
+        {
+            if (saveInterface == null || saveClass == null || !saveInterface.IsInterface || !saveClass.IsClass || saveClass.IsAbstract
+                || !saveInterface.IsAssignableFrom(saveClass))
             {
                 return false;
             }
 
-            string own = Path.GetFullPath(Path.Combine(settings.codeFolder, template + ".cs"));
-            return Directory.GetFiles("Assets", template + ".cs", SearchOption.AllDirectories)
-                .Any(path => !string.Equals(Path.GetFullPath(path), own, StringComparison.OrdinalIgnoreCase));
+            MethodInfo[] methods = saveInterface.GetMethods();
+            bool hasMembers = methods.Any(method => string.Equals(method.Name, "LoadOrCreateAsync", StringComparison.Ordinal))
+                              && methods.Any(method => string.Equals(method.Name, "Save", StringComparison.Ordinal));
+            return hasMembers && saveClass.GetConstructors().Any(constructor => constructor.GetParameters()
+                .All(parameter => string.Equals(parameter.ParameterType.FullName, "Pretzel.Data.IDataStore", StringComparison.Ordinal)));
+        }
+
+        private static bool IsSaveTemplate(string template)
+        {
+            return string.Equals(template, "ISaveService", StringComparison.Ordinal) || string.Equals(template, "SaveService", StringComparison.Ordinal);
+        }
+
+        private static Type FindSingleGlobalType(string name)
+        {
+            // Asks each compiled assembly by name instead of enumerating the AppDomain, which can include unloaded assemblies.
+            List<Type> found = CompilationPipeline.GetAssemblies(AssembliesType.Editor)
+                .Select(assembly => Type.GetType(name + ", " + assembly.name, false))
+                .Where(type => type != null)
+                .ToList();
+            return found.Count == 1 ? found[0] : null;
+        }
+
+        private static bool IsVisibleFrom(CompositionSettings settings, System.Reflection.Assembly assembly)
+        {
+            string target = Path.GetFileNameWithoutExtension(
+                CompilationPipeline.GetAssemblyNameFromScriptPath(settings.codeFolder + "/" + settings.InstallerName + ".cs") ?? string.Empty);
+            string name = assembly.GetName().Name;
+            if (string.Equals(target, name, StringComparison.Ordinal))
+            {
+                return true;
+            }
+
+            UnityEditor.Compilation.Assembly compiled = CompilationPipeline.GetAssemblies()
+                .FirstOrDefault(candidate => string.Equals(candidate.name, target, StringComparison.Ordinal));
+            return compiled != null && compiled.assemblyReferences.Any(reference => string.Equals(reference.name, name, StringComparison.Ordinal));
         }
 
         private static void WriteIfMissing(List<string> written, CompositionSettings settings, string fileName, string content)

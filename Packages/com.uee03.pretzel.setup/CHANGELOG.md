@@ -4,10 +4,23 @@ All notable changes to this package are documented here. The format follows [Kee
 
 ## [Unreleased]
 
+### Added
+
+- `PretzelSetup` (`CreateFolders`, `GenerateComposition`, `ApplyComposition`) and `CompositionResult`: the window's folder and VContainer features as a public API.
+- `PretzelSetupBatch.Folders` and `PretzelSetupBatch.Composition`: `-executeMethod` entry points that bootstrap a project from the command line in one run, with `-pretzelNamespace`, `-pretzelScope`, `-pretzelServices` and `-pretzelStarter` overrides. The composition run quits by itself (exit code 1 on failure, including generated code that does not compile).
+- The starter `IGameService` has a `ProgressLoaded` event, raised when saved progress finishes loading, so a screen no longer has to poll `IsLoaded`.
+
 ### Changed
 
 - The generated VContainer registrations for the API client, pool registry, audio service and preferences service now also register their interfaces (`IApiClient`, `IPoolRegistry`, `IAudioService`, `IPreferencesService`) next to the concrete type.
 - The scene templates message no longer mentions the removed Templates package.
+- The Game preset also creates `_Project/UI/Layouts` and `_Project/UI/Styles`, and every preset creates `_Scripts/Tests`. Saved presets are not rewritten; use the Settings tab reset to pick up the new defaults.
+
+### Fixed
+
+- `pretzel-settings.json` no longer stores the computed `ActivePreset`; it is derived from `folderPresets` and `activeFolderPreset`.
+- The scan for a project `ISaveService`/`SaveService` no longer enumerates the AppDomain (Unity analyzer UAC0005); it asks each compiled assembly by name.
+- Starter services no longer skip `ISaveService`/`SaveService` because a file with that name exists somewhere under `Assets`. The project's own pair (for example the Pretzel Data examples) is reused only when both types are compiled, `SaveService` implements `ISaveService` with `LoadOrCreateAsync` and `Save`, and the code folder's assembly can see them; otherwise the starter copies are written in the composition namespace.
 
 ## [0.2.0] - 2026-10-27
 

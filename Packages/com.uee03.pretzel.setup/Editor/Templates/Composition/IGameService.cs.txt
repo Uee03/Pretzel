@@ -11,6 +11,9 @@ namespace #NAMESPACE#
 
         event Action<int> ScoreChanged;
 
+        /// <summary>Raised once when <see cref="LoadProgressAsync"/> succeeds. A late subscriber should check <see cref="IsLoaded"/> first.</summary>
+        event Action ProgressLoaded;
+
         GameState State { get; }
 
         int Score { get; }

@@ -11,6 +11,7 @@ namespace Pretzel.Setup.Composition
     internal static class CompositionAfterCompile
     {
         private const string PendingKey = "Pretzel.Composition.ApplyAfterCompile";
+        private const string ExitKey = "Pretzel.Composition.ExitAfterApply";
 
         static CompositionAfterCompile()
         {
@@ -22,7 +23,12 @@ namespace Pretzel.Setup.Composition
 
         public static event Action<IReadOnlyList<string>> Applied;
 
-        public static void Request() => SessionState.SetBool(PendingKey, true);
+        /// <param name="exitWhenDone">For a batch run: quit the Editor once the assets exist (exit code 0) or could not be created (1).</param>
+        public static void Request(bool exitWhenDone = false)
+        {
+            SessionState.SetBool(PendingKey, true);
+            SessionState.SetBool(ExitKey, exitWhenDone);
+        }
 
         private static void ApplyPending()
         {
@@ -33,6 +39,9 @@ namespace Pretzel.Setup.Composition
             }
 
             SessionState.EraseBool(PendingKey);
+            bool exitWhenDone = SessionState.GetBool(ExitKey, false);
+            SessionState.EraseBool(ExitKey);
+            int exitCode = 0;
             try
             {
                 IReadOnlyList<string> log = CompositionAssets.Apply(PretzelSettings.Project.composition);
@@ -42,6 +51,12 @@ namespace Pretzel.Setup.Composition
             catch (InvalidOperationException ex)
             {
                 Debug.LogWarning("[Pretzel] VContainer setup did not finish: " + ex.Message);
+                exitCode = 1;
+            }
+
+            if (exitWhenDone && Application.isBatchMode)
+            {
+                EditorApplication.Exit(exitCode);
             }
         }
     }

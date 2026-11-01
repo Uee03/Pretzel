@@ -217,16 +217,10 @@ namespace Pretzel.Setup.Tabs
 
         private void GenerateAndSetUp()
         {
-            if (!CompositionAssets.IsIntegrationActive)
-            {
-                _result.text = "Install VContainer and the Pretzel Integrations module first.";
-                return;
-            }
-
-            IReadOnlyList<string> written;
+            CompositionResult result;
             try
             {
-                written = CompositionGenerator.Generate(Settings);
+                result = PretzelSetup.GenerateComposition();
             }
             catch (Exception ex) when (ex is ArgumentException || ex is InvalidOperationException || ex is IOException)
             {
@@ -234,22 +228,13 @@ namespace Pretzel.Setup.Tabs
                 return;
             }
 
-            if (written.Count > 0)
+            if (result.AssetsPending)
             {
-                CompositionAfterCompile.Request();
-                AssetDatabase.Refresh();
-                _result.text = "Wrote " + string.Join(", ", written.Select(path => Path.GetFileName(path))) + ". The assets are created after compilation.";
+                _result.text = "Wrote " + string.Join(", ", result.WrittenFiles.Select(path => Path.GetFileName(path))) + ". The assets are created after compilation.";
                 return;
             }
 
-            try
-            {
-                ShowLog(CompositionAssets.Apply(Settings));
-            }
-            catch (InvalidOperationException ex)
-            {
-                _result.text = ex.Message;
-            }
+            ShowLog(result.AssetLog);
         }
 
         private void AddSceneScope()

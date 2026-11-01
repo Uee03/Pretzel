@@ -267,7 +267,7 @@ A missing or corrupt file falls back to defaults. One `PretzelSettings` accessor
 
 - [ ] Release: every package is still `0.2.0` while the `[Unreleased]` changelog sections contain breaking changes (`AudioManager` -> `AudioService`, templates removed) and `cloud`/`multiplayer` are not in the `v0.2.0` tag. Bump to `0.3.0`, update the README install tag, run `Update-ModuleCatalog.ps1`, tag.
 - [ ] Audio has no component tests: the crossfade fixes above are not covered by automation (needs a PlayMode test that stops music mid-fade).
-- [ ] `CompositionGenerator` skips writing the starter `ISaveService`/`SaveService` when any file with that name exists under `Assets`, without checking the type, both files or asmdef reachability.
-- [ ] `ComponentPool.CountActive` drifts upward when idle instances are destroyed externally (for example a root-less `PoolRegistry` across scene loads); spawn caps based on it can stall.
+- [x] `CompositionGenerator` reuses a project `ISaveService`/`SaveService` only when both are compiled, compatible and visible from the code folder's assembly (2026-11-01).
+- [x] `ComponentPool.CountActive` counts live taken instances only; `Prewarm` drops destroyed idle instances (2026-11-01). `CountInactive` still includes an idle instance destroyed from outside until the next `Get` or `Prewarm`.
 - [ ] Not run: player save/quit/relaunch, IL2CPP for the modules added after the 2026-10-24 smoke, Linux/mobile/console players, Remote Config and account linking against live UGS, multiplayer on two real devices, performance and allocation budgets (see COMPATIBILITY.md).
 - [ ] New clones must run `git config core.hooksPath .githooks` and set the `unity-cloud-link` filter (see `.gitattributes`).

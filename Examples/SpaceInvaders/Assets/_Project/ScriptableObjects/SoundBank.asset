@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f38c2cf682f588545a2d7649b740edba, type: 3}
+  m_Name: SoundBank
+  m_EditorClassIdentifier: SpaceInvaders.Runtime::SpaceInvaders.Audio.SoundBank
+  _playerShot: {fileID: 11400000, guid: 2f5fdd2d5f1c4c04493eddd7a7ff3a6b, type: 2}
+  _invaderDestroyed: {fileID: 11400000, guid: 01f424f4b97d229499e90a9a911ba123, type: 2}
+  _playerHit: {fileID: 11400000, guid: 9d1ed5a89bf506a46a5407bea512f8fa, type: 2}
+  _ufoDestroyed: {fileID: 11400000, guid: eff919e08e8216147afda91136c407e5, type: 2}
+  _waveCleared: {fileID: 11400000, guid: 80ec377bd126ace46b21a792bbfd55d7, type: 2}
+  _gameOver: {fileID: 11400000, guid: 222bf6d0b77e8244981f720bd1e0759e, type: 2}
+  _march:
+  - {fileID: 8300000, guid: 8ff2f1a1e732cfa4d87be28fd90dab23, type: 3}
+  - {fileID: 8300000, guid: 226beb470bd24444c861fadb7da7829a, type: 3}
+  - {fileID: 8300000, guid: 6ced51442a13dd44b9cf76cdf0050521, type: 3}
+  - {fileID: 8300000, guid: 7164ce585765f62449bb24744d665f34, type: 3}

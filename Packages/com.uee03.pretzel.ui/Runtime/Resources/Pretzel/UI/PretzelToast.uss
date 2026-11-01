@@ -1,0 +1,28 @@
+/* Default look of ToastService toasts. Added to the panel root with the lowest priority, so any rule you write for these classes wins. */
+
+.pretzel-toast {
+    margin-top: 4px;
+    padding: 6px 14px;
+    color: rgb(238, 240, 246);
+    background-color: rgba(24, 26, 34, 0.94);
+    border-width: 1px;
+    border-color: rgb(96, 102, 120);
+    border-radius: 4px;
+    -unity-text-align: middle-center;
+}
+
+.pretzel-toast--info {
+    border-color: rgb(96, 160, 255);
+}
+
+.pretzel-toast--success {
+    border-color: rgb(80, 200, 120);
+}
+
+.pretzel-toast--warning {
+    border-color: rgb(240, 190, 70);
+}
+
+.pretzel-toast--error {
+    border-color: rgb(235, 90, 90);
+}

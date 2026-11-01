@@ -1,0 +1,20 @@
+{
+  "name": "SpaceInvaders.Tests.EditMode",
+  "rootNamespace": "SpaceInvaders.Tests",
+  "references": [
+    "SpaceInvaders.Runtime",
+    "UnityEngine.TestRunner",
+    "UnityEditor.TestRunner"
+  ],
+  "includePlatforms": [
+    "Editor"
+  ],
+  "overrideReferences": true,
+  "precompiledReferences": [
+    "nunit.framework.dll"
+  ],
+  "autoReferenced": false,
+  "defineConstraints": [
+    "UNITY_INCLUDE_TESTS"
+  ]
+}

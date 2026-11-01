@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Newtonsoft.Json;
 using Pretzel.Setup.Composition;
 
 namespace Pretzel.Setup.Settings
@@ -23,6 +24,8 @@ namespace Pretzel.Setup.Settings
 
         public CompositionSettings composition = new();
 
+        // Derived from folderPresets and activeFolderPreset, so it is not stored.
+        [JsonIgnore]
         public FolderPreset ActivePreset
         {
             get

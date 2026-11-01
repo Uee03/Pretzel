@@ -28,7 +28,8 @@ namespace Pretzel.Scenes
         [Tooltip("Name of a Label for status lines such as 'Spawning enemies'. Leave empty for none.")]
         [SerializeField] private string _statusLabelName = "status";
 
-        [Tooltip("Moves this object to DontDestroyOnLoad, so the screen stays up while a single-mode load replaces the scene.")]
+        [Tooltip("Moves this object to DontDestroyOnLoad, so the screen stays up while a single-mode load replaces the scene. "
+                 + "A child of an object that already persists, such as a root scope prefab, is left where it is.")]
         [SerializeField] private bool _persistAcrossLoads = true;
 
         private ProgressBar _progressBar;
@@ -48,21 +49,28 @@ namespace Pretzel.Scenes
                 _document = GetComponent<UIDocument>();
             }
 
-            if (_persistAcrossLoads)
+            if (_persistAcrossLoads && !transform.parent)
             {
-                if (transform.parent)
-                {
-                    Debug.LogWarning($"{name}: only a root object can persist across loads. Moving it to the root.", this);
-                    transform.SetParent(null, true);
-                }
-
                 DontDestroyOnLoad(gameObject);
             }
         }
 
         private void Start()
         {
+            // A child can only be judged after its parent was instantiated and, for a persistent prefab, moved to DontDestroyOnLoad.
+            if (_persistAcrossLoads && transform.parent && !IsInDontDestroyOnLoadScene())
+            {
+                Debug.LogWarning($"{name}: only a root object can persist across loads. Moving it to the root.", this);
+                transform.SetParent(null, true);
+                DontDestroyOnLoad(gameObject);
+            }
+
             Root?.FadeOutNow();
+        }
+
+        private bool IsInDontDestroyOnLoadScene()
+        {
+            return string.Equals(gameObject.scene.name, "DontDestroyOnLoad", StringComparison.Ordinal);
         }
 
         public Awaitable ShowAsync(CancellationToken cancellationToken) => FadeAsync(true, cancellationToken);

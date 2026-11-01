@@ -19,6 +19,9 @@ namespace Pretzel.DevConsole
     {
         private const string Block = "pretzel-dev-console";
 
+        /// <summary>Resources path of the default style sheet.</summary>
+        public const string DefaultStyleResource = "Pretzel/DevConsole/PretzelDevConsole";
+
         [SerializeField] private UIDocument _document;
         [SerializeField, Min(10)] private int _capacity = 500;
 
@@ -27,6 +30,9 @@ namespace Pretzel.DevConsole
 
         [SerializeField] private bool _startOpen;
         [SerializeField, Range(0.2f, 1f)] private float _height = 0.45f;
+
+        [Tooltip("Replaces the default look of the console controls. Leave empty to use the built-in style sheet.")]
+        [SerializeField] private StyleSheet _styleSheet;
 
 #if PRETZEL_INPUT_SYSTEM && ENABLE_INPUT_SYSTEM
         [SerializeField] private Key _toggleKey = Key.Backquote;
@@ -193,6 +199,12 @@ namespace Pretzel.DevConsole
             panel.style.height = Length.Percent(_height * 100f);
             panel.style.backgroundColor = new Color(0.07f, 0.07f, 0.09f, 0.94f);
             panel.style.paddingLeft = panel.style.paddingRight = panel.style.paddingTop = panel.style.paddingBottom = 4;
+
+            StyleSheet sheet = _styleSheet ? _styleSheet : Resources.Load<StyleSheet>(DefaultStyleResource);
+            if (sheet)
+            {
+                panel.styleSheets.Add(sheet);
+            }
 
             VisualElement toolbar = new();
             toolbar.AddToClassList(Block + "__toolbar");

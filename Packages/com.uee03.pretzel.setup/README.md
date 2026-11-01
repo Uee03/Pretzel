@@ -13,7 +13,9 @@ Open it from `Pretzel > Project Setup` (Shift + Alt + P). It opens once by itsel
   services and managers you list (interface, lifetime, `IStartable`/`ITickable`), a `GameFlow` entry point and the
   registrations for the Pretzel services you tick. Starter services add a complete `ISaveService`/`SaveService` (on
   Pretzel Data) and `IGameService`/`GameService` (states, score, pause, saved high score), plus an optional
-  `GameServicesExample` that shows how to use them. After compilation it creates the root scope prefab and
+  `GameServicesExample` that shows how to use them. If the project already has a compatible, compiled global
+  `ISaveService`/`SaveService` (the Pretzel Data examples) visible from the code folder, that pair is used instead of
+  a second copy. After compilation it creates the root scope prefab and
   `VContainerSettings`, and adds the settings to the preloaded assets, so the root scope exists before the first scene
   loads. Generated registrations live in `GameInstaller.Generated.cs`; every other file is created once and is yours.
   It can also add a scope to the open scene. Needs Pretzel Integrations; see its `Documentation~/VContainer.md`.
@@ -52,16 +54,17 @@ a release; `ModuleCatalogTests` also compares the catalog with the installed man
 
 ## Recommended folder structure
 
-All scripts live in `Assets/_Scripts`, split into `Editor` and `Runtime`. Everything else lives in `Assets/_Project`. The leading underscore sorts both to the top of the Project window. The presets create these folders and can be edited on the Main tab.
+All scripts live in `Assets/_Scripts`, split into `Editor`, `Runtime` and `Tests`. Everything else lives in `Assets/_Project`. The leading underscore sorts both to the top of the Project window. The presets create these folders and can be edited on the Main tab.
 
 ```
 Assets/
   _Scripts/
     Editor/
     Runtime/
+    Tests/
   _Project/
     Animations/   Art/{Materials,Models,Shaders,Sprites,Textures}/   Audio/{BGM,SFX}/
-    Prefabs/   Scenes/   ScriptableObjects/   Settings/   UI/{Fonts,Icons}/
+    Prefabs/   Scenes/   ScriptableObjects/   Settings/   UI/{Fonts,Icons,Layouts,Styles}/
 ```
 
 | Preset | Use for | Under `_Project` |
@@ -84,6 +87,29 @@ Third-party assets stay in their own folders (`Plugins`, `Addons`, package folde
 
 - `Pretzel > Create > Folders`: creates the folders of the active preset.
 - `Pretzel > Open`: Application Data Path, Persistent Data Path, Resources Folder, Temporary Folder.
+
+## Without the window
+
+Everything the window does for folders and the VContainer composition root is also a public API in `Pretzel.Setup` (reference `Pretzel.Setup.Editor` from your Editor assembly), and has command-line entry points for scripted project bootstrap and CI.
+
+```csharp
+PretzelSetup.CreateFolders();                              // the active preset's folders
+
+PretzelSettings.Project.composition.namespaceName = "MyGame";
+PretzelSettings.SaveProject();
+CompositionResult result = PretzelSetup.GenerateComposition();   // code now; assets after compilation
+```
+
+`GenerateComposition` writes the code, and when it wrote anything the installer, scope prefab and VContainer settings are created after Unity compiles it (`result.AssetsPending`). `ApplyComposition()` creates or repairs the assets directly once the code is compiled.
+
+```powershell
+Unity -batchmode -projectPath . -executeMethod Pretzel.Setup.PretzelSetupBatch.Folders
+Unity -batchmode -projectPath . -executeMethod Pretzel.Setup.PretzelSetupBatch.Composition `
+      -pretzelNamespace MyGame -pretzelServices events,scenes,pooling,audio -pretzelStarter true
+```
+
+- `Composition` uses the saved project settings (`ProjectSettings/Pretzel/pretzel-settings.json`), including custom services, and the `-pretzelNamespace`, `-pretzelScope`, `-pretzelServices` (ids, or `none`) and `-pretzelStarter` arguments override and save them.
+- **Do not pass `-quit` to `Composition`.** It quits by itself when the assets exist, with exit code 0, or with exit code 1 when the settings are invalid, the generated code does not compile or the setup cannot finish. Put a timeout on the job as a precaution.
 
 ## Extending the window
 

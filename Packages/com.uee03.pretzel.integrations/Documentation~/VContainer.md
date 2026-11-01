@@ -66,7 +66,7 @@ Generated files:
 | `GameInstaller.cs` | You | Never. Add registrations the tool does not cover here. |
 | `GameFlow.cs`, `IInventoryService.cs`, `InventoryService.cs` | You | Never, created only when missing. Services you add are empty classes to fill in. |
 | `ISaveService.cs`, `SaveService.cs` | You | Never. Complete: any serializable type by `DataKey` (slots, folders), sync and async, through Pretzel Data. A corrupt file throws and is kept, never overwritten. If the project already has these files (the Pretzel Data examples create the same ones), they are reused. |
-| `IGameService.cs`, `GameService.cs`, `GameState.cs`, `GameProgress.cs` | You | Never. Complete: menu, playing, paused and game-over states, score, pause through `Time.timeScale`, saved high score and games played. Call `LoadProgressAsync` once at startup; progress is only saved after a successful load. |
+| `IGameService.cs`, `GameService.cs`, `GameState.cs`, `GameProgress.cs` | You | Never. Complete: menu, playing, paused and game-over states, score, pause through `Time.timeScale`, saved high score and games played. Call `LoadProgressAsync` once at startup; progress is only saved after a successful load. `ProgressLoaded` is raised when it succeeds (check `IsLoaded` first if you subscribe late). |
 | `GameServicesExample.cs` | You | Never. Shows the calls; plays one session on every start. Untick **Usage example** and delete it when done. |
 
 Using the starter services from your own code:

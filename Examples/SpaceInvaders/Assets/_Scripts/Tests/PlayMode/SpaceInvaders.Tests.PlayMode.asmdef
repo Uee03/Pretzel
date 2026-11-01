@@ -1,0 +1,25 @@
+{
+  "name": "SpaceInvaders.Tests.PlayMode",
+  "rootNamespace": "SpaceInvaders.Tests",
+  "references": [
+    "SpaceInvaders.Runtime",
+    "Pretzel.Data",
+    "Pretzel.DevConsole",
+    "Pretzel.Scenes",
+    "Pretzel.Pooling",
+    "Pretzel.UI",
+    "Pretzel.Integrations.VContainer",
+    "VContainer",
+    "UnityEngine.TestRunner",
+    "UnityEditor.TestRunner"
+  ],
+  "includePlatforms": [],
+  "overrideReferences": true,
+  "precompiledReferences": [
+    "nunit.framework.dll"
+  ],
+  "autoReferenced": false,
+  "defineConstraints": [
+    "UNITY_INCLUDE_TESTS"
+  ]
+}

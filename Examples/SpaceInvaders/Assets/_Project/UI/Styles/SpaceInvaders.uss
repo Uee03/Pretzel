@@ -1,0 +1,227 @@
+:root {
+    --invaders-bg: rgb(7, 7, 18);
+    --invaders-green: rgb(85, 255, 119);
+    --invaders-green-dim: rgb(40, 120, 60);
+    --invaders-text: rgb(235, 240, 255);
+    --invaders-dim: rgb(125, 135, 170);
+    --invaders-accent: rgb(255, 90, 210);
+    --invaders-warning: rgb(255, 205, 80);
+    --invaders-danger: rgb(255, 85, 85);
+    --invaders-panel: rgba(8, 10, 24, 0.94);
+    --invaders-scrim: rgba(0, 0, 0, 0.7);
+    --invaders-fast: 0.15s;
+}
+
+/* Layout */
+
+.invaders-root {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+}
+
+.invaders-screen {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    justify-content: center;
+    align-items: center;
+}
+
+.invaders-screen--scrim {
+    background-color: var(--invaders-scrim);
+}
+
+.invaders-screen--solid {
+    background-color: var(--invaders-bg);
+}
+
+.invaders-panel {
+    align-items: center;
+    padding: 28px 48px;
+    min-width: 420px;
+    background-color: var(--invaders-panel);
+    border-width: 2px;
+    border-color: var(--invaders-green);
+    border-radius: 6px;
+}
+
+/* Text */
+
+.invaders-title {
+    font-size: 84px;
+    color: var(--invaders-green);
+    -unity-font-style: bold;
+    letter-spacing: 10px;
+    margin-bottom: 4px;
+}
+
+.invaders-title--small {
+    font-size: 48px;
+    letter-spacing: 6px;
+    margin-bottom: 12px;
+}
+
+.invaders-subtitle {
+    font-size: 20px;
+    color: var(--invaders-dim);
+    margin-bottom: 28px;
+    letter-spacing: 3px;
+}
+
+.invaders-label {
+    font-size: 20px;
+    color: var(--invaders-text);
+}
+
+.invaders-label--dim {
+    color: var(--invaders-dim);
+    font-size: 16px;
+}
+
+.invaders-label--accent {
+    color: var(--invaders-accent);
+    -unity-font-style: bold;
+}
+
+.invaders-value {
+    font-size: 34px;
+    color: var(--invaders-green);
+    -unity-font-style: bold;
+    letter-spacing: 3px;
+}
+
+.invaders-hint {
+    margin-top: 24px;
+    font-size: 15px;
+    color: var(--invaders-dim);
+}
+
+.invaders-logo {
+    width: 120px;
+    height: 114px;
+    margin-bottom: 12px;
+    background-image: url("../Icons/pretzel.png");
+    -unity-background-scale-mode: scale-to-fit;
+}
+
+/* Controls */
+
+.invaders-button {
+    min-width: 280px;
+    height: 48px;
+    margin: 6px 0;
+    font-size: 22px;
+    letter-spacing: 3px;
+    color: var(--invaders-green);
+    background-color: rgba(0, 0, 0, 0);
+    border-width: 2px;
+    border-color: var(--invaders-green);
+    border-radius: 4px;
+    transition-property: background-color, color;
+    transition-duration: var(--invaders-fast);
+}
+
+.invaders-button:hover,
+.invaders-button:focus {
+    color: var(--invaders-bg);
+    background-color: var(--invaders-green);
+}
+
+.invaders-button:disabled {
+    color: var(--invaders-green-dim);
+    border-color: var(--invaders-green-dim);
+}
+
+.invaders-button--danger {
+    color: var(--invaders-danger);
+    border-color: var(--invaders-danger);
+}
+
+.invaders-button--danger:hover,
+.invaders-button--danger:focus {
+    color: var(--invaders-bg);
+    background-color: var(--invaders-danger);
+}
+
+.invaders-slider {
+    width: 320px;
+    margin: 10px 0 14px 0;
+}
+
+.invaders-slider > Label {
+    min-width: 90px;
+    color: var(--invaders-text);
+}
+
+/* HUD */
+
+.invaders-hud__bar {
+    flex-direction: row;
+    justify-content: space-between;
+    padding: 14px 36px;
+}
+
+.invaders-hud__stat {
+    align-items: center;
+    min-width: 120px;
+}
+
+.invaders-toasts {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 190px;
+    align-items: center;
+}
+
+.pretzel-toast {
+    margin-top: 6px;
+    padding: 8px 22px;
+    font-size: 22px;
+    letter-spacing: 3px;
+    color: var(--invaders-text);
+    background-color: var(--invaders-panel);
+    border-width: 2px;
+    border-color: var(--invaders-dim);
+    border-radius: 4px;
+}
+
+.pretzel-toast--success {
+    color: var(--invaders-green);
+    border-color: var(--invaders-green);
+}
+
+.pretzel-toast--warning {
+    color: var(--invaders-warning);
+    border-color: var(--invaders-warning);
+}
+
+.pretzel-toast--error {
+    color: var(--invaders-danger);
+    border-color: var(--invaders-danger);
+}
+
+/* Loading screen */
+
+.invaders-loading__bar {
+    width: 420px;
+    margin-top: 18px;
+}
+
+.invaders-loading__bar .unity-progress-bar__background {
+    background-color: rgba(0, 0, 0, 0);
+    border-color: var(--invaders-green);
+}
+
+.invaders-loading__bar .unity-progress-bar__progress {
+    background-color: var(--invaders-green);
+}
+
+.invaders-loading__bar .unity-progress-bar__title {
+    color: var(--invaders-text);
+}

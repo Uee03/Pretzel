@@ -43,6 +43,20 @@ void Update()
 
 `DisposableAction` runs an action once on `Dispose`, which turns any unregister call into an `IDisposable`.
 
+`CompositeDisposable` is a bag for the subscriptions an owner makes. Add each `IDisposable` a subscribe call returns, then dispose the bag once; items are disposed in reverse order, and one that throws is logged without stopping the rest. `Clear()` disposes the items and keeps the bag usable (subscribe on enable, clear on disable), and an item added after `Dispose` is disposed at once.
+
+```csharp
+private readonly CompositeDisposable _subscriptions = new();
+
+void Start()
+{
+    _bus.Subscribe<InvaderDestroyed>(OnDestroyed).AddTo(_subscriptions);
+    _bus.Subscribe<WaveCleared>(OnCleared).AddTo(_subscriptions);
+}
+
+void OnDestroy() => _subscriptions.Dispose();
+```
+
 ## Sample
 
 `Samples~/CoreUsage`: a game session, a music player and a scene director.

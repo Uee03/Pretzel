@@ -15,16 +15,28 @@ namespace Pretzel.Pooling
     /// </summary>
     public sealed class ComponentPool<T> : IComponentPool<T> where T : Component
     {
+        private static readonly Predicate<T> _isDestroyed = item => !item;
+
         private readonly T _prefab;
         private readonly Transform _parent;
         private readonly ObjectPool<T> _pool;
+        private readonly HashSet<T> _active = new();
         private bool _disposed;
 
-        public int CountActive => _pool.CountActive;
+        /// <summary>Taken instances that still exist. Instances destroyed while taken, for example by a scene unload, are not counted.</summary>
+        public int CountActive
+        {
+            get
+            {
+                _active.RemoveWhere(_isDestroyed);
+                return _active.Count;
+            }
+        }
 
+        /// <summary>Idle instances. One destroyed from outside while idle is counted until the next Get or Prewarm skips it.</summary>
         public int CountInactive => _pool.CountInactive;
 
-        public int CountAll => _pool.CountAll;
+        public int CountAll => CountActive + CountInactive;
 
         public T Prefab => _prefab;
 
@@ -55,17 +67,20 @@ namespace Pretzel.Pooling
             Guard.NotDestroyed(item, nameof(item));
             if (_disposed)
             {
+                _active.Remove(item);
                 OnDestroyItem(item);
                 return;
             }
 
             _pool.Release(item);
+            _active.Remove(item);
         }
 
         /// <summary>Creates idle instances until at least <paramref name="count"/> are available.</summary>
         public void Prewarm(int count)
         {
             ThrowIfDisposed();
+            DropDestroyedIdle();
             int missing = count - _pool.CountInactive;
             if (missing <= 0)
             {
@@ -127,9 +142,36 @@ namespace Pretzel.Pooling
             }
 
             item.GetComponent<PooledObject>().MarkTaken();
+            _active.Add(item);
             item.gameObject.SetActive(true);
             Notify(item, true);
             return item;
+        }
+
+        private void DropDestroyedIdle()
+        {
+            int idle = _pool.CountInactive;
+            List<T> live = ListPool<T>.Get();
+            try
+            {
+                for (int i = 0; i < idle; i++)
+                {
+                    T item = _pool.Get();
+                    if (item)
+                    {
+                        live.Add(item);
+                    }
+                }
+
+                foreach (T item in live)
+                {
+                    _pool.Release(item);
+                }
+            }
+            finally
+            {
+                ListPool<T>.Release(live);
+            }
         }
 
         private T Create()

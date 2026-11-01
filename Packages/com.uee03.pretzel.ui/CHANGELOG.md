@@ -6,6 +6,8 @@ All notable changes to this package are documented here. The format follows [Kee
 
 ### Added
 
+- `ToastService` ships a default look (`Resources/Pretzel/UI/PretzelToast.uss`), added to the panel root with the lowest priority so your own `pretzel-toast` rules win. Pass `useDefaultStyle: false` to skip it.
+
 - Editor-tool samples: Editor Windows (basics, group boxes, lists, tabs, tables, dashboard), Custom Inspectors (default layout plus extras, fully custom, components, ScriptableObjects, multi-object) and Property Drawers (basic, intermediate and advanced levels).
 
 ### Changed

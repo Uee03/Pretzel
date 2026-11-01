@@ -1,0 +1,29 @@
+{
+  "name": "SpaceInvaders.Runtime",
+  "rootNamespace": "SpaceInvaders",
+  "references": [
+    "Pretzel.Core",
+    "Pretzel.Extensions",
+    "Pretzel.Tween",
+    "Pretzel.Data",
+    "Pretzel.Events",
+    "Pretzel.Pooling",
+    "Pretzel.Audio",
+    "Pretzel.UI",
+    "Pretzel.Scenes",
+    "Pretzel.Preferences",
+    "Pretzel.DevConsole",
+    "Pretzel.Integrations.VContainer",
+    "VContainer",
+    "Unity.InputSystem"
+  ],
+  "includePlatforms": [],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": true,
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": false
+}

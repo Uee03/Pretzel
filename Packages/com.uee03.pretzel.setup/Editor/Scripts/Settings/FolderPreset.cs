@@ -30,13 +30,13 @@ namespace Pretzel.Setup.Settings
 
         public static IReadOnlyList<FolderPreset> CreateDefaults()
         {
-            string[] scripts = { Scripts + "/Editor", Scripts + "/Runtime" };
+            string[] scripts = { Scripts + "/Editor", Scripts + "/Runtime", Scripts + "/Tests" };
 
             return new List<FolderPreset>
             {
                 Create(Game, scripts,
                     "Animations", "Art/Materials", "Art/Models", "Art/Shaders", "Art/Sprites", "Art/Textures",
-                    "Audio/BGM", "Audio/SFX", "Prefabs", "Scenes", "ScriptableObjects", "Settings", "UI/Fonts", "UI/Icons"),
+                    "Audio/BGM", "Audio/SFX", "Prefabs", "Scenes", "ScriptableObjects", "Settings", "UI/Fonts", "UI/Icons", "UI/Layouts", "UI/Styles"),
                 Create(Tool, scripts,
                     "Documentation", "Prefabs", "Samples", "Scenes", "ScriptableObjects", "Settings", "UI/Icons", "UI/Layouts", "UI/Styles"),
                 Create(Systems, scripts,

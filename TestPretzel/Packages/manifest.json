@@ -89,6 +89,7 @@
     "com.uee03.pretzel.core",
     "com.uee03.pretzel.data",
     "com.uee03.pretzel.devconsole",
+    "com.uee03.pretzel.editor",
     "com.uee03.pretzel.events",
     "com.uee03.pretzel.extensions",
     "com.uee03.pretzel.multiplayer",

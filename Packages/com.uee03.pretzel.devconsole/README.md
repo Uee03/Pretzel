@@ -13,6 +13,9 @@ GameObject. Press the back-quote key or call `Toggle()`.
 - Logs from any thread are captured into a ring buffer of **Capacity** entries. Filters show logs, warnings and errors;
   the toolbar shows counts. The list is virtualized, so a full buffer stays cheap.
 - Enter runs a command, Up and Down browse the history.
+- The controls get a dark default look from `Resources/Pretzel/DevConsole/PretzelDevConsole.uss`. Assign your own
+  `StyleSheet` to **Style Sheet** to replace it; the elements carry `pretzel-dev-console`, `__toolbar`, `__filter`, `__list`,
+  `__row` and `__input` classes.
 
 ## Commands
 

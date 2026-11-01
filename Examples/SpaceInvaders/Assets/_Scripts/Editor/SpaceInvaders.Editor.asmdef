@@ -1,0 +1,27 @@
+{
+  "name": "SpaceInvaders.Editor",
+  "rootNamespace": "SpaceInvaders.Editor",
+  "references": [
+    "SpaceInvaders.Runtime",
+    "Pretzel.Core",
+    "Pretzel.Audio",
+    "Pretzel.Pooling",
+    "Pretzel.Scenes",
+    "Pretzel.DevConsole",
+    "Pretzel.UI",
+    "Pretzel.UI.Editor",
+    "Pretzel.Integrations.VContainer",
+    "VContainer"
+  ],
+  "includePlatforms": [
+    "Editor"
+  ],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": false,
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": false
+}
